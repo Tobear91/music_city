@@ -1,0 +1,35 @@
+# Node modules (front & back)
+**/node_modules/
+**/dist/
+**/build/
+
+# Env files
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# OS/IDE-specific
+.DS_Store
+.vscode/
+.idea/
+
+# Next.js / Vite / Turbo / etc.
+.next/
+.turbo/
+.cache/
+out/
+
+# Test coverage
+coverage/
+
+# Optional: Yarn & lock files (si tu ne veux versionner qu'un seul yarn.lock global)
+**/yarn.lock
+
+# Misc
+*.tsbuildinfo
