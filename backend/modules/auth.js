@@ -1,0 +1,21 @@
+const RefreshToken = require("../models/refreshTokens");
+const jwt = require("jsonwebtoken");
+const moment = require("moment");
+
+const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
+const JWT_REFRESH_KEY = process.env.JWT_REFRESH_KEY;
+
+const generateAccessToken = (email) => {
+  return jwt.sign({ email }, JWT_PRIVATE_KEY, { expiresIn: "1hour" });
+};
+
+const generateRefreshToken = (email) => {
+  return jwt.sign({ email }, JWT_REFRESH_KEY, { expiresIn: "1day" });
+};
+
+const saveRefreshToken = async (refresh_token, email) => {
+  await RefreshToken.deleteOne({ email });
+  await RefreshToken.create({ refresh_token, email, expiredAt: moment().add(1, "day").toDate() });
+};
+
+module.exports = { generateAccessToken, generateRefreshToken, saveRefreshToken };

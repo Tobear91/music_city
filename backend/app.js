@@ -12,6 +12,7 @@ const swaggerUi = require("swagger-ui-express");
 const errorHandler = require("./middlewares/error");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
+const spotifyRouter = require("./routes/spotify");
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/spotify", spotifyRouter);
 app.use(errorHandler);
 
 module.exports = app;

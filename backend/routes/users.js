@@ -1,14 +1,11 @@
-const RefreshToken = require("../models/refreshTokens");
+const { generateAccessToken, generateRefreshToken, saveRefreshToken } = require("../modules/auth");
+const { generateSimpleToken } = require("../modules/spotify");
 const { checkBody } = require("../modules/helpers");
 const User = require("../models/users");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const moment = require("moment");
 const router = express.Router();
-
-const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
-const JWT_REFRESH_KEY = process.env.JWT_REFRESH_KEY;
 
 /**
  * @swagger
@@ -87,6 +84,28 @@ router.post("/signup", async (req, res, next) => {
       password: bcrypt.hashSync(password, 10),
     });
 
+    // Generate tokens
+    const access_token = generateAccessToken(user.email);
+    const refresh_token = generateRefreshToken(user.email);
+    saveRefreshToken(refresh_token, email);
+
+    // Save le refresh token en cookie HTTP-only
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: moment().add(1, "day").diff(moment()),
+    });
+
+    user = {
+      email,
+      access_token,
+      spotify: {
+        type: "simple",
+        access_token: await generateSimpleToken(),
+      },
+    };
+
     res.json({ result: true, user });
   } catch (error) {
     next(error);
@@ -155,23 +174,25 @@ router.post("/login", async (req, res, next) => {
     if (!user || (user && !bcrypt.compareSync(password, user.password))) throw Object.assign(new Error("Unauthorized"), { status: 401 });
 
     // Generate tokens
-    const access_token = jwt.sign({ email }, JWT_PRIVATE_KEY, { expiresIn: "20s" });
-    const refreshToken = jwt.sign({ email }, JWT_REFRESH_KEY, { expiresIn: "1m" });
-
-    const expiresAt = moment().add(7, "days").toDate();
-    await RefreshToken.create({ token: refreshToken, userEmail: email, expiresAt });
+    const access_token = generateAccessToken(email);
+    const refresh_token = generateRefreshToken(email);
+    saveRefreshToken(refresh_token, email);
 
     // Save le refresh token en cookie HTTP-only
-    res.cookie("refresh_token", refreshToken, {
+    res.cookie("refresh_token", refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: moment().add(7, "days").diff(moment()),
+      maxAge: moment().add(1, "day").diff(moment()),
     });
 
     user = {
       email,
       access_token,
+      spotify: {
+        type: "simple",
+        access_token: await generateSimpleToken(),
+      },
     };
 
     res.json({ result: true, user });
