@@ -87,10 +87,10 @@ router.post("/signup", async (req, res, next) => {
     // Generate tokens
     const access_token = generateAccessToken(user.email);
     const refresh_token = generateRefreshToken(user.email);
-    saveRefreshToken(refresh_token, email);
+    saveRefreshToken(refresh_token, "app", email);
 
     // Save le refresh token en cookie HTTP-only
-    res.cookie("refresh_token", refresh_token, {
+    res.cookie("app_refresh_token", refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",

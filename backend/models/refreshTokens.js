@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const refreshTokenSchema = new mongoose.Schema(
   {
     refresh_token: String,
+    type: String,
     email: String,
     expiresAt: Date,
   },

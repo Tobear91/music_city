@@ -13,9 +13,8 @@ const generateRefreshToken = (email) => {
   return jwt.sign({ email }, JWT_REFRESH_KEY, { expiresIn: "1day" });
 };
 
-const saveRefreshToken = async (refresh_token, email) => {
-  await RefreshToken.deleteOne({ email });
-  await RefreshToken.create({ refresh_token, email, expiredAt: moment().add(1, "day").toDate() });
+const saveRefreshToken = async (refresh_token, type, email) => {
+  await RefreshToken.create({ refresh_token, type, email, expiredAt: moment().add(1, "day").toDate() });
 };
 
 module.exports = { generateAccessToken, generateRefreshToken, saveRefreshToken };
