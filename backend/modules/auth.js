@@ -14,6 +14,7 @@ const generateRefreshToken = (email) => {
 };
 
 const saveRefreshToken = async (refresh_token, type, email) => {
+  await RefreshToken.deleteOne({ type, email });
   await RefreshToken.create({ refresh_token, type, email, expiredAt: moment().add(1, "day").toDate() });
 };
 

@@ -33,4 +33,17 @@ const generateUserToken = async (code) => {
   return await requestToken(body);
 };
 
-module.exports = { requestToken, generateSimpleToken, generateUserToken };
+const getUser = async (spotify_access_token) => {
+  const url = "https://api.spotify.com/v1/me";
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${spotify_access_token}`,
+    },
+  };
+
+  const response = await fetch(url, options);
+  return await response.json();
+};
+
+module.exports = { requestToken, generateSimpleToken, generateUserToken, getUser };

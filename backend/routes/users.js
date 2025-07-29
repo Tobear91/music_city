@@ -4,7 +4,6 @@ const { checkBody } = require("../modules/helpers");
 const User = require("../models/users");
 const bcrypt = require("bcryptjs");
 const express = require("express");
-const moment = require("moment");
 const router = express.Router();
 
 /**
@@ -89,14 +88,6 @@ router.post("/signup", async (req, res, next) => {
     const refresh_token = generateRefreshToken(user.email);
     saveRefreshToken(refresh_token, "app", email);
 
-    // Save le refresh token en cookie HTTP-only
-    res.cookie("app_refresh_token", refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: moment().add(1, "day").diff(moment()),
-    });
-
     user = {
       email,
       access_token,
@@ -177,14 +168,6 @@ router.post("/login", async (req, res, next) => {
     const access_token = generateAccessToken(email);
     const refresh_token = generateRefreshToken(email);
     saveRefreshToken(refresh_token, email);
-
-    // Save le refresh token en cookie HTTP-only
-    res.cookie("refresh_token", refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: moment().add(1, "day").diff(moment()),
-    });
 
     user = {
       email,
