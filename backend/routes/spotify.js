@@ -1,6 +1,6 @@
-const { generateAccessToken, generateRefreshToken, saveRefreshToken } = require("../modules/auth");
-const { generateUserToken, getUser } = require("../modules/spotify");
+const spotify = require("../modules/spotify");
 const querystring = require("querystring");
+const auth = require("../modules/auth");
 const User = require("../models/users");
 const express = require("express");
 const bcrypt = require("bcryptjs");
@@ -38,9 +38,9 @@ router.get("/callback", async (req, res, next) => {
   try {
     if (req.query.error) throw Object.assign(new Error("Access Denied"), { status: 403 });
     const { code } = req.query;
-    let datas = await generateUserToken(code);
+    let datas = await spotify.generateUserToken(code);
     const { access_token: spotify_access_token, refresh_token: spotify_refresh_token } = datas;
-    const spotify_user = await getUser(spotify_access_token);
+    const spotify_user = await spotify.getUser(spotify_access_token);
     const { email, product } = spotify_user;
 
     // Creation de l'utilisateur ... ou pas
@@ -55,10 +55,10 @@ router.get("/callback", async (req, res, next) => {
     }
 
     // Generate tokens
-    const app_access_token = generateAccessToken(user.email);
-    const app_refresh_token = generateRefreshToken(user.email);
-    saveRefreshToken(app_refresh_token, "app", email);
-    saveRefreshToken(spotify_refresh_token, "spotify", email);
+    const app_access_token = auth.generateAccessToken(user.email);
+    const app_refresh_token = auth.generateRefreshToken(user.email);
+    auth.saveRefreshToken(app_refresh_token, "app", email);
+    auth.saveRefreshToken(spotify_refresh_token, "spotify", email);
 
     const newUser = {
       email,

@@ -1,7 +1,7 @@
-const { generateAccessToken, generateRefreshToken, saveRefreshToken } = require("../modules/auth");
-const { generateSimpleToken } = require("../modules/spotify");
+const spotify = require("../modules/spotify");
 const { checkBody } = require("../modules/helpers");
 const User = require("../models/users");
+const auth = require("../modules/auth");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
@@ -84,16 +84,16 @@ router.post("/signup", async (req, res, next) => {
     });
 
     // Generate tokens
-    const access_token = generateAccessToken(user.email);
-    const refresh_token = generateRefreshToken(user.email);
-    saveRefreshToken(refresh_token, "app", email);
+    const access_token = auth.generateAccessToken(user.email);
+    const refresh_token = auth.generateRefreshToken(user.email);
+    auth.saveRefreshToken(refresh_token, "app", email);
 
     user = {
       email,
       access_token,
       spotify: {
         type: "simple",
-        access_token: await generateSimpleToken(),
+        access_token: await spotify.generateSimpleToken(),
       },
     };
 
@@ -165,16 +165,16 @@ router.post("/login", async (req, res, next) => {
     if (!user || (user && !bcrypt.compareSync(password, user.password))) throw Object.assign(new Error("Unauthorized"), { status: 401 });
 
     // Generate tokens
-    const access_token = generateAccessToken(email);
-    const refresh_token = generateRefreshToken(email);
-    saveRefreshToken(refresh_token, email);
+    const access_token = auth.generateAccessToken(email);
+    const refresh_token = auth.generateRefreshToken(email);
+    auth.saveRefreshToken(refresh_token, email);
 
     user = {
       email,
       access_token,
       spotify: {
         type: "simple",
-        access_token: await generateSimpleToken(),
+        access_token: await spotify.generateSimpleToken(),
       },
     };
 
