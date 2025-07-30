@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import styles from "../styles/Home.module.css";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../reducers/user";
+import spotify from "../modules/spotify";
 
 function Home() {
   const router = useRouter();
@@ -20,7 +20,14 @@ function Home() {
   }, [router.isReady]);
 
   useEffect(() => {
-    if (user?.email) router.push("/");
+    (async () => {
+      if (user?.email) router.push("/");
+
+      if (user) {
+        const datas = await spotify.getFollowedArtists(user.spotify.access_token);
+        console.log(datas);
+      }
+    })();
   }, [user]);
 
   const handleLogin = async () => {
@@ -31,7 +38,7 @@ function Home() {
 
   return (
     <>
-      <button onClick={() => handleLogin()}>Login</button>
+      {!user && <button onClick={() => handleLogin()}>Login</button>}
       <h1>{user && user.email}</h1>
     </>
   );
