@@ -1,6 +1,6 @@
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = "http://127.0.0.1:3000/spotify/callback";
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
 
 const requestToken = async (body) => {
   const authHeader = Buffer.from(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`).toString("base64");
@@ -28,7 +28,7 @@ const generateSimpleToken = async () => {
 const generateUserToken = async (code) => {
   const body = new URLSearchParams();
   body.append("code", code);
-  body.append("redirect_uri", REDIRECT_URI);
+  body.append("redirect_uri", SPOTIFY_REDIRECT_URI);
   body.append("grant_type", "authorization_code");
   return await requestToken(body);
 };

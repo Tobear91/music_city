@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const logger = require("morgan");
 const path = require("path");
+const cors = require("cors");
 
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
@@ -15,6 +16,13 @@ const usersRouter = require("./routes/users");
 const spotifyRouter = require("./routes/spotify");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: ["http://localhost:3001", "http://127.0.0.1:3001"],
+    credentials: true,
+  })
+);
 
 // Options Swagger
 const swaggerOptions = {

@@ -1,11 +1,13 @@
 const helpers = require("../modules/helpers");
 const spotify = require("../modules/spotify");
-const User = require("../models/users");
 const auth = require("../modules/auth");
 const bcrypt = require("bcryptjs");
 const express = require("express");
 const moment = require("moment");
 const router = express.Router();
+
+// Models
+const User = require("../models/users");
 
 /**
  * @swagger

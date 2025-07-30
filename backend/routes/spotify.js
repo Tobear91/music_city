@@ -9,7 +9,7 @@ const moment = require("moment");
 const router = express.Router();
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
-const REDIRECT_URI = "http://127.0.0.1:3000/spotify/callback";
+const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
 
 /**
  * @swagger
@@ -33,17 +33,17 @@ router.get("/login", async (req, res, next) => {
 
     const state = generateRandomString(16);
     const scope = "user-read-private user-read-email";
-
-    res.redirect(
+    const redirect_url =
       "https://accounts.spotify.com/authorize?" +
-        querystring.stringify({
-          response_type: "code",
-          client_id: SPOTIFY_CLIENT_ID,
-          scope: scope,
-          redirect_uri: REDIRECT_URI,
-          state: state,
-        })
-    );
+      querystring.stringify({
+        response_type: "code",
+        client_id: SPOTIFY_CLIENT_ID,
+        scope: scope,
+        redirect_uri: SPOTIFY_REDIRECT_URI,
+        state: state,
+      });
+
+    res.json({ redirect_url });
   } catch (error) {
     next(error);
   }
@@ -77,7 +77,6 @@ router.get("/callback", async (req, res, next) => {
     auth.saveRefreshToken(spotify_refresh_token, "spotify", email);
 
     // Generate cookies
-
     res.cookie("app_refresh_token", app_refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -101,7 +100,8 @@ router.get("/callback", async (req, res, next) => {
       },
     };
 
-    res.json({ result: true, user: newUser });
+    const encoded = Buffer.from(JSON.stringify(newUser)).toString("base64");
+    res.redirect(`http://127.0.0.1:3001?user=${encoded}`);
   } catch (error) {
     next(error);
   }
