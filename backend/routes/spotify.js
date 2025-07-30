@@ -5,11 +5,26 @@ const User = require("../models/users");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const moment = require("moment");
 const router = express.Router();
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = "http://127.0.0.1:3000/spotify/callback";
 
+/**
+ * @swagger
+ * /spotify/login:
+ *   get:
+ *     summary: Redirige vers la page d'autorisation Spotify (OAuth2)
+ *     tags: [Spotify]
+ *     description: |
+ *       Démarre le flux d'authentification OAuth2 avec Spotify. Redirige l'utilisateur vers Spotify pour qu'il autorise l'application.
+ *     responses:
+ *       302:
+ *         description: Redirection vers Spotify pour authentification
+ *       500:
+ *         description: Erreur serveur lors de la génération de l'URL d'autorisation
+ */
 router.get("/login", async (req, res, next) => {
   try {
     const generateRandomString = (length) => {
@@ -44,13 +59,14 @@ router.get("/callback", async (req, res, next) => {
     const { email, product } = spotify_user;
 
     // Creation de l'utilisateur ... ou pas
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email, type: "spotify" });
 
     if (!user) {
       // Add user in database
       user = await User.create({
         email,
         password: bcrypt.hashSync(email, 10),
+        type: "spotify",
       });
     }
 
@@ -59,6 +75,22 @@ router.get("/callback", async (req, res, next) => {
     const app_refresh_token = auth.generateRefreshToken(user.email);
     auth.saveRefreshToken(app_refresh_token, "app", email);
     auth.saveRefreshToken(spotify_refresh_token, "spotify", email);
+
+    // Generate cookies
+
+    res.cookie("app_refresh_token", app_refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: moment().add(1, "day").toDate(),
+    });
+
+    res.cookie("spotify_refresh_token", spotify_refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: moment().add(1, "day").toDate(),
+    });
 
     const newUser = {
       email,
