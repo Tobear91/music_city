@@ -33,7 +33,7 @@ function Home() {
   const handleLogin = async () => {
     const response = await fetch("http://127.0.0.1:3000/spotify/login");
     const datas = await response.json();
-    window.location.href = datas.redirect_url;
+    router.push(datas.redirect_url);
   };
 
   return (
