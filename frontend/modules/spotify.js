@@ -13,6 +13,7 @@ const customFetch = async (url) => {
   let response = await fetch(url, options);
   let datas = await response.json();
 
+  // Si le token est expiré on lance le refresh token et on relance le fetch
   if (datas.error?.status === 401) {
     const access_token = await refreshToken();
     store.dispatch(setSpotifyToken(access_token));
@@ -39,12 +40,12 @@ const refreshToken = async () => {
   return datas.access_token;
 };
 
-const getMe = async (token) => {
+const getMe = async () => {
   const url = "https://api.spotify.com/v1/me";
   return await customFetch(url);
 };
 
-const getFollowedArtists = async (token) => {
+const getFollowedArtists = async () => {
   const url = "https://api.spotify.com/v1/me/following?type=artist";
   return await customFetch(url);
 };

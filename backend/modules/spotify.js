@@ -36,7 +36,7 @@ const generateUserToken = async (code) => {
 const refreshUserToken = async (refresh_token) => {
   const body = new URLSearchParams();
   body.append("grant_type", "refresh_token");
-  body.append("refresh_token", refresh_token + "a");
+  body.append("refresh_token", refresh_token);
   return await requestToken(body);
 };
 

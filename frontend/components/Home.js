@@ -22,10 +22,10 @@ function Home() {
   useEffect(() => {
     (async () => {
       if (user?.email) router.push("/");
-      console.log(user);
 
       if (user) {
-        const datas = await spotify.getFollowedArtists(user.spotify.access_token);
+        // Si le user est connecté faire qqch
+        const datas = await spotify.getMe();
         console.log(datas);
       }
     })();
