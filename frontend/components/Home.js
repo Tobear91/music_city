@@ -3,8 +3,27 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../reducers/user";
 import spotify from "../modules/spotify";
+import dynamic from "next/dynamic";
+import { useState } from "react";
+
+// Ce composant sera uniquement rendu côté client
+const PhaserGame = dynamic(() => import("./phaserGame"), {
+  ssr: false, // 
+});
 
 function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+
+
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
@@ -39,7 +58,16 @@ function Home() {
   return (
     <>
       {!user && <button onClick={() => handleLogin()}>Login</button>}
-      <h1>{user && user.email}</h1>
+      {user && <PhaserGame openModal={openModal} />}
+      {isModalOpen && (
+  <div className="modal">
+    <div className="modal-content">
+      <p>Bienvenue à Music City !</p>
+      <button onClick={closeModal}>Fermer</button>
+    </div>
+  </div>
+)}
+
     </>
   );
 }
