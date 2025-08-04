@@ -4,6 +4,9 @@ const nextConfig = {
   images: {
     domains: [],
   },
+  sassOptions: {
+    implementation: "sass-embedded",
+  },
 };
 
 module.exports = nextConfig;

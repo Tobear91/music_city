@@ -1,7 +1,7 @@
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "../modules/store";
 import { Provider } from "react-redux";
-import "../styles/globals.css";
+import "../assets/scss/core/core.scss";
 import Head from "next/head";
 
 function App({ Component, pageProps }) {
