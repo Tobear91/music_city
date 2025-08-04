@@ -107,4 +107,20 @@ router.get("/callback", async (req, res, next) => {
   }
 });
 
+router.post("/refresh-token", async (req, res, next) => {
+  try {
+    const refresh_token = req.cookies.spotify_refresh_token;
+    if (!refresh_token) return next(Object.assign(new Error("Refresh token not found"), { status: 404 }));
+
+    const datas = await spotify.refreshUserToken(refresh_token);
+    const { access_token } = datas;
+
+    // VERIFIER la validité du REFRESH TOKEN
+    res.json({ result: true, access_token });
+  } catch (error) {
+    // OU LOGOUT DIRECT, faut que je vois
+    // next(error);
+  }
+});
+
 module.exports = router;

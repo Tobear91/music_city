@@ -33,6 +33,13 @@ const generateUserToken = async (code) => {
   return await requestToken(body);
 };
 
+const refreshUserToken = async (refresh_token) => {
+  const body = new URLSearchParams();
+  body.append("grant_type", "refresh_token");
+  body.append("refresh_token", refresh_token + "a");
+  return await requestToken(body);
+};
+
 const getUser = async (spotify_access_token) => {
   const url = "https://api.spotify.com/v1/me";
   const options = {
@@ -46,4 +53,4 @@ const getUser = async (spotify_access_token) => {
   return await response.json();
 };
 
-module.exports = { requestToken, generateSimpleToken, generateUserToken, getUser };
+module.exports = { requestToken, generateSimpleToken, generateUserToken, refreshUserToken, getUser };

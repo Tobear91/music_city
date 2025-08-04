@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../reducers/user";
+import { setUser } from "../reducers/user.js";
 import spotify from "../modules/spotify";
 
 function Home() {
@@ -22,13 +22,14 @@ function Home() {
   useEffect(() => {
     (async () => {
       if (user?.email) router.push("/");
+      console.log(user);
 
       if (user) {
         const datas = await spotify.getFollowedArtists(user.spotify.access_token);
         console.log(datas);
       }
     })();
-  }, [user]);
+  }, [user?.email]);
 
   const handleLogin = async () => {
     const response = await fetch("http://127.0.0.1:3000/spotify/login");
