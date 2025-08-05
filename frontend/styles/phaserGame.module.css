@@ -8,7 +8,7 @@
 .modalOverlay {
    
   position: fixed;
-  top: 60px;  /*permet de mettre la modale en dessous le menu */
+  top: 60px;  /*permet de mettre la modale en dessous le menu si on change la bien penser à changer la talille du menu aussi */
   left: 0;
   width: 100%;
   height: calc(100vh - 60px); /*permet de mettre la modale en dessous le menu */
@@ -18,7 +18,6 @@
   align-items: center;
   z-index: 1000;
 }
-
 
 .modal {
   background: purple;
