@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 
 // Ce composant sera uniquement rendu côté client, permet de bouger sur la map et ne pas laisser la carte en static
-const PhaserGame = dynamic(() => import("./phaserGame"), {
+const PhaserGame = dynamic(() => import("./PhaserGame"), {
   ssr: false, // 
 });
 
@@ -47,7 +47,7 @@ function Home() {
   return (
     <>
       {!user && <button onClick={() => handleLogin()}>Login</button>}
-      {user && <PhaserGame />}
+      {user && <PhaserGame/>}
 
 
     </>

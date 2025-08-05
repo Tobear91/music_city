@@ -1,6 +1,6 @@
 import { useEffect, useRef,useState } from "react";
 import Phaser from "phaser";
-import styles from "../styles/phaserGame.module.css"
+import styles from "../styles/PhaserGame.module.css"
 import { preload,update,create } from "../modules/phaser";
 
 
