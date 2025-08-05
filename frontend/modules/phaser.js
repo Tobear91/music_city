@@ -196,10 +196,10 @@ export function update() {
 
     // permet la mise en place des overlay, exempale pour music city ici. 
     const threshold = 50; // rayon de déclenchement
-    const building = this.coordsBuildings.find(b => b.name === 'musicCityBuilding');
+    const buildingSerie = this.coordsBuildings.find(b => b.name === 'serieBuilding');
 
-    if (building) {
-        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, building.xPos, building.yPos);
+    if (buildingSerie) {
+        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, buildingSerie.xPos, buildingSerie.yPos);
         const isInZone = distance < threshold;
 
         if (isInZone && !this.playerWasInZone) {

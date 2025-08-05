@@ -2,19 +2,13 @@ import { useEffect, useRef,useState } from "react";
 import Phaser from "phaser";
 import styles from "../styles/PhaserGame.module.css"
 import { preload,update,create } from "../modules/phaser";
-
-
-
-
-
-
-
+import BlindtestHome from "./BlindTest/BlindtestHome";
 
 const PhaserGame = () => {
  const gameRef = useRef();
 
 
-  const [showModal, setShowModal] = useState(false); // 👈 gestion de la modale
+  const [showModalSerie, setShowModalSerie] = useState(false); //gestion de la modale
 
 
   useEffect(() => {
@@ -38,8 +32,8 @@ const PhaserGame = () => {
     callbacks: {
       preBoot: (game) => {
         // Injecte les fonctions React dans l'instance Phaser
-        game.openModal = () => setShowModal(true);
-        game.closeModal = () => setShowModal(false);
+        game.openModal = () => setShowModalSerie(true);
+        game.closeModal = () => setShowModalSerie(false);
       }
     },
       };
@@ -51,16 +45,9 @@ const PhaserGame = () => {
 
   return (
   <>
-  <header className={styles.menu}> Ceci est le menu </header>
     <div ref={gameRef} className={styles.GameContainer} />
-    {showModal && (
-      <div className={styles.modalOverlay}>
-        <div className={styles.modal}>
-          <h2>Bienvenue à Music City !</h2>
-          <p>Voici une description ou une action possible...</p>
-          <button onClick={() => setShowModal(false)}>Fermer</button>
-        </div>
-      </div>
+    {showModalSerie && (
+      <BlindtestHome onClose={() => setShowModalSerie(false)}></BlindtestHome>
     )}
   </>
 );
