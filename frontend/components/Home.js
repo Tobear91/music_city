@@ -6,23 +6,12 @@ import spotify from "../modules/spotify";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
-// Ce composant sera uniquement rendu côté client
+// Ce composant sera uniquement rendu côté client, permet de bouger sur la map et ne pas laisser la carte en static
 const PhaserGame = dynamic(() => import("./phaserGame"), {
   ssr: false, // 
 });
 
 function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-
 
   const router = useRouter();
   const dispatch = useDispatch();
@@ -58,15 +47,8 @@ function Home() {
   return (
     <>
       {!user && <button onClick={() => handleLogin()}>Login</button>}
-      {user && <PhaserGame openModal={openModal} />}
-      {isModalOpen && (
-  <div className="modal">
-    <div className="modal-content">
-      <p>Bienvenue à Music City !</p>
-      <button onClick={closeModal}>Fermer</button>
-    </div>
-  </div>
-)}
+      {user && <PhaserGame />}
+
 
     </>
   );
