@@ -72,21 +72,13 @@ router.get("/callback", async (req, res, next) => {
 
     // Generate tokens
     const app_access_token = auth.generateAccessToken(user.email);
-    const app_refresh_token = auth.generateRefreshToken(user.email);
 
     // Generate cookies
-    res.cookie("app_refresh_token", app_refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: moment().add(1, "day").toDate(),
-    });
-
     res.cookie("spotify_refresh_token", spotify_refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: moment().add(1, "day").toDate(),
+      expires: moment().add(1, "year").toDate(),
     });
 
     const newUser = {
@@ -99,7 +91,7 @@ router.get("/callback", async (req, res, next) => {
     };
 
     const encoded = Buffer.from(JSON.stringify(newUser)).toString("base64");
-    res.redirect(`http://127.0.0.1:3001?user=${encoded}`);
+    res.redirect(`http://127.0.0.1:3001/connexion?user=${encoded}`);
   } catch (error) {
     next(error);
   }
@@ -108,12 +100,21 @@ router.get("/callback", async (req, res, next) => {
 router.post("/refresh-token", async (req, res, next) => {
   try {
     const refresh_token = req.cookies.spotify_refresh_token;
-    if (!refresh_token) return next(Object.assign(new Error("Refresh token not found"), { status: 404 }));
-    const datas = await spotify.refreshUserToken(refresh_token);
+    if (!refresh_token) throw Object.assign(new Error("Refresh token not found"), { status: 404 });
+
+    const { type } = req.body;
+    let datas = {};
+
+    if (type === "simple") {
+      datas = await spotify.generateSimpleToken();
+    } else {
+      datas = await spotify.refreshUserToken(refresh_token);
+    }
+
     const { access_token } = datas;
     res.json({ result: true, access_token });
   } catch (error) {
-    next(error);
+    res.json({ result: false, logout: true });
   }
 });
 
