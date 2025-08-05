@@ -51,6 +51,7 @@ const PhaserGame = () => {
 
   return (
   <>
+  <header className={styles.menu}> Ceci est le menu </header>
     <div ref={gameRef} className={styles.GameContainer} />
     {showModal && (
       <div className={styles.modalOverlay}>
