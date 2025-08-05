@@ -1,0 +1,56 @@
+@import "./variables.scss";
+
+*:focus {
+  outline: none;
+}
+
+.form-input {
+  height: 56px;
+  box-sizing: border-box;
+  border: 1px solid #e5e6e7;
+  border-radius: 8px;
+  color: $purple;
+  font-weight: 400;
+  font-size: 1.6rem;
+  padding: 10px 20px;
+}
+
+.form-button {
+  width: 100%;
+  height: 56px;
+  font-weight: 600;
+  font-size: 1.6rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+
+  &.primary {
+    background-color: $purple;
+    color: $pink;
+    position: relative;
+
+    svg {
+      position: absolute;
+      right: 20px;
+    }
+
+    &:hover {
+      background-color: $pink;
+      color: $purple;
+      transition: all 0.2s ease-in;
+    }
+  }
+
+  &.spotify {
+    background-color: $spotify;
+    color: #ffffff;
+    position: relative;
+
+    svg {
+      position: absolute;
+      right: 20px;
+    }
+  }
+}
