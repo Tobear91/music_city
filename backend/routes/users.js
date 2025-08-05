@@ -3,7 +3,6 @@ const spotify = require("../modules/spotify");
 const auth = require("../modules/auth");
 const bcrypt = require("bcryptjs");
 const express = require("express");
-const moment = require("moment");
 const router = express.Router();
 
 // Models
@@ -73,15 +72,16 @@ const User = require("../models/users");
 router.post("/signup", async (req, res, next) => {
   try {
     // Check fields are missing
-    if (!helpers.checkBody(req.body, ["email", "password"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
-    const { email, password } = req.body;
+    if (!helpers.checkBody(req.body, ["pseudo", "email", "password"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
+    const { email, password, pseudo } = req.body;
 
     // Check user in database
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email, type: "app" });
     if (user) throw Object.assign(new Error("User already exist"), { status: 409 });
 
     // Add user in database
     user = await User.create({
+      pseudo,
       email,
       password: bcrypt.hashSync(password, 10),
       type: "app",
@@ -89,18 +89,9 @@ router.post("/signup", async (req, res, next) => {
 
     // Generate tokens
     const access_token = auth.generateAccessToken(user.email);
-    const refresh_token = auth.generateRefreshToken(user.email);
-    auth.saveRefreshToken(refresh_token, "app", email);
-
-    // Generate cookies
-    res.cookie("app_refresh_token", refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: moment().add(1, "day").toDate(),
-    });
 
     user = {
+      pseudo,
       email,
       access_token,
       spotify: {
@@ -178,16 +169,6 @@ router.post("/login", async (req, res, next) => {
 
     // Generate tokens
     const access_token = auth.generateAccessToken(email);
-    const refresh_token = auth.generateRefreshToken(email);
-    auth.saveRefreshToken(refresh_token, email);
-
-    // Generate cookies
-    res.cookie("app_refresh_token", refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: moment().add(1, "day").toDate(),
-    });
 
     user = {
       email,

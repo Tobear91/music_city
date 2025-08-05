@@ -1,0 +1,41 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../reducers/user.js";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+
+function Spotify() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    if (router.query.user) {
+      const jsonString = atob(router.query.user);
+      const datas = JSON.parse(jsonString);
+      dispatch(setUser(datas));
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
+    if (user?.email) router.push("/");
+  }, [user?.email]);
+
+  const handleLogin = async () => {
+    const response = await fetch("http://127.0.0.1:3000/spotify/login");
+    const datas = await response.json();
+    router.push(datas.redirect_url);
+  };
+
+  return (
+    <button className="form-button spotify" onClick={() => handleLogin()}>
+      Spotify
+      <FontAwesomeIcon icon={faArrowRight} />
+    </button>
+  );
+}
+
+export default Spotify;
