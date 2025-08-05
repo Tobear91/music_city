@@ -1,43 +1,55 @@
 import { store } from "./store";
-import { setSpotifyToken } from "../reducers/user";
+import { setUser, setSpotifyToken } from "../reducers/user";
+import { useRouter } from "next/router";
 
 const customFetch = async (url) => {
   const user = store.getState().user.user;
 
-  let options = {
+  const options = {
     headers: {
       Authorization: `Bearer ${user.spotify.access_token}`,
     },
   };
 
-  let response = await fetch(url, options);
-  let datas = await response.json();
+  const response = await fetch(url, options);
+  const datas = await response.json();
 
   // Si le token est expiré on lance le refresh token et on relance le fetch
   if (datas.error?.status === 401) {
-    const access_token = await refreshToken();
+    const access_token = await refreshToken(user.spotify.type);
     store.dispatch(setSpotifyToken(access_token));
 
-    let options = {
+    const options = {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
     };
 
-    let response = await fetch(url, options);
+    const response = await fetch(url, options);
     return await response.json();
   } else {
     return datas;
   }
 };
 
-const refreshToken = async () => {
+const refreshToken = async (type) => {
   const response = await fetch("http://127.0.0.1:3000/spotify/refresh-token", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type }),
     credentials: "include",
   });
+
   const datas = await response.json();
-  return datas.access_token;
+  console.log(datas);
+
+  if (!datas.result && datas.logout) {
+    const router = useRouter();
+    store.dispatch(setUser({}));
+    router.push("/connexion");
+  } else {
+    return datas.access_token;
+  }
 };
 
 const getMe = async () => {

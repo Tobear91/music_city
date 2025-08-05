@@ -1,8 +1,9 @@
 @import "../core/variables.scss";
 
-.connexion {
+.inscription {
   height: 100vh;
   display: flex;
+  color: $purple;
 
   & > * {
     flex: 1;
@@ -43,8 +44,13 @@
     }
 
     p {
-      color: red;
       margin-bottom: 20px;
+      line-height: 24px;
+
+      & + p {
+        color: red;
+        margin-bottom: 20px;
+      }
     }
 
     form {
