@@ -1,18 +1,19 @@
-const axios = require("axios");
 const cheerio = require("cheerio");
+
+// possible d'utiliser jsdom pour simuler un DOM coté serveur mais cheerio est plus léger et plus rapide pour le scraping - egalement plus safe pour du scraping public car il n'exécute pas de JS
 
 async function scraperLyrics(artiste, titre) {
   // Sécurité supplémentaire: filtre les caractères spéciaux
   if (!/^[a-z0-9]+$/i.test(artiste) || !/^[a-z0-9]+$/i.test(titre)) {
-    throw new Error;
+    throw new Error();
   }
   const url = `https://www.azlyrics.com/lyrics/${artiste}/${titre}.html`;
   try {
     // Télécharger le HTML
-    const response = await axios.get(url);
-    const html = response.data;
+    const response = await fetch(url);
+    const html = await response.text();
 
-    // Charger le HTML avec cheerio - creation d'un DOM coté serveur
+    // Charger le HTML avec cheerio - creation d'un DOM coté serveur 
     const queryDOM = cheerio.load(html);
 
     // Sélectionner l'élément souhaité et formater
@@ -23,22 +24,10 @@ async function scraperLyrics(artiste, titre) {
       .text()
       .trim();
 
-
     return lyrics;
-
-
   } catch (error) {
     console.error("Erreur lors du scraping :", error.message);
   }
 }
 
 module.exports = scraperLyrics;
-
-
-
-    //Lister les div
-    // lyrics.each(function (index, element) {
-    //   // 'this' ou 'element' correspond à chaque div dans la sélection
-    //   const divText = parsing(this).text().trim();
-    //   console.log(`Div #${index + 1} :`, divText);
-    // });

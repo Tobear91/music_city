@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const scraperLyrics = require("../modules/MusicLab/getlyricsgetlyrics");
+const scraperLyrics = require("../modules/MusicLab/getlyrics");
 
 const Track = require("../models/tracks");
 
