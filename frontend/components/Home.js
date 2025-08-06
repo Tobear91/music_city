@@ -19,6 +19,7 @@ function Home() {
 
   return (
     <>
+    
       {user && <PhaserGame/>}
 
     </>
