@@ -1,185 +1,132 @@
-//mélanger un tableau
-function shuffleArray(array) {
-  return [...array].sort(() => Math.random() - 0.5);
-}
+export async function getQuestions(spotifyAccessToken) {
+  // Fonction pour mélanger
+  const shuffleArray = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
-// Mélanger les questions et en garder 10
-export const myQuestions = shuffleArray([
-  // Par artistes
-  {
-    question: "Qui chante 'Dynamite' ?",
-    options: ["BTS", "Blackpink", "Twice", "EXO"],
-    correctAnswer: "BTS",
-    
-  },
-  {
-    question: "Quel artiste a sorti 'Levitating' ?",
-    options: ["Dua Lipa", "Doja Cat", "Ariana Grande", "Billie Eilish"],
-    correctAnswer: "Dua Lipa",
-    
-  },
-  {
-    question: "Qui chante 'Thriller' ?",
-    options: ["Prince", "Michael Jackson", "Stevie Wonder", "James Brown"],
-    correctAnswer: "Michael Jackson",
-    
-  },
-  
-  // Albums
-  {
-    question: "De quel album provient 'Bohemian Rhapsody' ?",
-    options: ["A Night at the Opera", "News of the World", "The Game", "Jazz"],
-    correctAnswer: "A Night at the Opera",
-    
-  },
-  {
-    question: "Quel est l'album de debut de Billie Eilish ?",
-    options: ["When We All Fall Asleep, Where Do We Go?", "Happier Than Ever", "dont smile at me", "Guitar Songs"],
-    correctAnswer: "When We All Fall Asleep, Where Do We Go?",
+  try {
 
-  },
-  {
-    question: "Dans quel album trouve-t-on 'Shape of You' ?",
-    options: ["÷ (Divide)", "× (Multiply)", "+ (Plus)", "= (Equals)"],
-    correctAnswer: "÷ (Divide)",
-    
-  },
+    const response = await fetch(
+      `https://api.spotify.com/v1/me/top/tracks?limit=50`,
+      {
+        headers: { Authorization: `Bearer ${spotifyAccessToken}` },
+      }
+    );
 
-  // Années de sortie
-  {
-    question: "En quelle année 'Thriller' de Michael Jackson est-il sorti ?",
-    options: ["1982", "1983", "1981", "1984"],
-    correctAnswer: "1982",
-  },
-  {
-    question: "Quelle chanson de The Weeknd est sortie en 2019 ?",
-    options: ["Blinding Lights", "Starboy", "The Hills", "Can't Feel My Face"],
-    correctAnswer: "Blinding Lights",
-    
-  },
-  {
-    question: "En quelle décennie 'Stayin' Alive' des Bee Gees est-il sorti ?",
-    options: ["1970s", "1980s", "1960s", "1990s"],
-    correctAnswer: "1970s",
-    
-  },
+    const { items: tracks } = await response.json();
 
-  // Questions sur la durée des morceaux
-  {
-    question: "Quelle chanson dure approximativement 6 minutes ?",
-    options: ["Bohemian Rhapsody - Queen", "Shape of You - Ed Sheeran", "Bad Guy - Billie Eilish", "Dynamite - BTS"],
-    correctAnswer: "Bohemian Rhapsody - Queen",
-    
-  },
-  {
-    question: "Parmi ces morceaux, lequel est le plus court (environ 2min30) ?",
-    options: ["Bad Guy - Billie Eilish", "Thriller - Michael Jackson", "Bohemian Rhapsody - Queen", "Hotel California - Eagles"],
-    correctAnswer: "Bad Guy - Billie Eilish",
-    
-  },
+    // garde les tracks qui ont un nom, un artiste et un nom d'album valide
+    const validTracks = tracks.filter(
+      (track) => track?.name && track.artists?.[0]?.name && track.album?.name
+    );
 
-  // Questions sur les genres musicaux
-  {
-    question: "Quel genre musical correspond le mieux à 'Stayin' Alive' ?",
-    options: ["Disco", "Rock", "Pop", "Funk"],
-    correctAnswer: "Disco",
-    
-  },
-  {
-    question: "BTS appartient principalement à quel genre ?",
-    options: ["K-Pop", "J-Pop", "Pop", "Hip-Hop"],
-    correctAnswer: "K-Pop",
-    
-  },
-  {
-    question: "Quel genre caractérise le mieux Eminem ?",
-    options: ["Hip-Hop/Rap", "Pop", "Rock", "R&B"],
-    correctAnswer: "Hip-Hop/Rap",
-    
-  },
+    const shuffledTracks = shuffleArray(validTracks);
 
-  // Questions sur la popularité/charts
-  {
-    question: "Quelle chanson a atteint le #1 au Billboard Hot 100 en 2020 ?",
-    options: ["Blinding Lights - The Weeknd", "Drivers License - Olivia Rodrigo", "As It Was - Harry Styles", "Bad Guy - Billie Eilish"],
-    correctAnswer: "Blinding Lights - The Weeknd",
-    
-  },
-  {
-    question: "Quel artiste a eu le plus de streams sur Spotify en 2021 ?",
-    options: ["Bad Bunny", "Taylor Swift", "BTS", "Drake"],
-    correctAnswer: "Bad Bunny",
-    
-  },
+    // générer 4 options de choix
+    const generateAnswers = (correct, type, currentTrack) => {
+      const options = new Set([correct]);
+      const maxAttempts = 20;
+      let attempts = 0;
 
-  // Questions sur les collaborations
-  {
-    question: "Qui collabore avec Dua Lipa sur 'Cold Heart' ?",
-    options: ["Elton John", "Ed Sheeran", "Calvin Harris", "The Weeknd"],
-    correctAnswer: "Elton John",
-    
-  },
-  {
-    question: "Lady Gaga a collaboré avec quel artiste sur 'Rain on Me' ?",
-    options: ["Ariana Grande", "Beyoncé", "Taylor Swift", "Dua Lipa"],
-    correctAnswer: "Ariana Grande",
-    
-  },
+      while (options.size < 4 && attempts < maxAttempts) {
+        attempts++;
+        const randomTrack =
+          shuffledTracks[Math.floor(Math.random() * shuffledTracks.length)];
+        if (randomTrack.id === currentTrack.id) continue;
 
-  // Questions sur les caractéristiques audio (danceability, energy, etc.)
-  {
-    question: "Parmi ces morceaux, lequel a le plus haut niveau de 'danceability' ?",
-    options: ["Levitating - Dua Lipa", "Someone Like You - Adele", "Bohemian Rhapsody - Queen", "Hello - Adele"],
-    correctAnswer: "Levitating - Dua Lipa",
-    
-  },
-  {
-    question: "Quel morceau a un niveau d'énergie élevé ?",
-    options: ["Dynamite - BTS", "Someone Like You - Adele", "The Sound of Silence - Simon & Garfunkel", "Mad World - Gary Jules"],
-    correctAnswer: "Dynamite - BTS",
-    
-  },
+        let potentialOption;
+        switch (type) {
+          case "artist":
+            potentialOption = randomTrack.artists[0]?.name;
+            break;
+          case "album":
+            potentialOption = randomTrack.album?.name;
+            break;
+          case "title":
+            potentialOption = randomTrack.name;
+            break;
+          case "year":
+            potentialOption = randomTrack.album.release_date?.split("-")[0];
+            break;
+          default:
+            potentialOption = "";
+        }
 
-  // Questions sur les labels/maisons de disques
-  {
-    question: "Sur quel label Queen a-t-il sorti ses premiers albums ?",
-    options: ["EMI", "Warner Bros", "Universal", "Sony"],
-    correctAnswer: "EMI",
-  },
-  {
-    question: "BTS est signé sur quel label ?",
-    options: ["Big Hit Entertainment", "SM Entertainment", "YG Entertainment", "JYP Entertainment"],
-    correctAnswer: "Big Hit Entertainment",
-  },
+        if (potentialOption && !options.has(potentialOption)) {
+          options.add(potentialOption);
+        }
+      }
 
-  // Questions sur les certifications
-  {
-    question: "Combien de fois 'Shape of You' a-t-il été certifié platine aux États-Unis ?",
-    options: ["11x Platine", "5x Platine", "3x Platine", "Diamant"],
-    correctAnswer: "11x Platine",
-  },
+      const optionsArray = [...options];
+      while (optionsArray.length < 4) {
+        optionsArray.push("Autre");
+      }
 
-  // Questions sur les instruments principaux
-  {
-    question: "Quel instrument Ed Sheeran utilise-t-il principalement en live ?",
-    options: ["Guitare acoustique", "Piano", "Guitare électrique", "Ukulélé"],
-    correctAnswer: "Guitare acoustique",
-  },
-  {
-    question: "Freddie Mercury était principalement :",
-    options: ["Chanteur et pianiste", "Guitariste", "Bassiste", "Batteur"],
-    correctAnswer: "Chanteur et pianiste",
-  },
+      return shuffleArray(optionsArray);
+    };
 
-  // Récompenses
-  {
-    question: "Combien de Grammy Awards Adele a-t-elle remportés pour '21' ?",
-    options: ["6", "4", "8", "2"],
-    correctAnswer: "6",
-  },
-  {
-    question: "Quel artiste a remporté le Grammy de l'Album de l'année en 2021 ?",
-    options: ["Taylor Swift (folklore)", "Dua Lipa (Future Nostalgia)", "Post Malone (Hollywood's Bleeding)", "Harry Styles (Fine Line)"],
-    correctAnswer: "Taylor Swift (folklore)",
+    const questions = [];
+    const usedTrackIds = new Set();
+
+    // Parcourir les tracks jusqu'à générer 10 questions max
+    for (let i = 0; i < shuffledTracks.length && questions.length < 10; i++) {
+      const track = shuffledTracks[i];
+      if (usedTrackIds.has(track.id)) continue;
+      usedTrackIds.add(track.id);
+
+      const questionType = Math.floor(Math.random() * 4);
+      let newQuestion;
+
+      switch (questionType) {
+        case 0:
+          newQuestion = {
+            question: `Qui est l'artiste principal de "${track.name}" ?`,
+            correctAnswer: track.artists[0].name,
+            options: generateAnswers(track.artists[0].name, "artist", track),
+          };
+          break;
+
+        case 1:
+          newQuestion = {
+            question: `À quel album appartient "${track.name}" ?`,
+            correctAnswer: track.album.name,
+            options: generateAnswers(track.album.name, "album", track),
+            image: track.album.images[0]?.url,
+          };
+          break;
+
+        case 2:
+          const hasFeature = track.artists.length > 1;
+          const correctFeat = hasFeature ? track.artists[1].name : "Aucun";
+          const featOptions = hasFeature
+            ? generateAnswers(correctFeat, "artist", track)
+            : ["Aucun", ...generateAnswers("Autres", "artist", track).slice(1)];
+
+          while (featOptions.length < 4) featOptions.push("Autre");
+
+          newQuestion = {
+            question: `Qui est en featuring sur "${track.name}" ?`,
+            correctAnswer: correctFeat,
+            options: shuffleArray(featOptions),
+          };
+          break;
+
+        case 3:
+          newQuestion = {
+            question: `"${track.name}" de ${track.artists[0].name} est considéré comme populaire ?`, 
+            correctAnswer: track.popularity > 70 ? "Vrai" : "Faux", // plus de 70%
+            options: ["Vrai", "Faux"],
+          };
+          break;
+
+        default:
+          continue;
+      }
+
+      questions.push(newQuestion);
+    }
+
+    return shuffleArray(questions.slice(0, 10));
+  } catch (error) {
+    console.error("Erreur de génération du quiz:", error);
+    return [];
   }
-]).slice(0, 10);
+}

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// Route GET pour récupérer les morceaux likés
-router.get('/tracks', async (req, res) => {
-  const accessToken = req.headers.authorization
+// Route GET pour récupérer les morceaux likés de l'utilisateur
+router.post('/tracks', async (req, res) => {
+  const accessToken = req.body.spotifyAccessToken;  
 
   if (!accessToken) {
     return res.status(401).json({ error: 'Access token manquant' });
@@ -11,7 +11,7 @@ router.get('/tracks', async (req, res) => {
 
   try {
     const response = await fetch('https://api.spotify.com/v1/me/tracks', {
-      method: 'GET',
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -24,8 +24,8 @@ router.get('/tracks', async (req, res) => {
 
     const data = await response.json();
     res.json(data);
-  } catch (err) {
-    console.error('Erreur lors de l’appel à Spotify :', err);
+  } catch (error) {
+    console.error('Erreur lors de l’appel à Spotify :', error);
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });

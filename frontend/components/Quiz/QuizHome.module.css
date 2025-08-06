@@ -4,7 +4,7 @@
   font-family: Arial, sans-serif;
 }
 
-/* Partie gauche avec fond violet #2E1B5C */
+/* Partie gauche */
 .quizLeft {
   width: 50%;
   background-color: #2E1B5C;
@@ -26,8 +26,10 @@
 }
 
 .quizTitle {
-  font-size: 48px;
-  font-weight: bold;
+  font-family: "Wedges", sans-serif;
+  font-size: 6.4rem;
+  color: #ffffff;
+  text-shadow: 2px 2px 0px #fb6ca2;
 }
 
 /* Partie droite */
