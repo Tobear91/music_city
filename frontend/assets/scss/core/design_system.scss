@@ -53,4 +53,22 @@
       right: 20px;
     }
   }
+
+  &.secondary {
+    background-color: black;
+    color:#D59FC7 ;
+    position: relative;
+    border:solid 2px $pink ;
+
+    svg {
+      position: absolute;
+      right: 10px;
+    }
+
+    &:hover {
+      background-color: $pink;
+      color: $purple;
+      transition: all 0.2s ease-in;
+    }
+  }
 }

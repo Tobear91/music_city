@@ -1,0 +1,58 @@
+@import "../core/variables.scss";
+
+.modalOverlay {
+  position: fixed;
+  top: 0;  /*permet de mettre la modale en dessous le menu si on change la bien penser à changer la talille du menu aussi */
+  left: 0;
+  width: 100vw;
+  height: 100vh; /*permet de mettre la modale en dessous le menu */
+  display: grid;
+  grid-template-columns: 1fr 1fr
+}
+
+.modalTitle {
+  background: $purple;
+  display: inline-flex; 
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  grid-column: auto; 
+}
+
+.titlePage {
+    font-family: "Wedges", sans-serif;
+    font-size: 6.4rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 0px $pink;
+}
+
+.modalTxt {
+  background: white;
+  display: inline-flex; 
+  flex-direction: column;
+  text-align: center;
+  justify-content: space-between;
+  align-items: center;
+  grid-column: auto; 
+  padding: 100px;
+}
+
+.crossClose{
+    color: $pink;
+}
+
+.crossClose:hover{
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: 0.5;
+    
+}
+
+
+.subtitle {
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: $purple;
+    margin-bottom: 20px;
+}

@@ -1,0 +1,41 @@
+@import "../core/variables.scss";
+
+
+.modalOverlay {
+  position: fixed;
+  top: 0;  /*permet de mettre la modale en dessous le menu si on change la bien penser à changer la talille du menu aussi */
+  left: 0;
+  width: 100vw;
+  height: 100vh; /*permet de mettre la modale en dessous le menu */
+}
+
+.main {
+  width:100%;
+  height:100%;
+  background: $purple;
+  display: inline-flex; 
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.titlePage {
+    font-family: "Wedges", sans-serif;
+    font-size: 6.4rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 0px $pink;
+    margin-top: 60px;
+}
+
+
+
+.characters {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.character {
+  width: 80px; // ou selon votre image
+}
