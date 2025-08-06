@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { closeModal,addQuestionListToStore } from "../../reducers/blindtest";
+import { closeModal,addQuestionListToStore, openModal,resetQuiz } from "../../reducers/blindtest";
 
 export default function BlindtestHome (){
   const [showQuiz, setShowQuiz] = useState(false);   
@@ -22,10 +22,12 @@ export default function BlindtestHome (){
     {serieName: "Game Of Thrones",mainActor: "Peter Dinklage",posterUrl: "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",previewURL:"https://p.scdn.co/mp3-preview/c790a8cdacbc2afe9d2e478edeace6cc90ad3eda"},
       {serieName: "Squid Game",mainActor:"Lee Jung-jae",posterUrl: "https://image.tmdb.org/t/p/w500/1QdXdRYfktUSONkl1oD5gc6Be0s.jpg",previewURL:"https://p.scdn.co/mp3-preview/59f2a10febaacf3527b1306ede3f2baa3abd7af8"},
   ]
-  useEffect(()=>{
-    dispatch(addQuestionListToStore(listQuestion))
-  },[])
-  
+
+    const initializeQuiz = () => {
+  dispatch(addQuestionListToStore(listQuestion));
+};
+
+
 
   const handleCloseModal = ()=>{
       dispatch(closeModal())
@@ -34,20 +36,26 @@ export default function BlindtestHome (){
   // test de page de chargement pendant 1 secondes
   const handleStartQuiz = () => {
     setDispLoadingScreen(true);
+    initializeQuiz();
     setTimeout(() => {
       setDispLoadingScreen(false);
       setShowQuiz(true);
     }, 1000); // 1 secondes
   };
 
+  const restartQuiz = () => {
+  dispatch(resetQuiz());            
+  setShowQuiz(false);             
+  setDispLoadingScreen(false);
 
+  };
 
     return (
     <>
       {dispLoadingScreen ? (
           <LoadingScreens></LoadingScreens>
       ) : showQuiz ? (
-        <Questions />
+        <Questions restartQuiz={restartQuiz} />
       ) : (
         <div className={styles.modalOverlay}>
           <div className={styles.modalTitle}>

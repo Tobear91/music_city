@@ -27,10 +27,16 @@ export const blindtestSlice = createSlice({
     },
     nextQuestion:(state,action)=>{
       state.questionNbr=state.questionNbr+1
+    },
+    resetQuiz: (state) => {
+      
+      state.questionNbr = 0;
+      state.answerList = [];
+      state.questionList = [];
     }
 
   },
 });
 
-export const { openModal, closeModal,addQuestionListToStore,addAnswerToStore,nextQuestion } = blindtestSlice.actions;
+export const { openModal, closeModal,addQuestionListToStore,addAnswerToStore,nextQuestion,resetQuiz } = blindtestSlice.actions;
 export default blindtestSlice.reducer;

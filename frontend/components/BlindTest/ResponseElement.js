@@ -6,7 +6,7 @@ import Image from 'next/image';
 
 
 
-export default function ReponseElement({mainActor,posterUrl, currentAnswer, setCurrentAnswer }){
+export default function ResponseElement({mainActor,posterUrl, currentAnswer, setCurrentAnswer }){
     
 
         const handleActorClick = () => {
