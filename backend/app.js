@@ -14,6 +14,8 @@ const errorHandler = require("./middlewares/error");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const spotifyRouter = require("./routes/spotify");
+const blindtestRouter = require("./routes/blindtest");
+
 
 const app = express();
 
@@ -48,6 +50,10 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/spotify", spotifyRouter);
+app.use("/blindtest", blindtestRouter);
+
+
+
 app.use(errorHandler);
 
 module.exports = app;
