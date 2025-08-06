@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import "../assets/scss/core/core.scss";
 import Head from "next/head";
 
+
 function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
@@ -18,3 +19,4 @@ function App({ Component, pageProps }) {
 }
 
 export default App;
+

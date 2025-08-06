@@ -6,6 +6,9 @@ const userSchema = mongoose.Schema(
     email: String,
     password: String,
     type: String,
+    avatar: String,
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "vinyles" }],
   },
   { timestamps: true }
 );
