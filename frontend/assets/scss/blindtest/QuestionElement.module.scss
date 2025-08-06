@@ -1,0 +1,33 @@
+
+@import "../core/variables.scss";
+
+.question{
+    width: 1000px;
+    background-color: white;
+    margin: 50px;
+    padding: 50px;
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-around;
+}
+
+
+.questionTxt{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.subtitle {
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: $purple;
+    margin-bottom: 20px;
+}
+
+.listenButton{
+    width: 30%;
+}
+
+
+

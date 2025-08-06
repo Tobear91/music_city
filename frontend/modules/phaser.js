@@ -119,8 +119,14 @@ export function create() {
         frameRate: 20
     });
 
-
-    this.cursors  = this.input.keyboard.createCursorKeys();
+    // Autorise phaser à seulement écouter les fl^ches directionnelles
+    this.cursors = this.input.keyboard.addKeys({
+    up: Phaser.Input.Keyboard.KeyCodes.UP,
+    down: Phaser.Input.Keyboard.KeyCodes.DOWN,
+    left: Phaser.Input.Keyboard.KeyCodes.LEFT,
+    right: Phaser.Input.Keyboard.KeyCodes.RIGHT
+    // pas de SPACE ici
+});
     this.runKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT); // add function to make the player run
 
     this.hasRedirected = false; // variable qui va permettre la redirection vers une autre page
