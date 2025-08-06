@@ -19,7 +19,6 @@ function Home() {
 
   return (
     <>
-      {!user && <button onClick={() => handleLogin()}>Login</button>}
       {user && <PhaserGame/>}
 
     </>
