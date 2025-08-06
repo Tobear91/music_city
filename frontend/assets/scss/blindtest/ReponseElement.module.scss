@@ -1,0 +1,58 @@
+
+@import "../core/variables.scss";
+
+.question{
+    width: 1000px;
+    background-color: white;
+    margin: 50px;
+    padding: 50px;
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    height: 280px;
+}
+
+.questionTxt{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.subtitle {
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: $purple;
+    margin-bottom: 20px;
+}
+
+
+.indicesContainer{
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    height: 100%;
+}
+
+
+.indiceElement{
+    width: 300px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+
+
+.indiceActor{
+    margin-top: 80px;
+}
+
+
+.button{
+    width: 200px;
+}
+
+

@@ -3,13 +3,23 @@ import Phaser from "phaser";
 import styles from "../styles/PhaserGame.module.css"
 import { preload,update,create } from "../modules/phaser";
 import BlindtestHome from "./BlindTest/BlindtestHome";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { openModal,closeModal } from "../reducers/blindtest";
 
 const PhaserGame = () => {
+  
  const gameRef = useRef();
+  const dispatch = useDispatch()
+  const showModalSerie = useSelector((state) => state.blindtest.isOpen);
+  
+  const handleOpenModal = ()=>{
+    dispatch(openModal())
+  }
 
-
-  const [showModalSerie, setShowModalSerie] = useState(false); //gestion de la modale
-
+    const handleCloseModal = ()=>{
+    dispatch(closeModal())
+  }
 
   useEffect(() => {
     // permet de s'adapter à la taiille de l'écran + barre des tâches n'est pas sur la carte 
@@ -32,8 +42,8 @@ const PhaserGame = () => {
     callbacks: {
       preBoot: (game) => {
         // Injecte les fonctions React dans l'instance Phaser
-        game.openModal = () => setShowModalSerie(true);
-        game.closeModal = () => setShowModalSerie(false);
+        game.openModal = handleOpenModal;
+        game.closeModal = handleCloseModal;
       }
     },
       };
@@ -47,7 +57,7 @@ const PhaserGame = () => {
   <>
     <div ref={gameRef} className={styles.GameContainer} />
     {showModalSerie && (
-      <BlindtestHome onClose={() => setShowModalSerie(false)}></BlindtestHome>
+      <BlindtestHome></BlindtestHome>
     )}
   </>
 );

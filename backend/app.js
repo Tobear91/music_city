@@ -17,6 +17,9 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const spotifyRouter = require("./routes/spotify");
 const discogsRouter = require("./routes/discogs");
+const quizRouter = require("./routes/quiz")
+const blindtestRouter = require("./routes/blindtest");
+const tracksRouter = require('./routes/tracks')
 
 const app = express();
 
@@ -69,6 +72,10 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/spotify", spotifyRouter);
 app.use("/discogs", discogsRouter);
+app.use("/quiz", quizRouter)
+app.use("/blindtest", blindtestRouter);
+app.use("/tracks", tracksRouter);
+
 app.use(errorHandler);
 
 module.exports = app;
