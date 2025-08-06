@@ -1,9 +1,9 @@
-import styles from "../styles/Recommandations.module.css";
+import styles from "../../styles/MusicLab/Recommandations.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 
-function Recommandations() {
+function Recommandations(props) {
   const storeData = useSelector((state) => state.analyses.value); 
 
   useEffect(() => {

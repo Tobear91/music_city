@@ -7,52 +7,28 @@ import {
   newTrackFromSPO,
   getLyrics,
   getGenres,
-  getAudioFeatures
-} from "../reducers/analyses";
+  getAudioFeatures,
+} from "../../reducers/analyses";
+
+import {
+  getTrackData,
+  getArtistData,
+  getAlbumDataFromTrackData,
+} from "../../modules/spotify";
 
 function Launch() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [trackId, setTrackId] = useState("");
-  const [token, setToken] = useState("");
 
-  useEffect;
-  const client_id = "4e883e65d8104a14ac4a47e8d97cf74e";
-  const client_secret = "422c1092bb314117b87d008d14a1aeff";
-  const localhost_url = "http://127.0.0.1:3000";
+  async function searchTrack(query) {
+    let data;
+    let res = await getTrackData(query).then((datas) => {
+      data = datas;
+      return data;
+    });
 
-  useEffect(() => {
-    async function getTokenSpotify(id, secret) {
-      const res = await fetch("https://accounts.spotify.com/api/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization:
-            "Basic " + Buffer.from(`${id}:${secret}`).toString("base64"), //Buffer: binaire; toString(base64) passe en alphanumerique
-        },
-        body: "grant_type=client_credentials",
-      });
-      const data = await res.json();
-      const token = data.access_token;
-
-      setToken(token);
-    }
-    getTokenSpotify(client_id, client_secret);
-  }, []);
-
-  async function searchTrack(token, query) {
-    let res = await fetch(
-      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-        query
-      )}&type=track&limit=1`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    let data = await res.json();
-    console.log(data.tracks.items[0])
+    // console.log(data.tracks.items[0]);
     const artiste = data.tracks.items[0].artists[0].name
       .split("(")[0]
       .toLowerCase()
@@ -75,18 +51,14 @@ function Launch() {
 
     dispatch(newTrackFromSPO(data));
 
-    res = await fetch(
-      `https://api.spotify.com/v1/albums/${data.tracks.items[0].album.id}/tracks`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    data = await res.json();
+    res = await getAlbumDataFromTrackData(data).then((datas) => {
+      data = datas;
+      return data;
+    });
+
     dispatch(getAlbumTracks(data.items));
 
-      //audiofeatures ne fonctionne plus chez spotify
+    //audiofeatures ne fonctionne plus chez spotify
     //   res = await fetch(
     //   `https://api.spotify.com/v1/audio-features/${track_id}`,
     //   {
@@ -99,26 +71,20 @@ function Launch() {
     // console.log(data)
     // dispatch(getAudioFeatures(data));
 
-    res = await fetch(
-      `https://api.spotify.com/v1/artists/${artiste_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    data = await res.json();
+    res = await getArtistData(artiste_id).then((datas) => {
+      data = datas; return data;
+    });
+
     dispatch(getGenres(data.genres));
 
-
-
     res = await fetch(
-      `http://localhost:3000/tracks/lyrics?artiste=${artiste}&titre=${titre}`
+      `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste}&titre=${titre}`
     );
     data = await res.json();
     dispatch(getLyrics(data.lyrics));
-
-    router.push("/results");
+    console.log()
+    // console.log(data);
+    router.push("/musiclab/results");
   }
 
   return (
@@ -132,7 +98,7 @@ function Launch() {
         ></input>
         <button
           onClick={() => {
-            searchTrack(token, trackId);
+            searchTrack(trackId);
           }}
         >
           SEARCH TRACK

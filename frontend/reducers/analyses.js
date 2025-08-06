@@ -50,6 +50,8 @@ export const analysesSlice = createSlice({
           track_number: tracks[i].track_number,
           name: tracks[i].name,
           id: tracks[i].id,
+          uri: tracks[i].uri,
+          duration_ms: tracks[i].duration_ms,
         };
         state.value.album.tracks.push(track);
       }

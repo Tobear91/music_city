@@ -4,12 +4,6 @@ import { Provider } from "react-redux";
 import "../assets/scss/core/core.scss";
 import Head from "next/head";
 
-import { configureStore } from '@reduxjs/toolkit';
-import analyses from '../../reducers/analyses';
-
-const store = configureStore({
- reducer: { analyses },
-});
 
 function App({ Component, pageProps }) {
   return (

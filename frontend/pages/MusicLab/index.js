@@ -1,4 +1,4 @@
-import '../../styles/MusicLab/Launch.module.css';
+
 import Launch from '../../components/MusicLab/Launch';
 
 function Index() {
