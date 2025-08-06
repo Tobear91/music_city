@@ -6,6 +6,7 @@ const userSchema = mongoose.Schema(
     email: String,
     password: String,
     type: String,
+    discogs_auth: Object,
   },
   { timestamps: true }
 );

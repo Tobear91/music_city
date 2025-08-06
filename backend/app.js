@@ -2,6 +2,8 @@ require("dotenv").config();
 require("./models/connection");
 
 const cookieParser = require("cookie-parser");
+const MongoStore = require("connect-mongo");
+const session = require("express-session");
 const express = require("express");
 const logger = require("morgan");
 const path = require("path");
@@ -14,13 +16,31 @@ const errorHandler = require("./middlewares/error");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const spotifyRouter = require("./routes/spotify");
+const discogsRouter = require("./routes/discogs");
 
 const app = express();
 
+// CORS
 app.use(
   cors({
     origin: ["http://localhost:3001", "http://127.0.0.1:3001"],
     credentials: true,
+  })
+);
+
+// Session
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    },
   })
 );
 
@@ -48,6 +68,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/spotify", spotifyRouter);
+app.use("/discogs", discogsRouter);
 app.use(errorHandler);
 
 module.exports = app;
