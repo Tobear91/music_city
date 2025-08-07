@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
+import { setUsername } from "../../reducers/discogs.js";
 
 function Connexion() {
   const dispatch = useDispatch();
@@ -26,7 +27,20 @@ function Connexion() {
   }, [router.isReady]);
 
   useEffect(() => {
-    if (user?.discogs) router.push("/vinyles-store");
+    (async () => {
+      if (user?.discogs) {
+        let response = await fetch("http://127.0.0.1:3000/discogs/identity", {
+          credentials: "include",
+        });
+        let datas = await response.json();
+
+        if (datas.result) {
+          const { username } = datas.identity;
+          dispatch(setUsername(username));
+          router.push("/vinyles-store/wantlist");
+        }
+      }
+    })();
   }, [user?.discogs]);
 
   const handleDiscord = async (e) => {

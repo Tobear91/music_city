@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const Discogs = require("disconnect").Client;
-const discogs = require("../modules/discogs.js");
+const helpers = require("../modules/helpers");
 
 const DISCOGS_KEY = process.env.DISCOGS_KEY;
 const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
 const DISCOGS_REDIRECT_URI = process.env.DISCOGS_REDIRECT_URI;
 
-router.get("/authorize", function (req, res) {
+router.get("/authorize", function (req, res, next) {
   try {
     const oAuth = new Discogs().oauth();
 
@@ -22,14 +22,13 @@ router.get("/authorize", function (req, res) {
   }
 });
 
-router.get("/callback", async (req, res) => {
+router.get("/callback", async (req, res, next) => {
   try {
     console.log("requestData", req.session.requestData);
     const oAuth = new Discogs(req.session.requestData).oauth();
 
     oAuth.getAccessToken(req.query.oauth_verifier, async function (err, accessData) {
       req.session.accessData = accessData;
-      // await discogs.saveAccessData(req.session.email, accessData);
 
       const encoded = Buffer.from(JSON.stringify({ connected: true })).toString("base64");
       res.redirect(`http://127.0.0.1:3001/vinyles-store/connexion?discogs=${encoded}`);
@@ -39,7 +38,7 @@ router.get("/callback", async (req, res) => {
   }
 });
 
-router.get("/identity", async (req, res) => {
+router.get("/identity", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
     dis.getIdentity(function (err, datas) {
@@ -50,7 +49,7 @@ router.get("/identity", async (req, res) => {
   }
 });
 
-router.get("/users/:username/wantlist", async (req, res) => {
+router.get("/users/:username/wantlist", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
     const wantlist = dis.user().wantlist();
@@ -61,12 +60,29 @@ router.get("/users/:username/wantlist", async (req, res) => {
   }
 });
 
-router.delete("/users/:username/wants/:release_id", async (req, res) => {
+router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
     const wantlist = dis.user().wantlist();
     await wantlist.removeRelease(req.params.username, req.params.release_id);
     res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/database/search", async (req, res, next) => {
+  try {
+    console.log(req.body);
+    // Check fields are missing
+    if (!helpers.checkBody(req.body, ["search", "params"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
+    const { search, params } = req.body;
+
+    const dis = new Discogs(req.session.accessData);
+    const database = dis.database();
+
+    const results = await database.search(search, params);
+    res.json({ result: true, results });
   } catch (error) {
     next(error);
   }
