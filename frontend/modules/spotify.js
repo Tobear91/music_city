@@ -62,11 +62,15 @@ const getFollowedArtists = async () => {
   return await customFetch(url);
 };
 
-const getTracksUser = async () => {
-  const url = "https://api.spotify.com/v1/me/tracks";
+const getTopTracksUser = async () => {
+  const url = "https://api.spotify.com/v1/me/top/tracks";
   return await customFetch(url)
 }
 
+const getPlaylistsUser = async () => {
+  const url = "https://api.spotify.com/v1/me/playlists"
+  return await customFetch(url)
+}
 const getTrackData = async (trackId) => {
   const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(trackId)}&type=track&limit=1`;
   return await customFetch(url);
@@ -102,4 +106,5 @@ const getFirstTrackAlbum =async(albumId)=>{
           trackId: firstTrack.id,
       }
 }
-module.exports = { getMe, getFollowedArtists, getTrackData,getTracksUser, getAlbumDataFromTrackData, getArtistData, getAlbum, getFirstTrackAlbum };
+
+module.exports = { getMe, getFollowedArtists, getTrackData, getTopTracksUser, getAlbumDataFromTrackData, getArtistData, getPlaylistsUser,getAlbum,getFirstTrackAlbum };

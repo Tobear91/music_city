@@ -10,8 +10,7 @@ const getRandomSeries = async()=>{
         { name: 'Netflix', id: 8 },
         { name: 'Prime Video', id: 119 },
         { name: 'HBO', id: 1899 },
-        { name : 'Disney+', id: 337 },
-        { name : 'Canal+', id: 	51 }
+
     ];
     // selection d'un id aleatoire 
 
@@ -20,7 +19,7 @@ const getRandomSeries = async()=>{
     const platformName = platforms[randomPlatformIndex].name;
 
     // on recherche sur cette plateforme toute les éries avec un score d'au moins 7.5 et au moins 500 votes
-    const initialUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&sort_by=popularity.desc&with_watch_providers=${platformId}&watch_region=FR&page=1&without_genres=16&first_air_date.gte=2000-01-01&first_air_date.lte=2024-12-31&vote_average.gte=7.5&vote_count.gte=350`
+    const initialUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&sort_by=popularity.desc&with_watch_providers=${platformId}&watch_region=FR&page=1&without_genres=16&first_air_date.gte=1990-01-01&first_air_date.lte=2024-12-31&vote_average.gte=7&vote_count.gte=300`
 
 
     // on récupere le nombre de page de cette requete et on en selectionne une au hasard
@@ -32,7 +31,7 @@ const getRandomSeries = async()=>{
 
     const randomPage = Math.floor(Math.random() * totalPages) + 1;
 
-    const finalUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&sort_by=popularity.desc&with_watch_providers=${platformId}&watch_region=FR&page=${randomPage}&without_genres=16&first_air_date.gte=2000-01-01&first_air_date.lte=2024-12-31&vote_average.gte=7.5&vote_count.gte=350`;
+    const finalUrl = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&sort_by=popularity.desc&with_watch_providers=${platformId}&watch_region=FR&page=${randomPage}&without_genres=16&first_air_date.gte=1990-01-01&first_air_date.lte=2024-12-31&vote_average.gte=7&vote_count.gte=300`;
     const response = await fetch(finalUrl);
     const data = await response.json();
 

@@ -38,21 +38,53 @@
   padding: 100px;
 }
 
-.crossClose{
-    color: $pink;
-}
-
-.crossClose:hover{
+.crossClose {
+  color: $pink;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  
+  &:hover {
     cursor: pointer;
     transition: opacity 0.2s;
     opacity: 0.5;
-    
+  }
+}
+
+.instruction{
+  font-size: 1.8rem;
+  color: $purple;
+  margin-block: 10px;
+  text-align: justify;
+  line-height: 1.6;
+
+}
+
+.separator {
+  width: 100%;
+  border: none;
+  border-top: 2px solid $purple; 
 }
 
 
 .subtitle {
-    font-size: 2.4rem;
+    font-size: 3rem;
     font-weight: 600;
     color: $purple;
     margin-bottom: 20px;
+}
+
+.bodyTxt {
+  font-size: 1.8rem;
+  color: $purple;
+  margin-block: 10px;
+  line-height: 1.4;
+}
+
+
+.pointCpt{
+    font-family: "Wedges", sans-serif;
+    font-size: 2rem;
+    color: $purple;
 }

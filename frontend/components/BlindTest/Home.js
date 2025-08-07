@@ -5,7 +5,7 @@ import LoadingScreens from './LoadingScreens';
 import { useState } from 'react';
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faCircleXmark,faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
 import { useSelectorn,useDispatch } from "react-redux";
 import { closeModal,addQuestionListToStore, openModal,resetQuiz } from "../../reducers/blindtest";
 import { getSoundtrackScore } from '../../modules/checkKeyWords';
@@ -21,6 +21,7 @@ export default function Home (){
 
     const initializeQuiz = () => {
   dispatch(addQuestionListToStore(listQuestion));
+  setShowQuiz(true)
 };
 
 
@@ -63,7 +64,7 @@ export default function Home (){
         data.series[i].trackId = firsTrack.trackId;
         data.series[i].spotifyAlbumName = bestAlbum.name;
 
-        if (bestScore>40){
+        if (bestScore>25){
           data.series[i].isTrackMatchCertain = true;
         }
 
@@ -90,7 +91,7 @@ export default function Home (){
     listQuestion = data.series.map((serie)=>{
       return (
         {
-          serieName:serie.title,
+          serieName:serie.title.split(':')[0],
           mainActor:serie.mainActor,
           posterUrl:serie.posterPath,
           previewURL:serie.previewURL,
@@ -98,17 +99,10 @@ export default function Home (){
         }
       )
     })
-  
+    setDispLoadingScreen(false)
 
-
-
-    
     initializeQuiz();
-    setTimeout(() => {
-      setDispLoadingScreen(false);
-      setShowQuiz(true);
-    }, 1000); // 1 secondes
-  };
+ };
 
   const restartQuiz = () => {
   dispatch(resetQuiz());            
@@ -132,22 +126,21 @@ export default function Home (){
           <div className={styles.modalTxt}>
             <FontAwesomeIcon icon={faCircleXmark} className={styles.crossClose} style={{ width: "40px", height: "40px" }} onClick={handleCloseModal}/>
             <h2 className={styles.subtitle}>Bienvenue dans le BlindTest</h2>
-            <p>
-              Dans ce bâtiment, vous allez pouvoir tester vos connaissances musicales sur les séries.
-              Vous allez entamer un blind test de 5 questions. Vous aurez la possibilité de demander un indice sur le nom de l'acteur principal ou bien un morceau de l'affiche du film. 
-              Mais ATTENTION : en demandant un indice vous gagnerez moins de points.
+            <p className={styles.instruction}>
+              Dans ce bâtiment, vous allez pouvoir tester vos connaissances musicales sur les séries. Il vous sera possible d'écouter des extraits musicaux de série choisis aléatoirement. Vous enchaînerez 5 question. Vous aurez la possibilité de demander un indice sur le nom de l'acteur principal ou bien l'affiche de la série.
             </p>
-            <ul>
-              <p>Calcul des points :</p>
-              <li>Pas d'indice révélé : + 3 points</li>
-              <li>Un indice révélé : + 2 points</li>
-              <li>Deux indices révélés : + 1 point</li>
-              <li>Mauvaise réponse : 0 point</li>
+            <p className={styles.instruction}> 
+              <FontAwesomeIcon icon={faExclamationTriangle} style={{ width: "20px", height: "20px" }}/> ATTENTION : en demandant un indice vous gagnerez moins de points.
+            </p>
+            <hr className={styles.separator} />
+            <ul className={styles.bodyTxt}>
+              <p className={styles.subtitle}>Calcul des points :</p>
+              <li>Pas d'indice révélé : <span className={styles.pointCpt}> III </span> points</li>
+              <li>Un indice révélé : <span className={styles.pointCpt}> II </span> points</li>
+              <li>Deux indices révélés :<span className={styles.pointCpt}> I </span> point</li>
+              <li>Mauvaise réponse : <span className={styles.pointCpt}> 0 </span> point</li>
             </ul>
-            <ul>
-              <li>Choisissez ou non les genres sur lesquels vous voulez être interrogés</li>
-              <li>Choisissez ou non la période</li>
-            </ul>
+
             <button onClick={handleStartQuiz} className={"form-button primary"}>
               Démarrer le quiz
               <FontAwesomeIcon icon={faArrowRight} />

@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getQuestions } from './Questions';
-import styles from './Quiz.module.css';
-import QuizCorrection from './QuizCorrection';
-
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { getQuestions } from "./Questions";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
+import styles from "../../assets/scss/quiz/Quiz.module.scss";
+import QuizCorrection from "./QuizCorrection";
 
 export default function Quiz() {
-
-  const spotifyAccessToken = useSelector(state => state.user.user.spotify.access_token);
-  console.log(spotifyAccessToken)
+  const spotifyAccessToken = useSelector(
+    (state) => state.user.user.spotify.access_token
+  );
+  console.log(spotifyAccessToken);
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [showCorrection, setShowCorrection] = useState(false);
-
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -34,40 +36,100 @@ export default function Quiz() {
   };
 
   if (currentQuestion >= questions.length) {
-  return (
-    <div className={styles.container}>
-      <h2 className={styles.title}>Quiz terminé !</h2>
-      <p className={styles.score}>Score : {score}/{questions.length}</p>
-      
-        <button
-          className={styles.answerButton}
-          onClick={() => setShowCorrection(true)}
-        >
-          Voir correction
-        </button>
-      
-    </div>
-  );
-}
+    if (showCorrection) {
+      return <QuizCorrection questions={questions} />;
+    }
 
+    return (
+      <>
+        <div className={styles.menuBar}>
+          <FontAwesomeIcon
+            icon={faCircleXmark}
+            className={styles.crossClose}
+            style={{ width: "40px", height: "40px" }}
+          />
+        </div>
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <div>
+              <Image
+                src="/img/cloudy_moon.jpg"
+                alt="Cloudy Moon"
+                width={707}
+                height={194}
+                priority
+              />
+            </div>
+            <div>
+              <h1 className={styles.title}>QUIZ TERMINE !</h1>
+            </div>
+          </div>
+          <p className={styles.score}>
+            Score : {score}/{questions.length}
+          </p>
+          <div className={styles.buttonContainer}>
+            <button
+              className={styles.endButton}
+              onClick={() => setShowCorrection(true)}
+            >
+              Voir correction
+            </button>
+            <button
+              className={styles.endButton}
+              onClick={() => window.location.reload()}
+            >
+              Rejouer un quiz
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   const myQuestion = questions[currentQuestion];
-  
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}><h1 className={styles.title}>QUIZ</h1></div>
-      <div className={styles.questionCard}>
-        <span className={styles.counter}>{currentQuestion + 1}/{questions.length}</span>
-        <h2 className={styles.questionText}>{myQuestion.question}</h2>
+    <>
+      <div className={styles.menuBar}>
+        <FontAwesomeIcon
+          icon={faCircleXmark}
+          className={styles.crossClose}
+          style={{ width: "40px", height: "40px" }}
+        />
+        <div>
+          <h1 className={styles.title}>QUIZ</h1>
+        </div>
       </div>
-      <div className={styles.answers}>
-        {myQuestion.options.map((option, i) => (
-          <button key={i} onClick={() => handleAnswer(option)} className={styles.answerButton}>
-            {option}
-          </button>
-        ))}
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <div>
+            <Image
+              src="/img/cloudy_moon.jpg"
+              alt="Cloudy Moon"
+              width={707}
+              height={194}
+              priority
+            />
+          </div>
+        </div>
+        <div className={styles.questionCard}>
+          <span className={styles.counter}>
+            {currentQuestion + 1}/{questions.length}
+          </span>
+          <h2 className={styles.questionText}>{myQuestion.question}</h2>
+        </div>
+        <div className={styles.answers}>
+          {myQuestion.options.map((option, i) => (
+            <button
+              key={i}
+              onClick={() => handleAnswer(option)}
+              className={styles.answerButton}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
