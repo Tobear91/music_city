@@ -62,7 +62,7 @@ function Recherche() {
                           <button className="button-square small pink">
                             <FontAwesomeIcon icon={faHeart} />
                           </button>
-                          <a className="button-square small purple" href={`https://www.discogs.com/fr${result.uri}`}>
+                          <a className="button-square small purple" href={`https://www.discogs.com/fr${result.uri}`} target="_blank">
                             <FontAwesomeIcon icon={faLink} />
                           </a>
                         </div>
