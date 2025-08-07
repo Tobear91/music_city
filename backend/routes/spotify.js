@@ -32,7 +32,7 @@ router.get("/login", async (req, res, next) => {
     };
 
     const state = generateRandomString(16);
-    const scope = "user-read-private user-read-email user-top-read user-follow-read user-library-read";
+    const scope = "user-read-private user-read-email user-top-read user-follow-read user-library-read playlist-read-private";
     const redirect_url =
       "https://accounts.spotify.com/authorize?" +
       querystring.stringify({

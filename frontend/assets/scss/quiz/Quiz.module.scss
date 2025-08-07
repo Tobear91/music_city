@@ -1,3 +1,5 @@
+@import "../core/variables.scss";
+
 .container {
   min-height: 100vh;
   background-color: #2E1B5C;
@@ -9,12 +11,13 @@
   box-sizing: border-box;
 }
 
+
 .questionCard {
   background-color: white;
-  color: #2E1B5C;
+  color: $purple;
   width: 100%;
   max-width: 800px;
-  height: 100px;
+  height: 150px;
   padding: 32px; 
   border-radius: 24px; 
   margin-bottom: 48px; 
@@ -39,7 +42,7 @@
 
 .answerButton {
   background-color: white;
-  color: #2d145f;
+  color: $purple;
   border: none;
   border-radius: 16px; 
   padding: 24px 32px; 
@@ -62,12 +65,49 @@
 }
 
 .title {
-  font-size: 40px; 
+  font-size: 6.4rem; 
   font-weight: 800;
   margin-bottom: 24px;
+  text-align: center;
+  font-family: "Wedges", sans-serif;
+  text-shadow: 2px 2px 0px $pink;
+  color: $purple
 }
 
 .score {
   font-size: 28px; 
   font-weight: 600;
 }
+
+.buttonContainer {
+  display: flex;
+  justify-content: center; 
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.endButton {  
+  
+  background-color: white;
+  color: $purple;
+  border: none;
+  border-radius: 16px; 
+  font-size: 20px; 
+  font-weight: 600;
+  height: 50px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.crossClose{
+    color: $pink;
+}
+
+.crossClose:hover{
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: 0.5;
+    
+}
+
