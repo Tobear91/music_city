@@ -1,15 +1,18 @@
-import { getTopTracksUser } from "../../modules/spotify";
+import { getTracksUser } from "../../modules/spotify";
 
-export async function getQuestions() {
+export async function getQuestions(spotifyAccessToken) {
   // Mélanger un tableau
   const shuffleArray = (arr) => [...arr].sort(() => Math.random() - 0.5);
 
   try {
+   
 
-    const data = await getTopTracksUser()
-    const validTracks = (data.items || []).filter(
-      (track) => track?.name && track.artists?.[0]?.name && track.album?.name
-    );
+    const data = await getTracksUser()
+    const validTracks = data.items
+      .map((item) => item.track)
+      .filter(
+        (track) => track?.name && track.artists?.[0]?.name && track.album?.name
+      );
 
     const shuffledTracks = shuffleArray(validTracks);
 
@@ -103,12 +106,25 @@ export async function getQuestions() {
           break;
 
         case 3:
-          newQuestion = {
-            question: `"${track.name}" de ${track.artists[0].name} est considéré comme populaire ?`,
-            correctAnswer: track.popularity > 70 ? "Vrai" : "Faux", // plus de 70%
-            options: ["Vrai", "Faux"],
-          };
-          break;
+  const releaseYear = track.album.release_date?.split("-")[0];
+
+  const yearOptions = new Set([releaseYear]);
+  const currentYear = new Date().getFullYear();
+
+  while (yearOptions.size < 4) {
+    const offset = Math.floor(Math.random() * 10) - 5;
+    const fakeYear = String(Number(releaseYear) + offset);
+    if (Number(fakeYear) > 1960 && Number(fakeYear) <= currentYear) {
+      yearOptions.add(fakeYear);
+    }
+  }
+
+  newQuestion = {
+    question: `En quelle année est sorti "${track.name}" de ${track.artists[0].name} ?`,
+    correctAnswer: releaseYear,
+    options: shuffleArray([...yearOptions]),
+  };
+  break;
 
         case 4:
           const dateCandidates = shuffleArray([
@@ -138,8 +154,16 @@ export async function getQuestions() {
             numArtists + 2,
           ]);
           const artistCountOptions = [...baseOptions].map(String);
-          while (artistCountOptions.length < 4)
-            artistCountOptions.push("Autre");
+          while (artistCountOptions.length < 4) {
+            if (!artistCountOptions.includes("Autre")) {
+              artistCountOptions.push("Autre");
+            } else {            
+              let randomOption = String(Math.floor(Math.random() * 5) + 1);
+              if (!artistCountOptions.includes(randomOption)) {
+                artistCountOptions.push(randomOption);
+              }
+            }          
+          }
 
           newQuestion = {
             question: `Combien d’artistes sont crédités sur "${track.name}" de ${track.artists[0].name} ?`,
@@ -156,7 +180,6 @@ export async function getQuestions() {
             compilation: "Compilation",
           };
           const typeOptions = ["Album", "Single", "Compilation"];
-          while (typeOptions.length < 4) typeOptions.push("Autre");
 
           newQuestion = {
             question: `"${track.name}" de ${track.artists[0].name} est issu de quel type de publication ?`,
