@@ -17,9 +17,9 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const spotifyRouter = require("./routes/spotify");
 const discogsRouter = require("./routes/discogs");
-const quizRouter = require("./routes/quiz")
+const quizRouter = require("./routes/quiz");
 const blindtestRouter = require("./routes/blindtest");
-const tracksRouter = require('./routes/tracks')
+const tracksRouter = require("./routes/tracks");
 
 const app = express();
 
@@ -32,18 +32,27 @@ app.use(
 );
 
 // Session
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
+//     cookie: {
+//       secure: false,
+//       httpOnly: true,
+//       sameSite: "lax",
+//       maxAge: 1000 * 60 * 60 * 24 * 365,
+//     },
+//   })
+// );
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
-    cookie: {
-      secure: false,
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 1000 * 60 * 60 * 24 * 365,
-    },
+    cookie: { secure: false },
   })
 );
 
@@ -72,7 +81,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/spotify", spotifyRouter);
 app.use("/discogs", discogsRouter);
-app.use("/quiz", quizRouter)
+app.use("/quiz", quizRouter);
 app.use("/blindtest", blindtestRouter);
 app.use("/tracks", tracksRouter);
 

@@ -1,4 +1,4 @@
-import Homepage from "../../components/vinyles_store/Homepage";
+import Homepage from "../../components/VinylesStore/Homepage";
 
 function VSConnexionPage() {
   return <Homepage />;

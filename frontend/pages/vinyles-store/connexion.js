@@ -1,4 +1,4 @@
-import Connexion from "../../components/vinyles_store/Connexion";
+import Connexion from "../../components/VinylesStore/Connexion";
 
 function VSConnexionPage() {
   return <Connexion />;
