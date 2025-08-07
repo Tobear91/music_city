@@ -17,7 +17,6 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const spotifyRouter = require("./routes/spotify");
 const discogsRouter = require("./routes/discogs");
-const quizRouter = require("./routes/quiz");
 const blindtestRouter = require("./routes/blindtest");
 const tracksRouter = require("./routes/tracks");
 
@@ -47,14 +46,6 @@ app.use(
   })
 );
 
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: { secure: false },
-//   })
-// );
 
 // Options Swagger
 const swaggerOptions = {
@@ -81,7 +72,6 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/spotify", spotifyRouter);
 app.use("/discogs", discogsRouter);
-app.use("/quiz", quizRouter);
 app.use("/blindtest", blindtestRouter);
 app.use("/tracks", tracksRouter);
 

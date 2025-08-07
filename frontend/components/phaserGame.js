@@ -2,7 +2,7 @@ import { useEffect, useRef,useState } from "react";
 import Phaser from "phaser";
 import styles from "../styles/PhaserGame.module.css"
 import { preload,update,create } from "../modules/phaser";
-import BlindtestHome from "./BlindTest/BlindtestHome";
+import Home from "./blindtest/Home";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { openModal,closeModal } from "../reducers/blindtest";
@@ -57,7 +57,7 @@ const PhaserGame = () => {
   <>
     <div ref={gameRef} className={styles.GameContainer} />
     {showModalSerie && (
-      <BlindtestHome></BlindtestHome>
+      <Home></Home>
     )}
   </>
 );
