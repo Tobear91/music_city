@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faBars, faMagnifyingGlass, faHeart, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faBars, faMagnifyingGlass, faHeart, faPlus, faBarcode, faTrash } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Homepage.module.scss";
 
 function Homepage() {
   const [wantlist, setWantlist] = useState([]);
+  const [dUsername, setDUsername] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -14,6 +15,7 @@ function Homepage() {
       let datas = await response.json();
       console.log(datas);
       const { username } = datas.identity;
+      setDUsername(username);
 
       response = await fetch(`http://127.0.0.1:3000/discogs/users/${username}/wantlist`, {
         credentials: "include",
@@ -24,6 +26,15 @@ function Homepage() {
     })();
   }, []);
 
+  const handleDelete = async (id, indexToRemove) => {
+    const response = await fetch(`http://127.0.0.1:3000/discogs/users/${dUsername}/wants/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    const datas = await response.json();
+    if (datas.result) setWantlist((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
   return (
     <div className={styles.content}>
       <header className={styles.header}>
@@ -31,8 +42,11 @@ function Homepage() {
           <FontAwesomeIcon icon={faBars} />
         </button>
         <span>Vinyles Store</span>
+        <button className="button-square purple">
+          <FontAwesomeIcon icon={faBarcode} />
+        </button>
         <form>
-          <input type="text" className="form-input" placeholder="Artiste / Track / Code Barre" />
+          <input type="text" className="form-input" placeholder="Artiste, Titre, ..." />
           <button type="submit">
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </button>
@@ -44,26 +58,31 @@ function Homepage() {
       <main className={styles.main}>
         <h1>Ma wantlist</h1>
         <div className={styles.wantlist}>
-          {wantlist.length > 0 &&
-            wantlist.map((release, i) => {
-              return (
-                <div key={i}>
-                  <div>
-                    <img src={release.basic_information.thumb} alt={release.basic_information.title} />
+          <div>
+            {wantlist.length > 0 &&
+              wantlist.map((release, i) => {
+                return (
+                  <div key={i}>
+                    <div>
+                      <img src={release.basic_information.thumb} alt={release.basic_information.title} />
+                    </div>
+                    <h2>{release.basic_information.title}</h2>
+                    <p>{release.basic_information.artists[0].name}</p>
+                    <div>
+                      <button className="button-square small pink">
+                        <FontAwesomeIcon icon={faHeart} />
+                      </button>
+                      <button className="button-square small purple">
+                        <FontAwesomeIcon icon={faPlus} />
+                      </button>
+                      <button className="button-square small red" onClick={() => handleDelete(release.basic_information.id, i)}>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </div>
                   </div>
-                  <h2>{release.basic_information.title}</h2>
-                  <p>{release.basic_information.artists[0].name}</p>
-                  <div>
-                    <button className="button-square pink">
-                      <FontAwesomeIcon icon={faHeart} />
-                    </button>
-                    <button className="button-square purple">
-                      <FontAwesomeIcon icon={faPlus} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+          </div>
         </div>
       </main>
     </div>

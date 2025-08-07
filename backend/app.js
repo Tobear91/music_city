@@ -32,29 +32,29 @@ app.use(
 );
 
 // Session
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
-//     cookie: {
-//       secure: false,
-//       httpOnly: true,
-//       sameSite: "lax",
-//       maxAge: 1000 * 60 * 60 * 24 * 365,
-//     },
-//   })
-// );
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false },
+    store: MongoStore.create({ mongoUrl: process.env.CONNECTION_STRING }),
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    },
   })
 );
+
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: { secure: false },
+//   })
+// );
 
 // Options Swagger
 const swaggerOptions = {

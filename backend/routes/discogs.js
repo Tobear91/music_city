@@ -61,4 +61,15 @@ router.get("/users/:username/wantlist", async (req, res) => {
   }
 });
 
+router.delete("/users/:username/wants/:release_id", async (req, res) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const wantlist = dis.user().wantlist();
+    await wantlist.removeRelease(req.params.username, req.params.release_id);
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
