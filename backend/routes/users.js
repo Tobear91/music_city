@@ -87,20 +87,7 @@ router.post("/signup", async (req, res, next) => {
       type: "app",
     });
 
-    // Generate tokens
-    const access_token = auth.generateAccessToken(user.email);
-
-    user = {
-      pseudo,
-      email,
-      access_token,
-      spotify: {
-        type: "simple",
-        access_token: await spotify.generateSimpleToken(),
-      },
-    };
-
-    res.json({ result: true, user });
+    res.json({ result: true });
   } catch (error) {
     next(error);
   }
@@ -177,6 +164,7 @@ router.post("/login", async (req, res, next) => {
         type: "simple",
         access_token: await spotify.generateSimpleToken(),
       },
+      discogs: !!req.session.accessData,
     };
 
     res.json({ result: true, user });

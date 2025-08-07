@@ -73,7 +73,7 @@ router.get("/callback", async (req, res, next) => {
     // Generate tokens
     const app_access_token = auth.generateAccessToken(user.email);
 
-    // Generate cookies
+    // Generate le cookie du refresh token spotify
     res.cookie("spotify_refresh_token", spotify_refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -88,6 +88,7 @@ router.get("/callback", async (req, res, next) => {
         type: product,
         access_token: spotify_access_token,
       },
+      discogs: !!req.session.accessData,
     };
 
     const encoded = Buffer.from(JSON.stringify(newUser)).toString("base64");

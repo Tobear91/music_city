@@ -1,0 +1,75 @@
+@import "../core/variables.scss";
+
+.content {
+  min-height: 100vh;
+  background-color: $purple;
+}
+
+.main {
+  padding: 170px 50px 50px;
+
+  h1 {
+    font-family: "Wedges", sans-serif;
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 50px;
+  }
+
+  .wantlist {
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+
+      & > div {
+        display: flex;
+        background-color: #ffffff;
+        border-radius: 5px;
+        padding: 10px;
+        gap: 10px;
+
+        // Image
+        & > div:first-child {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 60px;
+          height: 60px;
+          overflow: hidden;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+          }
+
+          svg {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            color: $pink;
+          }
+        }
+
+        // Infos
+        & > div:last-child {
+          // Titre
+          p {
+            font-size: 1.4rem;
+          }
+
+          // Actions
+          & > div {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+          }
+        }
+      }
+    }
+  }
+}

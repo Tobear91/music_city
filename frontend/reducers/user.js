@@ -14,8 +14,11 @@ export const userSlice = createSlice({
     setSpotifyToken: (state, action) => {
       state.user.spotify.access_token = action.payload;
     },
+    setDiscogs: (state, action) => {
+      state.user.discogs = action.payload;
+    },
   },
 });
 
-export const { setUser, setSpotifyToken } = userSlice.actions;
+export const { setUser, setSpotifyToken, setDiscogs } = userSlice.actions;
 export default userSlice.reducer;
