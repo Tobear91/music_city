@@ -76,7 +76,7 @@ export default function Questions({ restartQuiz }) {
         </div>
         </>
       ) :( <>
-                <QuestionElement previewUrl={blindtestInfo.questionList[blindtestInfo.questionNbr].previewURL} totalQuestion={blindtestInfo.questionList.length} questioNumber={blindtestInfo.questionNbr + 1}></QuestionElement>
+                <QuestionElement previewUrl={blindtestInfo.questionList[blindtestInfo.questionNbr].previewURL} totalQuestion={blindtestInfo.questionList.length} questioNumber={blindtestInfo.questionNbr + 1} isCertain={blindtestInfo.questionList[blindtestInfo.questionNbr].isTrackMatchCertain}></QuestionElement>
                 <ResponseElement mainActor={blindtestInfo.questionList[blindtestInfo.questionNbr].mainActor} posterUrl= {blindtestInfo.questionList[blindtestInfo.questionNbr].posterUrl}     currentAnswer={currentAnswer}
                 setCurrentAnswer={setCurrentAnswer}></ResponseElement>
 

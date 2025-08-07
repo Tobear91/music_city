@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay} from "@fortawesome/free-solid-svg-icons";
 
 
-export default function QuestionElement({previewUrl,totalQuestion,questioNumber}){
+export default function QuestionElement({previewUrl,totalQuestion,questioNumber,isCertain}){
     
     const audioRef = useRef(null);
     let timeoutId = null;
@@ -31,7 +31,13 @@ export default function QuestionElement({previewUrl,totalQuestion,questioNumber}
         <div className={styles.question}>
             <div className={styles.questionTxt}>
   
-                <h2 className={styles.subtitle}> Question {questioNumber}/ {totalQuestion} </h2>
+                <h2 className={styles.subtitle}> Question {questioNumber}/ {totalQuestion}   
+                  {!isCertain && (
+                  <span style={{ color: 'red', marginLeft: '1rem', fontSize:'1rem' }}>
+                    (incertitude sur l'extrait - veuillez retourner l'affiche)
+                  </span>
+                    )} 
+                </h2>
                 <p> De quel série provient cet extrait musicale ?</p>             
             </div>
 

@@ -1,27 +1,23 @@
 import React, { useEffect } from 'react';
 import styles from "../../assets/scss/blindtest/Home.module.scss";
 import Questions from './Questions';
-
 import LoadingScreens from './LoadingScreens';
-
 import { useState } from 'react';
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelectorn,useDispatch } from "react-redux";
 import { closeModal,addQuestionListToStore, openModal,resetQuiz } from "../../reducers/blindtest";
+import { getSoundtrackScore } from '../../modules/checkKeyWords';
+import {getAlbum,getFirstTrackAlbum} from '../../modules/spotify'
 
-export default function BlindtestHome (){
+export default function Home (){
   const [showQuiz, setShowQuiz] = useState(false);   
   const [dispLoadingScreen, setDispLoadingScreen] = useState(false);
   const dispatch = useDispatch()
   
+  let listQuestion = [];
 
-  const listQuestion = [
-    {serieName: "Game Of Thrones",mainActor: "Peter Dinklage",posterUrl: "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",previewURL:"https://p.scdn.co/mp3-preview/c790a8cdacbc2afe9d2e478edeace6cc90ad3eda"},
-      {serieName: "Squid Game",mainActor:"Lee Jung-jae",posterUrl: "https://image.tmdb.org/t/p/w500/1QdXdRYfktUSONkl1oD5gc6Be0s.jpg",previewURL:"https://p.scdn.co/mp3-preview/59f2a10febaacf3527b1306ede3f2baa3abd7af8"},
-  ]
 
     const initializeQuiz = () => {
   dispatch(addQuestionListToStore(listQuestion));
@@ -34,8 +30,79 @@ export default function BlindtestHome (){
     }
 
   // test de page de chargement pendant 1 secondes
-  const handleStartQuiz = () => {
+  const handleStartQuiz = async () => {
+
+
     setDispLoadingScreen(true);
+    let data = await fetch('http://127.0.0.1:3000/blindtest/randomshow');
+    data = await data.json()
+    
+    for (let i=0; i<data.series.length;i++){
+          const title = data.series[i].title;
+          const platform = data.series[i].platform;
+          const query = `${title} soundtrack`;
+          let albums = await getAlbum(query);
+          
+
+          let bestAlbum = null;
+          let bestScore = -1;
+          
+          for (let album of albums.albums.items) {
+              const score = await getSoundtrackScore(album.name, title, platform);
+              
+              if (score > bestScore) {
+                  bestScore = score;
+                  bestAlbum = album;
+                  
+              }
+          }
+          const firsTrack = await getFirstTrackAlbum(bestAlbum.id);
+
+        data.series[i].artistName = firsTrack.artistName;
+        data.series[i].soundtrack = firsTrack.trackName;
+        data.series[i].trackId = firsTrack.trackId;
+        data.series[i].spotifyAlbumName = bestAlbum.name;
+
+        if (bestScore>40){
+          data.series[i].isTrackMatchCertain = true;
+        }
+
+
+        const response = await fetch('http://127.0.0.1:3000/blindtest/previewUrl',{
+          method: "POST",
+            body: JSON.stringify({
+            artistName: firsTrack.artistName,
+            trackName: firsTrack.trackName,
+      }),
+        headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+        })
+        
+        const dataSpotifyPreview = await response.json()
+
+        data.series[i].previewURL = dataSpotifyPreview.previewUrl;
+    }
+
+    console.log(data.series) 
+
+      
+    listQuestion = data.series.map((serie)=>{
+      return (
+        {
+          serieName:serie.title,
+          mainActor:serie.mainActor,
+          posterUrl:serie.posterPath,
+          previewURL:serie.previewURL,
+          isTrackMatchCertain:serie.isTrackMatchCertain
+        }
+      )
+    })
+  
+
+
+
+    
     initializeQuiz();
     setTimeout(() => {
       setDispLoadingScreen(false);
