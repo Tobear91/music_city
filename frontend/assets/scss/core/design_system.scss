@@ -160,7 +160,12 @@ span.button-square {
   }
 
   &.red {
-    background: #ff0000;
+    background: #d05353;
     color: #ffffff;
+  }
+
+  &.white {
+    background: #ffffff;
+    color: $purple;
   }
 }

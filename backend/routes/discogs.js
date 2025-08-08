@@ -60,6 +60,17 @@ router.get("/users/:username/wantlist", async (req, res, next) => {
   }
 });
 
+router.get("/releases/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const database = dis.database();
+    const release = await database.getRelease(req.params.release_id);
+    res.json({ result: true, release });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);

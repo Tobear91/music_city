@@ -1,7 +1,7 @@
 import styles from "../../assets/scss/vinyles_store/Wantlist.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toggleWantlistItem } from "../../reducers/discogs";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faEye } from "@fortawesome/free-solid-svg-icons";
 import { useSelector, useDispatch } from "react-redux";
 
 function WantlistList({ index, item, deleteRelease }) {
@@ -29,6 +29,9 @@ function WantlistList({ index, item, deleteRelease }) {
       <h2>{item.basic_information.title}</h2>
       <p>{item.basic_information.artists[0].name}</p>
       <div>
+        <a className="button-square small purple" href={`http://127.0.0.1:3001/vinyles-store/release/${item.id}`}>
+          <FontAwesomeIcon icon={faEye} />
+        </a>
         <button className="button-square small red" onClick={() => handleDelete()}>
           <FontAwesomeIcon icon={faTrash} />
         </button>
