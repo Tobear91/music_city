@@ -2,24 +2,29 @@ import { useEffect, useRef,useState } from "react";
 import Phaser from "phaser";
 import styles from "../styles/PhaserGame.module.css"
 import { preload,update,create } from "../modules/phaser";
-import Home from "./blindtest/Home";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { openModal,closeModal } from "../reducers/blindtest";
+import { useSelector,useDispatch } from "react-redux";
+import { useRouter } from "next/router";
+
+import EnterScreen from "./globalapp/EnterScren";
 
 const PhaserGame = () => {
-  
- const gameRef = useRef();
-  const dispatch = useDispatch()
-  const showModalSerie = useSelector((state) => state.blindtest.isOpen);
-  
-  const handleOpenModal = ()=>{
-    dispatch(openModal())
-  }
+    const gameRef = useRef();
+    const characterPosition = useSelector((state)=>state.character.position)
+    const router = useRouter();
+    const [showEnterScreen, setShowEnterScreen] = useState(false);
 
-    const handleCloseModal = ()=>{
-    dispatch(closeModal())
-  }
+    useEffect(() => {
+    if (characterPosition.name && router.asPath !== `/${characterPosition.name}`) {
+      setShowEnterScreen(true);
+            setTimeout(() => {
+        router.push(`/${characterPosition.name}`);
+      }, 1000);
+
+    } else if (!characterPosition.name && router.asPath !== "/") {
+      router.push("/");
+    }
+  }, [characterPosition.name]);
+
 
   useEffect(() => {
     // permet de s'adapter à la taiille de l'écran + barre des tâches n'est pas sur la carte 
@@ -39,27 +44,18 @@ const PhaserGame = () => {
           create,
           update,
         },
-    callbacks: {
-      preBoot: (game) => {
-        // Injecte les fonctions React dans l'instance Phaser
-        game.openModal = handleOpenModal;
-        game.closeModal = handleCloseModal;
-      }
-    },
       };
 
     const game = new Phaser.Game(config);
-
     return () => game.destroy(true);
   }, []);
 
+  if (showEnterScreen) {
+    return <EnterScreen />;
+  }
   return (
-  <>
     <div ref={gameRef} className={styles.GameContainer} />
-    {showModalSerie && (
-      <Home></Home>
-    )}
-  </>
+    
 );
 };
 export default PhaserGame;
