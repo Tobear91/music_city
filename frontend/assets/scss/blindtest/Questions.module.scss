@@ -10,18 +10,21 @@
 }
 
 .menuBar {
-  height: 60px;
+  height: 80px;
   background-color: white;
 }
-
 .crossClose {
   color: $pink;
-}
-
-.crossClose:hover {
-  cursor: pointer;
-  transition: opacity 0.2s;
-  opacity: 0.5;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  
+  &:hover {
+    cursor: pointer;
+    transition: opacity 0.2s;
+    opacity: 0.5;
+  }
 }
 
 .mainContainer {
