@@ -16,17 +16,14 @@ import {
   getAlbumDataFromTrackData,
 } from "../../modules/spotify";
 
+
 function Launch() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [trackId, setTrackId] = useState("");
 
   async function searchTrack(query) {
-    let data;
-    let res = await getTrackData(query).then((datas) => {
-      data = datas;
-      return data;
-    });
+    let data = await getTrackData(query)
 
     // console.log(data.tracks.items[0]);
     const artiste = data.tracks.items[0].artists[0].name
@@ -51,10 +48,7 @@ function Launch() {
 
     dispatch(newTrackFromSPO(data));
 
-    res = await getAlbumDataFromTrackData(data).then((datas) => {
-      data = datas;
-      return data;
-    });
+    data = await getAlbumDataFromTrackData(data)
 
     dispatch(getAlbumTracks(data.items));
 
@@ -71,21 +65,21 @@ function Launch() {
     // console.log(data)
     // dispatch(getAudioFeatures(data));
 
-    res = await getArtistData(artiste_id).then((datas) => {
-      data = datas; return data;
-    });
+    data = await getArtistData(artiste_id)
 
     dispatch(getGenres(data.genres));
 
-    res = await fetch(
+
+    data = await fetch(
       `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste}&titre=${titre}`
     );
-    data = await res.json();
-    dispatch(getLyrics(data.lyrics));
-    console.log()
-    // console.log(data);
-    router.push("/musiclab/results");
+    const res = await data.json();
+
+    dispatch(getLyrics(res.lyrics));
+
+    router.push("/MusicLab/results");
   }
+
 
   return (
     <div>
