@@ -9,6 +9,7 @@ const userSchema = mongoose.Schema(
     avatar: String,
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "vinyles" }],
+    avisInterpretations: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
   },
   { timestamps: true }
 );
