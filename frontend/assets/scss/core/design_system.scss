@@ -105,6 +105,10 @@
   }
 }
 
+span.button-square {
+  cursor: default;
+}
+
 .button-square {
   display: flex;
   align-items: center;
@@ -147,6 +151,11 @@
 
   &.pink {
     background: $pink;
+    color: #ffffff;
+  }
+
+  &.green {
+    background: green;
     color: #ffffff;
   }
 
