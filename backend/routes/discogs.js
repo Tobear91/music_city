@@ -60,6 +60,29 @@ router.get("/users/:username/wantlist", async (req, res, next) => {
   }
 });
 
+router.get("/releases/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const database = dis.database();
+    const release = await database.getRelease(req.params.release_id);
+    res.json({ result: true, release });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+router.put("/users/:username/wants/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const wantlist = dis.user().wantlist();
+    await wantlist.addRelease(req.params.username, req.params.release_id);
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -73,15 +96,13 @@ router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
 
 router.post("/database/search", async (req, res, next) => {
   try {
-    console.log(req.body);
-    // Check fields are missing
-    if (!helpers.checkBody(req.body, ["search", "params"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
     const { search, params } = req.body;
 
     const dis = new Discogs(req.session.accessData);
     const database = dis.database();
 
     const results = await database.search(search, params);
+
     res.json({ result: true, results });
   } catch (error) {
     next(error);
