@@ -33,7 +33,7 @@ function Wantlist() {
     <div className={styles.content}>
       <Header />
       <main className={styles.main}>
-        <h1>Ma wantlist</h1>
+        <h1>Ma wantlist Discogs</h1>
         <div className={styles.wantlist}>
           <div>{wantedlist.length > 0 && wantedlist.map((release, i) => <WantlistList key={i} index={i} item={release} deleteRelease={handleDeleteRelease} />)}</div>
         </div>
