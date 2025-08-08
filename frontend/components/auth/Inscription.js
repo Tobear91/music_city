@@ -1,16 +1,13 @@
 import styles from "../../assets/scss/auth/Inscription.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { setUser } from "../../reducers/user.js";
 import { useRouter } from "next/router.js";
-import { useDispatch } from "react-redux";
 import Spotify from "./Spotify.js";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 function Inscription() {
-  const dispatch = useDispatch();
   const router = useRouter();
   const [error, setError] = useState(null);
 
@@ -34,8 +31,7 @@ function Inscription() {
     const datas = await response.json();
 
     if (datas.result) {
-      dispatch(setUser(datas.user));
-      router.push("/");
+      router.push("/connexion");
     } else setError(datas.error);
   };
 

@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: false,
   images: {
-    domains: [],
+    domains: ["image.tmdb.org", "i.discogs.com"],
   },
   sassOptions: {
     implementation: "sass-embedded",

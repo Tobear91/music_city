@@ -62,6 +62,15 @@ const getFollowedArtists = async () => {
   return await customFetch(url);
 };
 
+const getTopTracksUser = async () => {
+  const url = "https://api.spotify.com/v1/me/top/tracks";
+  return await customFetch(url)
+}
+
+const getPlaylistsUser = async () => {
+  const url = "https://api.spotify.com/v1/me/playlists"
+  return await customFetch(url)
+}
 const getTrackData = async (trackId) => {
   const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(trackId)}&type=track&limit=1`;
   return await customFetch(url);
@@ -76,5 +85,26 @@ const getArtistData = async (artistId) => {
   const url = `https://api.spotify.com/v1/artists/${artistId}`;
   return await customFetch(url);
 }
+//Récupère 5 album sur Spotify pour une recherche donnée 
+const getAlbum = async(albumQuery)=>{
+  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(albumQuery)}&type=album&limit=10`;
+  return await customFetch(url);
+}
 
-module.exports = { getMe, getFollowedArtists, getTrackData, getAlbumDataFromTrackData, getArtistData };
+// récupère la première track d'un album
+const getFirstTrackAlbum =async(albumId)=>{
+  const tracksResponse = await customFetch(
+      `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=1`
+  )
+
+
+  const firstTrack = tracksResponse.items[0];
+      
+      return {
+          trackName: firstTrack.name,
+          artistName: firstTrack.artists[0]?.name || 'Artiste inconnu',
+          trackId: firstTrack.id,
+      }
+}
+
+module.exports = { getMe, getFollowedArtists, getTrackData, getTopTracksUser, getAlbumDataFromTrackData, getArtistData, getPlaylistsUser,getAlbum,getFirstTrackAlbum };

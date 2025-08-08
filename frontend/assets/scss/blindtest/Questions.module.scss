@@ -1,0 +1,76 @@
+@import "../core/variables.scss";
+
+.modalOverlay {
+  position: fixed;
+  top: 0; /*permet de mettre la modale en dessous le menu si on change la bien penser à changer la talille du menu aussi */
+  left: 0;
+  width: 100vw;
+  height: 100vh; /*permet de mettre la modale en dessous le menu */
+  background-color: $purple;
+}
+
+.menuBar {
+  height: 60px;
+  background-color: white;
+}
+
+.crossClose {
+  color: $pink;
+}
+
+.crossClose:hover {
+  cursor: pointer;
+  transition: opacity 0.2s;
+  opacity: 0.5;
+}
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  position: relative;
+}
+
+.overlaySection {
+  position: absolute;
+  top: 70px;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 50px;
+}
+
+.nextButton {
+  background-color: white;
+  width: 300px;
+  color: $purple;
+  font-weight: 600;
+  font-size: 1.6rem;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  height: 56px;
+  color: $purple;
+  position: relative;
+}
+
+.nextButton:hover {
+  background-color: $pink;
+  color: $purple;
+  transition: all 0.2s ease-in;
+}
+
+.nextFa {
+  position: absolute;
+  right: 20px;
+}
+
+.buttonTriple {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 150px;
+}
