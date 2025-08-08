@@ -10,21 +10,20 @@ function Genres(props) {
   }, [storeData]);
 
   let genreslist = props.genres.map((genre, index) => (
-    <div key={index}>
-      <li><span>{genre}</span> <button onClick={() => props.function({genre})}>AddtoCriteres</button></li> 
-      </div>))
+      <li key={index}><span>{genre}</span> <button onClick={() => props.function({genre})}>AddtoCriteres</button></li> 
+  ));
 
   return (
     <div>
-      <main className={styles.main}>
 
-        <h1 className={styles.title}>Genres Musicaux :</h1>
+
+        <h1 className={styles.title}>GENRES MUSICAUX :</h1>
 
         <ol>
           {genreslist}
         </ol>
 
-      </main>
+
     </div>
   );
 }
