@@ -67,6 +67,7 @@ router.get("/releases/:release_id", async (req, res, next) => {
     const release = await database.getRelease(req.params.release_id);
     res.json({ result: true, release });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 });
@@ -95,8 +96,6 @@ router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
 
 router.post("/database/search", async (req, res, next) => {
   try {
-    // Check fields are missing
-    if (!helpers.checkBody(req.body, ["search", "params"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
     const { search, params } = req.body;
 
     const dis = new Discogs(req.session.accessData);
