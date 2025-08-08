@@ -15,13 +15,13 @@
     margin-bottom: 50px;
   }
 
-  .wantlist {
+  .search {
     & > div {
       display: flex;
       flex-direction: column;
       gap: 20px;
 
-      & > div {
+      .item {
         display: flex;
         background-color: #ffffff;
         border-radius: 5px;
