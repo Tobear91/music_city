@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isOpen: false,
   questionList : [],
   questionNbr : null,
   answerList :[]
@@ -11,12 +10,7 @@ export const blindtestSlice = createSlice({
   name: "blindtest",
   initialState,
   reducers: {
-    openModal: (state, action) => {
-      state.isOpen = true;
-    },
-    closeModal: (state, action) => {
-      state.isOpen = false;
-    },
+
     addQuestionListToStore:(state, action)=>{
         state.questionList = action.payload;
         state.questionNbr = 0;

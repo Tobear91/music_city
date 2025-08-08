@@ -43,7 +43,7 @@ function Connexion() {
     })();
   }, [user?.discogs]);
 
-  const handleDiscord = async (e) => {
+  const handleDiscord = async () => {
     const response = await fetch(`http://127.0.0.1:3000/discogs/authorize?email=${user.email}`, {
       credentials: "include",
     });

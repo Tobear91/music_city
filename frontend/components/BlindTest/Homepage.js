@@ -1,39 +1,40 @@
 import React, { useEffect } from 'react';
 import styles from "../../assets/scss/blindtest/Home.module.scss";
-import Questions from './Questions';
 import LoadingScreens from './LoadingScreens';
 import { useState } from 'react';
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCircleXmark,faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
-import { useSelectorn,useDispatch } from "react-redux";
-import { closeModal,addQuestionListToStore, openModal,resetQuiz } from "../../reducers/blindtest";
+import { useDispatch } from "react-redux";
+import { addQuestionListToStore } from "../../reducers/blindtest";
 import { getSoundtrackScore } from '../../modules/checkKeyWords';
 import {getAlbum,getFirstTrackAlbum} from '../../modules/spotify'
+import { useRouter } from 'next/router';
+import {leaveApplication} from '../../modules/appinteraction'
+
 
 export default function Home (){
   const [showQuiz, setShowQuiz] = useState(false);   
   const [dispLoadingScreen, setDispLoadingScreen] = useState(false);
+  const [showLeaveScreen, setShowLeaveScreen] = useState(false);
+
   const dispatch = useDispatch()
-  
+    
   let listQuestion = [];
-
-
-    const initializeQuiz = () => {
+  const router = useRouter();
+  
+  const initializeQuiz = () => {
   dispatch(addQuestionListToStore(listQuestion));
-  setShowQuiz(true)
+  router.push('/blindtest-serie/questions');
 };
 
+  const handleLeaveBuilding = () => {
+      leaveApplication(router)
+  };
 
-
-  const handleCloseModal = ()=>{
-      dispatch(closeModal())
-    }
 
   // test de page de chargement pendant 1 secondes
   const handleStartQuiz = async () => {
-
-
     setDispLoadingScreen(true);
     let data = await fetch('http://127.0.0.1:3000/blindtest/randomshow');
     data = await data.json()
@@ -104,27 +105,20 @@ export default function Home (){
     initializeQuiz();
  };
 
-  const restartQuiz = () => {
-  dispatch(resetQuiz());            
-  setShowQuiz(false);             
-  setDispLoadingScreen(false);
-
-  };
+  // Affiche LoadingScreen si on charge un quiz
+  if (dispLoadingScreen) {
+    return <LoadingScreens />;
+  }
 
     return (
     <>
-      {dispLoadingScreen ? (
-          <LoadingScreens></LoadingScreens>
-      ) : showQuiz ? (
-        <Questions restartQuiz={restartQuiz} />
-      ) : (
         <div className={styles.modalOverlay}>
           <div className={styles.modalTitle}>
             <Image src="/img/cloudy_moon.jpg" alt="Cloudy Moon" width={707} height={194} priority />
             <h1 className={styles.titlePage}>Blind Test</h1>
           </div>
           <div className={styles.modalTxt}>
-            <FontAwesomeIcon icon={faCircleXmark} className={styles.crossClose} style={{ width: "40px", height: "40px" }} onClick={handleCloseModal}/>
+            <FontAwesomeIcon icon={faCircleXmark} className={styles.crossClose} style={{ width: "40px", height: "40px" }} onClick={handleLeaveBuilding}/>
             <h2 className={styles.subtitle}>Bienvenue dans le BlindTest</h2>
             <p className={styles.instruction}>
               Dans ce bâtiment, vous allez pouvoir tester vos connaissances musicales sur les séries. Il vous sera possible d'écouter des extraits musicaux de série choisis aléatoirement. Vous enchaînerez 5 question. Vous aurez la possibilité de demander un indice sur le nom de l'acteur principal ou bien l'affiche de la série.
@@ -147,7 +141,7 @@ export default function Home (){
             </button>
           </div>
         </div>
-      )}
+      
     </>
   );
 }

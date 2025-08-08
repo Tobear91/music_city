@@ -105,6 +105,10 @@
   }
 }
 
+span.button-square {
+  cursor: default;
+}
+
 .button-square {
   display: flex;
   align-items: center;
@@ -150,8 +154,18 @@
     color: #ffffff;
   }
 
-  &.red {
-    background: #ff0000;
+  &.green {
+    background: green;
     color: #ffffff;
+  }
+
+  &.red {
+    background: #d05353;
+    color: #ffffff;
+  }
+
+  &.white {
+    background: #ffffff;
+    color: $purple;
   }
 }

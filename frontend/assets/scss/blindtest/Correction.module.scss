@@ -8,11 +8,12 @@
   width: 100vw;
   height: 100vh; /*permet de mettre la modale en dessous le menu */
   background-color: $purple;
+  
 }
 
 .title {
     font-family: "Wedges", sans-serif;
-    font-size: 6.4rem;
+    font-size: 4rem;
     color: $purple;
     text-shadow: 2px 2px 0px $pink;
 }
@@ -25,15 +26,16 @@
     margin-bottom: 20px;
 }
 
-.container {
+.containerTitle {
     background-color: white;
-    width: 1000px;
-    height: 300px;
+    width: 800px;
+    height: 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
     border-radius: 50px;
+    
 }
 
 
@@ -48,6 +50,9 @@
 .overlaySection {
   position: absolute;
   top: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 
@@ -69,6 +74,10 @@
   right: 20px;
 }
 
+.previousFa {
+  position: absolute;
+  left: 20px;
+}
 .buttonTriple {
   display: flex;
   justify-content: space-around;
@@ -88,7 +97,6 @@
   height: 56px;
   color: $purple;
   position: relative;
-  margin: 20px;
 }
 
 .crossClose {
@@ -110,8 +118,15 @@
 }
 .buttonTriple {
   display: flex;
-  justify-content: space-around;
-  margin-top: 150px;
+  justify-content: center;  /* centre les boutons */
+  gap: 20px;
+  margin-top: 50px;
 }
 
 
+.correctionContainer {
+  max-height: 400px;    /* or any height you want */
+  overflow-y: auto;     /* vertical scrollbar */
+  /* Optional styling */
+  margin-top: 50px;
+}
