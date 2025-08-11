@@ -21,9 +21,8 @@ export default function Correction (){
     };
 
     const correction = blindtestInfo.questionList.map((data,i)=>{
-        
-        let isAnswerCorrect = blindtestInfo.isCorrect[0][i].isCorrect;
-        console.log(isAnswerCorrect)
+
+        let isAnswerCorrect = blindtestInfo.correction[i].isCorrect;
         return (<CorrectionElement previewUrl={data.previewURL} questionNbr={i+1} key={i} serieName={data.serieName} userAnswer={blindtestInfo.answerList[i].answer} totalQuestion={blindtestInfo.answerList.length} isCorrect={isAnswerCorrect}></CorrectionElement>)
     })
     

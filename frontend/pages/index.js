@@ -1,7 +1,7 @@
-import Home from '../components/Home';
+import Launch from '../components/Launch';
 
 function Index() {
-  return <Home />;
+  return <Launch />;
 }
 
 export default Index;

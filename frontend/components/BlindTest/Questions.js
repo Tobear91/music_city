@@ -25,6 +25,8 @@ export default function Questions() {
     showPoster: false
 });
     const blindtestInfo = useSelector((state)=>state.blindtest)
+    const email = useSelector((state)=>state.user.user.email)   
+
     const [dispEndQuizz,setDispEndQuiz] = useState(false);
 
 
@@ -33,14 +35,46 @@ export default function Questions() {
         setCurrentAnswer({ answer: '', showActor: false, showPoster: false });
     };
 
-
       const handleLeaveBuilding = () => {
           leaveApplication(router)
       };
-const handleFinishQuiz = () => {
-    const updatedAnswerList = [...blindtestInfo.answerList, currentAnswer];
+    // cettre fonction permet d'attendre que tous les show soient ajoutés a la database poru ocntinuer
+  async function addAllShows() {
+    const url = "http://127.0.0.1:3000/blindtest/newshow";
+    const allShows = blindtestInfo.questionList;
+    
+    await Promise.all(
+      allShows.map(showToAdd => {
+        const body = {
+          type: "serie",
+          tmbdId: showToAdd.id,
+          name: showToAdd.title,
+          posterPath: showToAdd.posterPath,
+          mainActor: showToAdd.mainActor,
+          platform: showToAdd.platform,
+          soundtrackName: showToAdd.soundtrack,
+          soundtrackArtist: showToAdd.artistName,
+          soundtrackPreview: showToAdd.previewURL,
+          soundtrackSpotifyId: showToAdd.trackId,
+          isPreviewCertain: showToAdd.isTrackMatchCertain,
+        };
 
-    const correctionList = blindtestInfo.questionList.map(q => q.serieName);
+        return fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        })
+        .then(res => res.json())
+        .then(data => console.log("Show ajouté :", data))
+        .catch(err => console.error("Erreur ajout show :", err));
+      })
+    );
+  }
+
+const handleFinishQuiz = async () => {
+    const updatedAnswerList = [...blindtestInfo.answerList, currentAnswer];
+    
+    const correctionList = blindtestInfo.questionList.map(q => q.title);
     let correction = [];
     for (let i = 0; i < correctionList.length; i++) {
     correction.push({
@@ -52,7 +86,6 @@ const handleFinishQuiz = () => {
     indiceNbr: (updatedAnswerList[i].showPoster ? 1 : 0) + (updatedAnswerList[i].showActor ? 1 : 0)
 });
     }
-
     let score = correction.reduce((total, item) => {
         if (!item.isCorrect) {
             return total;
@@ -63,10 +96,32 @@ const handleFinishQuiz = () => {
             return total;
         }
     }, 0);
-
     dispatch(setCorrectionAndScore({ correction, score }));
-
     dispatch(addAnswerToStore(currentAnswer));
+
+    // ajotu des serie dans la BDD 
+    await addAllShows();
+    const Score = blindtestInfo.score;  
+    const Type = "serie"
+    const questions = blindtestInfo.questionList.map((q, index) => ({
+        showid: q.id,
+        userAnswer: updatedAnswerList[index].answer,
+        actorRevealed: updatedAnswerList[index].showActor,
+        posterRevealed: updatedAnswerList[index].showPoster,
+        isCorrect: blindtestInfo.correction[index].isCorrect
+    }));
+    fetch("http://127.0.0.1:3000/blindtest/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, Score, Type, questions })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("Blindtest enregistré :", data);
+        })
+        .catch(err => {
+            console.error("Erreur lors de l'enregistrement :", err);
+        });
 
     router.push('./results');
 };

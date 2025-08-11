@@ -13,7 +13,7 @@ const showSchema = mongoose.Schema(
     soundtrackArtist:String,
     soundtrackPreview:String,
     soundtrackSpotifyId:String,
-    isPreviewCetain: Boolean,
+    isPreviewCertain: Boolean,
   },
 )
 
