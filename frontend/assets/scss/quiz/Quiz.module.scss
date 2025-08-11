@@ -7,8 +7,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 32px; 
-  box-sizing: border-box;
+  padding: 48px 32px;
+  padding-top: 130px; 
+  box-sizing: border-box;  
 }
 
 
@@ -23,6 +24,7 @@
   margin-bottom: 48px; 
   box-sizing: border-box;
   justify-content: center;
+  position: relative;
 }
 
 .questionText {
@@ -30,6 +32,15 @@
   font-size: 32px; 
   font-weight: 700;
   margin: 0;
+}
+
+.counter {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: $purple;
 }
 
 .answers {
@@ -65,13 +76,19 @@
 }
 
 .title {
-  font-size: 6.4rem; 
+  color:$purple;
+  font-size: 50px; 
   font-weight: 800;
   margin-bottom: 24px;
-  text-align: center;
   font-family: "Wedges", sans-serif;
-  text-shadow: 2px 2px 0px $pink;
-  color: $purple
+}
+
+.titleHead {
+  color:$purple;
+  font-size: 50px; 
+  font-weight: 800;
+  margin-bottom: 24px;
+  font-family: "Wedges", sans-serif;
 }
 
 .score {
@@ -110,4 +127,6 @@
     opacity: 0.5;
     
 }
+
+
 
