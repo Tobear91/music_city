@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Models
 const User = require("../models/users");
+const Track = require("../models/tracks");
 
 /**
  * @swagger
@@ -72,12 +73,16 @@ const User = require("../models/users");
 router.post("/signup", async (req, res, next) => {
   try {
     // Check fields are missing
-    if (!helpers.checkBody(req.body, ["pseudo", "email", "password"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
+    if (!helpers.checkBody(req.body, ["pseudo", "email", "password"]))
+      throw Object.assign(new Error("Missing or empty fields"), {
+        status: 400,
+      });
     const { email, password, pseudo } = req.body;
 
     // Check user in database
     let user = await User.findOne({ email, type: "app" });
-    if (user) throw Object.assign(new Error("User already exist"), { status: 409 });
+    if (user)
+      throw Object.assign(new Error("User already exist"), { status: 409 });
 
     // Add user in database
     user = await User.create({
@@ -147,12 +152,16 @@ router.post("/signup", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
   try {
     // Check fields are missing
-    if (!helpers.checkBody(req.body, ["email", "password"])) throw Object.assign(new Error("Missing or empty fields"), { status: 400 });
+    if (!helpers.checkBody(req.body, ["email", "password"]))
+      throw Object.assign(new Error("Missing or empty fields"), {
+        status: 400,
+      });
     const { email, password } = req.body;
 
     // Check user in database
     let user = await User.findOne({ email, type: "app" });
-    if (!user || (user && !bcrypt.compareSync(password, user.password))) throw Object.assign(new Error("Unauthorized"), { status: 401 });
+    if (!user || (user && !bcrypt.compareSync(password, user.password)))
+      throw Object.assign(new Error("Unauthorized"), { status: 401 });
 
     // Generate tokens
     const access_token = auth.generateAccessToken(email);
@@ -172,5 +181,77 @@ router.post("/login", async (req, res, next) => {
     next(error);
   }
 });
+
+//retourne la liste de votes coté front pour déterminer s'il faut afficher l'option
+router.get("/avisInterpretations", async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
+  User.findOne({ email: email })
+    .populate("avisInterpretations")
+    .then((user) => {
+      const spotifyIds = user.avisInterpretations.map(
+        (avis) => avis.track_spotify_id
+      );
+      res.json(spotifyIds);
+    });
+});
+
+// ajout/retrait d'un object_id des favoris à partir d'un id spotify + email
+router.post("/addtofavorites", async (req, res) => {
+  const {  email , track_id, uri, artist, title} = req.body;
+  if (!email || !track_id) {
+    return res.status(400).json({ error: "Email and Id are required" });
+  }
+
+  try {
+    let track = await Track.findOne({ track_spotify_id: track_id });
+    if (!track) {
+      console.log(email)
+      const newtrack = new Track({
+        title: title,
+        artist: artist,
+        spotify_uri: uri,
+        track_spotify_id: track_id,
+      })
+      track = await newtrack.save();
+    }
+
+    const doc = await User.findOne({ email: email });
+    if (!doc) {
+      
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    const id = track._id;
+
+    if (!doc.favorites.includes(id)) {
+      await User.findOneAndUpdate(
+        { email: email },
+        { $addToSet: { favorites: id } }
+      );
+      console.log("id ajouté");
+      return res.json({ result: true });
+    } else {
+      await User.findOneAndUpdate(
+        { email: email },
+        { $pull: { favorites: id } }
+      );
+      console.log("id supprimé");
+      return res.json({ result: true });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ result: false });
+  }
+});
+
+router.post('/favorites', async (req, res) =>{
+  const {email} = req.body;
+  const user = await User.findOne({ email }).populate('favorites');
+  res.json({result: true, favorites: user.favorites})
+})
 
 module.exports = router;
