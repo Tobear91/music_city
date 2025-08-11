@@ -27,29 +27,30 @@ const PhaserGame = () => {
 
 
   useEffect(() => {
-    // permet de s'adapter à la taiille de l'écran + barre des tâches n'est pas sur la carte 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    let gameInstance;
 
-      const config = {
-        type: Phaser.AUTO,
-        width: width,
-        height: height,
-        parent: gameRef.current,
-        physics: {
-          default: 'arcade',
-        },
-        scene: {
-          preload,
-          create,
-          update,
-        },
-      };
+    if (typeof window !== "undefined") {
+      import("phaser").then((Phaser) => {
+        const config = {
+          type: Phaser.AUTO,
+          width: window.innerWidth,
+          height: window.innerHeight,
+          parent: gameRef.current,
+          physics: { default: "arcade" },
+          scene: { preload, create, update },
+        };
 
-    const game = new Phaser.Game(config);
-    return () => game.destroy(true);
+        gameInstance = new Phaser.Game(config);
+      });
+    }
+
+    // Nettoyage à la destruction du composant
+    return () => {
+      if (gameInstance) {
+        gameInstance.destroy(true);
+      }
+    };
   }, []);
-
   if (showEnterScreen) {
     return <EnterScreen />;
   }

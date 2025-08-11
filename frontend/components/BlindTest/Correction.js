@@ -13,18 +13,18 @@ export default function Correction (){
 
     const blindtestInfo = useSelector((state)=>state.blindtest);
     
-    console.log(blindtestInfo)
-
-const handleBack = () => {
+    const handleBack = () => {
         router.push('./results');       
+        };
+    const handleLeaveBuilding = () => {
+        leaveApplication(router)
     };
-  const handleLeaveBuilding = () => {
-      leaveApplication(router)
-  };
 
     const correction = blindtestInfo.questionList.map((data,i)=>{
-
-        return (<CorrectionElement previewUrl={data.previewURL} questionNbr={i+1} key={i} serieName={data.serieName} userAnswer={blindtestInfo.answerList[i].answer} totalQuestion={blindtestInfo.answerList.length}></CorrectionElement>)
+        
+        let isAnswerCorrect = blindtestInfo.isCorrect[0][i].isCorrect;
+        console.log(isAnswerCorrect)
+        return (<CorrectionElement previewUrl={data.previewURL} questionNbr={i+1} key={i} serieName={data.serieName} userAnswer={blindtestInfo.answerList[i].answer} totalQuestion={blindtestInfo.answerList.length} isCorrect={isAnswerCorrect}></CorrectionElement>)
     })
     
     return (
@@ -40,7 +40,6 @@ const handleBack = () => {
 
                 </div>
         <div className={styles.correctionContainer}>
-            
             {correction}
             </div>        
         <div className={styles.buttonTriple} >

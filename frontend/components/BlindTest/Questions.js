@@ -11,9 +11,14 @@ import { useDispatch } from "react-redux";
 import {nextQuestion,addAnswerToStore  } from "../../reducers/blindtest";
 import { useRouter } from 'next/router';
 import {leaveApplication} from '../../modules/appinteraction'
+import { checkCorrection } from '../../modules/checkCorrection';
+import { setCorrectionAndScore } from '../../reducers/blindtest';
 
-export default function Questions({ restartQuiz }) {
-     const router = useRouter();   
+
+export default function Questions() {
+    const dispatch = useDispatch()
+
+    const router = useRouter();   
     const [currentAnswer, setCurrentAnswer] = useState({
     answer: '',
     showActor: false,
@@ -32,13 +37,39 @@ export default function Questions({ restartQuiz }) {
       const handleLeaveBuilding = () => {
           leaveApplication(router)
       };
+const handleFinishQuiz = () => {
+    const updatedAnswerList = [...blindtestInfo.answerList, currentAnswer];
 
-    const handleFinishQuiz = () => {
-        saveCurrentAnswer();          
-        router.push('./results');       
-    };
+    const correctionList = blindtestInfo.questionList.map(q => q.serieName);
+    let correction = [];
+    for (let i = 0; i < correctionList.length; i++) {
+    correction.push({
+    isCorrect: updatedAnswerList[i].answer
+        ? checkCorrection(correctionList[i], updatedAnswerList[i].answer)
+        : false,  // si pas de réponse, pas correct
+    userAnswer: updatedAnswerList[i].answer,
+    correctAnswer: correctionList[i],
+    indiceNbr: (updatedAnswerList[i].showPoster ? 1 : 0) + (updatedAnswerList[i].showActor ? 1 : 0)
+});
+    }
 
-    const dispatch = useDispatch()
+    let score = correction.reduce((total, item) => {
+        if (!item.isCorrect) {
+            return total;
+        } else {
+            if (item.indiceNbr === 0) return total + 3;
+            if (item.indiceNbr === 1) return total + 2;
+            if (item.indiceNbr === 2) return total + 1;
+            return total;
+        }
+    }, 0);
+
+    dispatch(setCorrectionAndScore({ correction, score }));
+
+    dispatch(addAnswerToStore(currentAnswer));
+
+    router.push('./results');
+};
 
     const handleNextQuestion = ()=>{
             saveCurrentAnswer();
@@ -62,7 +93,7 @@ export default function Questions({ restartQuiz }) {
             <div className={styles.overlaySection}>
 
                 <QuestionElement previewUrl={blindtestInfo.questionList[blindtestInfo.questionNbr].previewURL} totalQuestion={blindtestInfo.questionList.length} questioNumber={blindtestInfo.questionNbr + 1} isCertain={blindtestInfo.questionList[blindtestInfo.questionNbr].isTrackMatchCertain}></QuestionElement>
-                <ResponseElement mainActor={blindtestInfo.questionList[blindtestInfo.questionNbr].mainActor} posterUrl= {blindtestInfo.questionList[blindtestInfo.questionNbr].posterUrl}     currentAnswer={currentAnswer}
+                <ResponseElement mainActor={blindtestInfo.questionList[blindtestInfo.questionNbr].mainActor} posterUrl= {blindtestInfo.questionList[blindtestInfo.questionNbr].posterPath}     currentAnswer={currentAnswer}
                 setCurrentAnswer={setCurrentAnswer}></ResponseElement>
 
                 {!dispEndQuizz && <div className={styles.buttonContainer}>
