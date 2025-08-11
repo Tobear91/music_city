@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Discogs = require("disconnect").Client;
 const helpers = require("../modules/helpers");
+const User = require("../models/users");
 
 const DISCOGS_KEY = process.env.DISCOGS_KEY;
 const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
@@ -60,18 +61,6 @@ router.get("/users/:username/wantlist", async (req, res, next) => {
   }
 });
 
-router.get("/releases/:release_id", async (req, res, next) => {
-  try {
-    const dis = new Discogs(req.session.accessData);
-    const database = dis.database();
-    const release = await database.getRelease(req.params.release_id);
-    res.json({ result: true, release });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
-
 router.put("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -94,16 +83,61 @@ router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
   }
 });
 
+router.get("/releases/:release_id", async (req, res, next) => {
+  try {
+    const url = `https://api.discogs.com/releases/${req.params.release_id}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Discogs key=${DISCOGS_KEY}, secret=${DISCOGS_SECRET}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const release = await response.json();
+    res.json({ result: true, release });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/database/search", async (req, res, next) => {
   try {
     const { search, params } = req.body;
+    const url_params = new URLSearchParams({ q: search, ...params });
+    const url = `https://api.discogs.com/database/search?${url_params}`;
 
-    const dis = new Discogs(req.session.accessData);
-    const database = dis.database();
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Discogs key=${DISCOGS_KEY}, secret=${DISCOGS_SECRET}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const datas = await response.json();
+    res.json({ result: true, results: datas.results });
+  } catch (error) {
+    next(error);
+  }
+});
 
-    const results = await database.search(search, params);
+router.post("/add-in-wantlist/:release_id", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const release_id = req.params.release_id;
+    await User.findOneAndUpdate({ email }, { $push: { wantlist: { id: release_id } } }, { new: true });
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
 
-    res.json({ result: true, results });
+router.post("/remove-in-wantlist/:release_id", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const release_id = req.params.release_id;
+    await User.findOneAndUpdate({ email }, { $pull: { wantlist: { id: release_id } } }, { new: true });
+    res.json({ result: true });
   } catch (error) {
     next(error);
   }

@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 
+const wantitemSchema = mongoose.Schema({
+  id: String,
+});
+
 const userSchema = mongoose.Schema(
   {
     pseudo: String,
@@ -10,6 +14,7 @@ const userSchema = mongoose.Schema(
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "vinyles" }],
     avisInterpretations: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
+    wantlist: [wantitemSchema],
   },
   { timestamps: true }
 );
