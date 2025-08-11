@@ -1,4 +1,3 @@
-require("dotenv").config();
 const OpenAI = require("openai");
 
 async function interpreterParoles(paroles, artiste) {

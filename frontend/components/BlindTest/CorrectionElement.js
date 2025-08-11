@@ -1,10 +1,10 @@
 import React, { useRef,useState } from 'react';
 import styles from "../../assets/scss/blindtest/CorrectionElement.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay} from "@fortawesome/free-solid-svg-icons";
+import { faPlay,faCheck,faXmark} from "@fortawesome/free-solid-svg-icons";
 
 
-export default function CorrectionElement({previewUrl,totalQuestion,questionNbr,serieName, userAnswer}){
+export default function CorrectionElement({previewUrl,totalQuestion,questionNbr,serieName, userAnswer,isCorrect}){
     
     const audioRef = useRef(null);
     let timeoutId = null;
@@ -33,7 +33,14 @@ export default function CorrectionElement({previewUrl,totalQuestion,questionNbr,
         <div className={styles.question}>
             <div className={styles.questionTxt}>
   
-                <h2 className={styles.subtitle}> Question {questionNbr}/ {totalQuestion}   
+                <h2 className={styles.subtitle}> 
+                    
+                    Question {questionNbr}/ {totalQuestion}   
+                    {isCorrect ? (
+                        <FontAwesomeIcon icon={faCheck} style={{ color: "green" }} />
+                    ) : (
+                        <FontAwesomeIcon icon={faXmark} style={{ color: "red" }} />
+                    )}
                 </h2>
                 <p className={styles.text}>
                     Nom de la série : {serieName}

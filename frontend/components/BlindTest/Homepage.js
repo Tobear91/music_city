@@ -14,17 +14,15 @@ import {leaveApplication} from '../../modules/appinteraction'
 
 
 export default function Home (){
-  const [showQuiz, setShowQuiz] = useState(false);   
   const [dispLoadingScreen, setDispLoadingScreen] = useState(false);
-  const [showLeaveScreen, setShowLeaveScreen] = useState(false);
 
   const dispatch = useDispatch()
     
-  let listQuestion = [];
+  const validSeries = [];
   const router = useRouter();
   
   const initializeQuiz = () => {
-  dispatch(addQuestionListToStore(listQuestion));
+  dispatch(addQuestionListToStore(validSeries));
   router.push('/blindtest-serie/questions');
 };
 
@@ -39,70 +37,63 @@ export default function Home (){
     let data = await fetch('http://127.0.0.1:3000/blindtest/randomshow');
     data = await data.json()
     
-    for (let i=0; i<data.series.length;i++){
-          const title = data.series[i].title;
-          const platform = data.series[i].platform;
-          const query = `${title} soundtrack`;
-          let albums = await getAlbum(query);
-          
+    const requiredCount = 5;  // Nombre de séries valides minimum
+    const maxSeries = data.series.length;      
 
-          let bestAlbum = null;
-          let bestScore = -1;
-          
-          for (let album of albums.albums.items) {
-              const score = await getSoundtrackScore(album.name, title, platform);
-              
-              if (score > bestScore) {
-                  bestScore = score;
-                  bestAlbum = album;
-                  
-              }
-          }
-          const firsTrack = await getFirstTrackAlbum(bestAlbum.id);
+  for (let i = 0; i < data.series.length && validSeries.length < requiredCount && i < maxSeries; i++) {
+    const title = data.series[i].title;
+    const platform = data.series[i].platform;
+    const query = `${title} soundtrack`;
+    let albums = await getAlbum(query);
 
-        data.series[i].artistName = firsTrack.artistName;
-        data.series[i].soundtrack = firsTrack.trackName;
-        data.series[i].trackId = firsTrack.trackId;
-        data.series[i].spotifyAlbumName = bestAlbum.name;
+    let bestAlbum = null;
+    let bestScore = -1;
 
-        if (bestScore>25){
-          data.series[i].isTrackMatchCertain = true;
-        }
+    for (let album of albums.albums.items) {
+      const score = await getSoundtrackScore(album.name, title, platform);
+      if (score > bestScore) {
+        bestScore = score;
+        bestAlbum = album;
+      }
+    }
+    if (!bestAlbum) continue;
 
+    const firstTrack = await getFirstTrackAlbum(bestAlbum.id);
+    if (!firstTrack || !firstTrack.trackId) continue;
 
-        const response = await fetch('http://127.0.0.1:3000/blindtest/previewUrl',{
-          method: "POST",
-            body: JSON.stringify({
-            artistName: firsTrack.artistName,
-            trackName: firsTrack.trackName,
+    const response = await fetch('http://127.0.0.1:3000/blindtest/previewUrl', {
+      method: "POST",
+      body: JSON.stringify({
+        artistName: firstTrack.artistName,
+        trackName: firstTrack.trackName,
       }),
-        headers: {
+      headers: {
         "Content-type": "application/json; charset=UTF-8"
       }
-        })
-        
-        const dataSpotifyPreview = await response.json()
+    });
 
-        data.series[i].previewURL = dataSpotifyPreview.previewUrl;
-    }
+    if (!response.ok) continue;
 
-    console.log(data.series) 
+    const dataSpotifyPreview = await response.json();
+    if (!dataSpotifyPreview.previewUrl) continue;
 
-      
-    listQuestion = data.series.map((serie)=>{
-      return (
-        {
-          serieName:serie.title.split(':')[0],
-          mainActor:serie.mainActor,
-          posterUrl:serie.posterPath,
-          previewURL:serie.previewURL,
-          isTrackMatchCertain:serie.isTrackMatchCertain
-        }
-      )
-    })
-    setDispLoadingScreen(false)
+    // Construire la série enrichie
+    const enrichedSerie = {
+      ...data.series[i],
+      artistName: firstTrack.artistName,
+      soundtrack: firstTrack.trackName,
+      trackId: firstTrack.trackId,
+      isTrackMatchCertain: bestScore > 25,
+      previewURL: dataSpotifyPreview.previewUrl,
+    };
 
-    initializeQuiz();
+    validSeries.push(enrichedSerie);
+  }
+
+  
+  setDispLoadingScreen(false);
+  initializeQuiz();
+
  };
 
   // Affiche LoadingScreen si on charge un quiz

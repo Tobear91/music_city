@@ -2,9 +2,11 @@ const mongoose = require("mongoose");
 
 
 const questionSchema = mongoose.Schema({
- tracks: { type: mongoose.Schema.Types.ObjectId, ref: "tracks" },
+ show: { type: mongoose.Schema.Types.ObjectId, ref: "shows" },
  userAnswer: String,
- isCOrret : Boolean,
+ actorRevealed:Boolean,
+ posterRevealed:Boolean,
+ isCorrect : Boolean,
 });
 
 
@@ -12,6 +14,7 @@ const blindtestSchema = mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
     Score: Number,
+    Type:String,
     question: [questionSchema],
   },
 )
