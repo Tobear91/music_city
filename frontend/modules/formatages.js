@@ -1,12 +1,14 @@
 import React from "react";
 
 function replaceLinesBreacksWithBr(text) {
+    if(text){
     return text.split('\n').map((line, index) => ( //react.Fragment is used to avoid adding extra nodes to the DOM
     <React.Fragment key={index}>   
         {line}
       <br />
       </React.Fragment>
     ))
+    }
 }
 
 function replaceMsWithMinutesAndSeconds(duration) {
