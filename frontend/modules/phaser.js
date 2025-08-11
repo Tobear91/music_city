@@ -1,4 +1,10 @@
 //Function permettant mise en place du jeu phaser
+import { store } from "./store";
+
+import {setPosition } from "../reducers/character";
+
+
+
 
 
 export function preload() {
@@ -38,34 +44,47 @@ export function create() {
     const letterLayer = map.createStaticLayer('Letters', [tileset1, tileset2,tileset7,tileset5,tileset8,tileset9], 0, 0);
     const constructionLayer = map.createStaticLayer('Construction', [tileset4,tileset8], 0, 0);
 
+
+    // Bien mettre dans name le nom du dossier contenant les pages de votre app
     this.coordsBuildings = [
-        {name: 'serieBuilding', xPos : 4301, yPos : 2921},
-        {name: 'movieBuilding', xPos : 3719, yPos : 2907},
-        {name: 'homeBuilding', xPos : 3502, yPos : 2332},
-        {name: 'musicCityBuilding', xPos : 2579, yPos : 2532},
-        {name: 'quizzBuilding', xPos : 2875, yPos : 1793},
-        {name: 'observatoryBuilding', xPos : 4406, yPos : 910},
-        {name: 'musicLabBuilding', xPos : 2925, yPos : 604},
-        {name: 'vinylStoreBuilding', xPos : 554, yPos : 2458},
+        {name: 'blindtest-serie', xPos : 4301, yPos : 2921},
+        {name: 'quiz', xPos : 2875, yPos : 1793},
+        {name: 'music-lab', xPos : 2925, yPos : 604},
+        {name: 'vinyles-store', xPos : 554, yPos : 2458},
+    ]
+
+
+    const buildingToCreate = [
         {name: 'rapBuilding', xPos : 1718, yPos : 1370},
         {name: 'jazzBuilding', xPos : 311, yPos : 1260},
         {name: 'classicalBuilding', xPos : 1220, yPos : 986},
         {name: 'rockBuilding', xPos : 1689, yPos : 490},
         {name: 'toDefineBuilding', xPos : 755, yPos : 538},
         {name: 'grooveBoxBuilding', xPos : 1500, yPos : 3150},
+        {name: 'observatoryBuilding', xPos : 4406, yPos : 910},
+        {name: 'homeBuilding', xPos : 3502, yPos : 2332},
+        {name: 'movieBuilding', xPos : 3719, yPos : 2907},
+        {name: 'musicCityBuilding', xPos : 2579, yPos : 2532},
+        {name: 'movieBuilding', xPos : 3719, yPos : 2907},
+
     ]
 
-
-    //Permet 'louvrteure dune modale : 
-    this.playerWasInZone = false;
-    this.openModal = this.game.openModal
+    //Permet la redirection vers des batiments
+    this.playerWasInZoneByBuilding = {};
+    for (const building of this.coordsBuildings) {
+    this.playerWasInZoneByBuilding[building.name] = false;
+    }
 
     // Touts le sbatiments d la couche layer vont être des obstacles pour le jouer
     BuildingsLayer.setCollisionByProperty({ collides: true });
     decorationLayer.setCollisionByProperty({ collides: true });
     constructionLayer.setCollisionByProperty({ collides: true });
 
-    this.player = this.physics.add.sprite(2590, 3270, 'player');
+
+    // permet de stocker la position dans le reducer
+    const position = store.getState().character.position;
+    this.player = this.physics.add.sprite(position.xPos, position.yPos, 'player');
+
     const mapWidth = map.widthInPixels;
     const mapHeight = map.heightInPixels;
     this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
@@ -153,8 +172,8 @@ export function update() {
 
 
     if (this.controlsEnabled) {
-    let baseSpeed = 250;
-    let runSpeed = 500;
+    let baseSpeed = 500;
+    let runSpeed = 800;
     let speed = this.runKey.isDown ? runSpeed : baseSpeed;
 
     let velocityX = 0;
@@ -200,20 +219,22 @@ export function update() {
     }
 
 
-    // permet la mise en place des overlay, exempale pour music city ici. 
-    const threshold = 50; // rayon de déclenchement
-    const buildingSerie = this.coordsBuildings.find(b => b.name === 'serieBuilding');
+const threshold = 50;
 
-    if (buildingSerie) {
-        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, buildingSerie.xPos, buildingSerie.yPos);
-        const isInZone = distance < threshold;
+for (const building of this.coordsBuildings) {
+  const distance = Phaser.Math.Distance.Between(
+    this.player.x, this.player.y,
+    building.xPos, building.yPos
+  );
+  
+  const isInZone = distance < threshold;
+  const wasInZone = this.playerWasInZoneByBuilding[building.name];
 
-        if (isInZone && !this.playerWasInZone) {
-            this.game.openModal(); // ouvre uniquement à l'entrée
-        } else if (!isInZone && this.playerWasInZone) {
-            this.game.closeModal(); // ferme uniquement à la sortie
-        }
+  if (isInZone && !wasInZone) {
+    console.log("Entrée zone:", building.name);
+    store.dispatch(setPosition({ xPos: this.player.x, yPos: this.player.y, name: building.name, xPosBuilding:building.xPos,yPosBuilding:building.yPos}));
+  } 
 
-        this.playerWasInZone = isInZone;
-    }
+  this.playerWasInZoneByBuilding[building.name] = isInZone;
+}
 }

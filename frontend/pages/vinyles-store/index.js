@@ -1,7 +1,10 @@
-import Homepage from "../../components/VinylesStore/Homepage";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 function VSConnexionPage() {
-  return <Homepage />;
+  const router = useRouter();
+  const user = useSelector((state) => state.user.user);
+  user.discogs ? router.push("/vinyles-store/wantlist") : router.push("/vinyles-store/connexion");
 }
 
 export default VSConnexionPage;

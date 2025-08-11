@@ -1,17 +1,12 @@
-import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMusic, faLink, faUser, faHeart } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Recherche.module.scss";
-import Header from "./Header";
+import { useEffect, useState } from "react";
+import RechercheItem from "./RechercheItem";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
-import Link from "next/link";
+import Header from "./Header";
 
 function Recherche() {
-  const discogs = useSelector((state) => state.discogs);
   const router = useRouter();
   const { q } = router.query;
-
   const [results, setResults] = useState([]);
 
   useEffect(() => {
@@ -31,11 +26,7 @@ function Recherche() {
           credentials: "include",
         });
         const datas = await response.json();
-        console.log(datas);
-
-        if (datas.result) {
-          setResults(datas.results.results);
-        }
+        if (datas.result) setResults(datas.results.results);
       }
     })();
   }, [q]);
@@ -44,34 +35,11 @@ function Recherche() {
     <div className={styles.content}>
       <Header q={q} />
       <main className={styles.main}>
-        <h1>Résultats pour "{q}"</h1>
-        <div className={styles.wantlist}>
-          <div>
-            {results.length > 0 &&
-              results.map((result, i) => {
-                return (
-                  <div key={i}>
-                    <div>
-                      {!result.thumb && <FontAwesomeIcon icon={faMusic} />}
-                      {result.thumb && <img src={result.cover_image} alt={result.title} />}
-                    </div>
-                    <div>
-                      <p>{result.title}</p>
-                      {["master", "release"].includes(result.type) && (
-                        <div>
-                          <button className="button-square small pink">
-                            <FontAwesomeIcon icon={faHeart} />
-                          </button>
-                          <a className="button-square small purple" href={`https://www.discogs.com/fr${result.uri}`} target="_blank">
-                            <FontAwesomeIcon icon={faLink} />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
+        <h1>
+          {results.length} Résultats pour "{q}"
+        </h1>
+        <div className={styles.search}>
+          <div>{results.length > 0 && results.map((result, i) => <RechercheItem key={i} item={result} />)}</div>
         </div>
       </main>
     </div>
