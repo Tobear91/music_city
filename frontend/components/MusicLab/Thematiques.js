@@ -1,33 +1,45 @@
-import styles from "../../styles/MusicLab/Lyrics.module.css";
+import styles from "../../styles/MusicLab/Composants.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 function Thematiques(props) {
-  const thematiquesState = useSelector((state) => state.analyses.value.interpretation_by_ai.themes);
+  const thematiquesState = useSelector(
+    (state) => state.analyses.value.interpretation_by_ai.themes
+  );
 
-  if(thematiquesState){
+  if (thematiquesState) {
     const thematiques = thematiquesState.map((theme, index) => (
-    <li key={index}>{theme} <button onClick={() => props.function({genre})}>AddtoCriteres</button></li> 
-))
+      <li key={index}>
+        {theme}
+        <button
+          onClick={() => props.function({ genre })}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+            marginLeft: "8px",
+            color: "#6200ee",
+          }}
+        >
+          <FontAwesomeIcon icon={faPlus} />
+        </button>
+      </li>
+    ));
     return (
       <div>
-        <h1>
-          THEMATIQUES :
-        </h1>
-        <div>
-        <ol>{thematiques}</ol>
-        </div>
+        <div className={styles.title}>THEMATIQUES:</div>
+          <ol>{thematiques}</ol>
+       
       </div>
     );
   }
 
   return (
-    <div>
-        <h1>
-          THEMATIQUES :
-        </h1>
-        <p>Lancer l'analyse pour voir les thématiques</p>
+    <div className={styles.title}>THEMATIQUES:
+      <p>Lancer l'analyse pour voir les thématiques</p>
     </div>
   );
 }

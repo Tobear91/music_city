@@ -1,0 +1,16 @@
+.trackslist {
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* espace vertical */
+}
+
+.titleRow{
+  font-weight: bold;
+  align-items: center;
+    display: flex;
+  justify-content: space-between; /* espace entre les éléments */
+}
+
+.title{
+    display: flex;
+}

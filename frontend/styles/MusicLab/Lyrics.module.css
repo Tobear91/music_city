@@ -7,16 +7,27 @@
   padding: 4rem 0;
 }
 
-.title {
-  line-height: 1.15;
-  font-size: 4rem;
-}
-
-.title a {
-  color: #0070f3;
-  text-decoration: none;
-}
 
 .title a:hover, .title a:focus, .title a:active {
   text-decoration: underline;
+}
+
+.titleRow{
+  font-weight: bold;
+  align-items: center;
+    display: flex;
+  justify-content: space-between; /* espace entre les éléments */
+}
+
+.title{
+  font-weight: bold;
+  display: flex;
+}
+.buttons{
+    gap: 5px; /* espace horizontal entre éléments */
+  display: flex;
+}
+
+.lyrics{
+  padding: 10px;
 }

@@ -3,35 +3,32 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { replaceMsWithMinutesAndSeconds } from "../../modules/formatages";
+import Track from "./Track";
 
-function Album(props) {
+function Album() {
   const storeData = useSelector((state) => state.analyses.value);
-  // useEffect(() => {
-  //   console.log("Contenu du store :", storeData);
-  // }, [storeData]);
 
-  let trackslist = props.tracks.map((track, index) => (
-    <div key={index}>
-      <p>
-        {track.track_number} - {track.name} :{" "}
-        {replaceMsWithMinutesAndSeconds(track.duration_ms)} PLAY({track.uri})
-        ADDTOFAVORITE({track.id})
-      </p>
-    </div>
+  let trackslist = storeData.album.tracks.map((track, index) => (
+    <Track index={index} />
   ));
-
   return (
     <div>
       <main className={styles.main}>
-        <h1 className={styles.title}>ALBUM :</h1>
+        <img
+          src={storeData.album.image}
+          alt="image de l'album"
+          style={{ width: "330px", height: "auto", justifyContent:"center", display: 'flex'}} // optionnel pour taille
+        />
         <div>
-          <p>
-            <span>{props.name}</span> - <span>{props.date}</span>{" "}
-            <span>{props.image}</span>
+          <p className={styles.titleRow}>
+            <div className={styles.title}>
+              <span>{storeData.album.name} -</span>
+              <span>- {storeData.album.date}</span>
+            </div>
           </p>
         </div>
 
-        <div>{trackslist}</div>
+        <div className={styles.trackslist}>{trackslist}</div>
       </main>
     </div>
   );
