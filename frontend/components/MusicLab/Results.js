@@ -2,6 +2,7 @@ import styles from "../../styles/MusicLab/Results.module.css";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import Header from "./Header";
 import Lyrics from "./Lyrics";
 import Album from "./Album";
 import Genres from "./Genres";
@@ -12,14 +13,22 @@ import Recommandations from "./Recommandations";
 import {
   getInterpretationAndThemes,
   resetAnalyses,
+  addALike,
+  addADislike,
 } from "../../reducers/analyses";
 import { replaceLinesBreacksWithBr } from "../../modules/formatages";
+import { store } from "../../modules/store";
 
 function Results() {
   const dispatch = useDispatch();
   const router = useRouter();
   const storeData = useSelector((state) => state.analyses.value);
+  const useremail = useSelector((state) => state.user.user.email);
+
+  const [dejaFait, setDejafait] = useState(false);
   const [criteres, setCriteres] = useState([]);
+  // const [likes, setLikes] = useState(0);
+  // const [dislikes, setDislikes] = useState(0);
 
   const {
     track_id,
@@ -31,6 +40,10 @@ function Results() {
     metadatas,
     genres,
   } = storeData;
+
+  const interpretation = storeData.interpretation_by_ai.interpretation;
+  const themes = storeData.interpretation_by_ai.themes;
+  let formatedlyrics = replaceLinesBreacksWithBr(lyrics.lyrics);
 
   async function interpretationFunction(lyrics, artiste) {
     if (lyrics === "") {
@@ -58,11 +71,6 @@ function Results() {
     });
 
     dispatch(getInterpretationAndThemes(res));
-
-    // const avis = await fetch(
-    //   `http://127.0.1:3000/tracks/like?track_id=${track_id}`
-    // );
-    // console.log("Avis sur l'interprétation :", await avis.json());
   }
 
   useEffect(() => {
@@ -80,32 +88,87 @@ function Results() {
         genres: storeData.genres,
         lyrics: storeData.lyrics.lyrics,
         album: tracksIdFromAlbum,
+        duration_ms: storeData.duration_ms,
+        album_image: storeData.album.image,
         release_date: storeData.release_date,
+        preview_url: storeData.preview_url,
       }),
     }).then((response) => response.json());
 
-    // console.log(lyrics.lyrics);
-  }, [storeData]);
+    fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        track_id: track_id,
+        interpretation: interpretation,
+        thematiques: themes,
+      }),
+    }).then((response) => response.json());
+    // fetch(`http://127.0.0.1:3000/tracks/like?track_id=${track_id}`)
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     setLikes(data.likes);
+    //     setDislikes(data.dislikes);
+    //   });
+    fetch(`http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (
+          data.some((database_id) => {
+            return database_id === track_id;
+          })
+        ) {
+          setDejafait(true);
+        } else {
+          setDejafait(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user data:", error);
+      });
+  }, [track_id, interpretation, themes, storeData]);
 
   function saveCritere(newcritere) {
-    console.log("ajout d'un nouveau critère :", newcritere);
+    // console.log("ajout d'un nouveau critère :", newcritere);
     setCriteres((prev) => [...prev, newcritere]);
   }
 
   function getRecommendations(criteresparam) {
-    console.log(
-      "gros fetch du turfu dans le backend avec la base de donnée secrete"
-    );
+    // console.log(
+    //   "gros fetch du turfu dans le backend avec la base de donnée secrete"
+    // );
 
-    // dispatch(fetchedRecommandations(criteresparam));
+    dispatch(fetchedRecommandations(criteresparam));
   }
 
   function handleLike() {
-    console.log("Liked");
+    fetch("http://127.0.1:3000/tracks/like", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        track_id: track_id,
+        email: useremail,
+      }),
+    });
+    setDejafait(true);
   }
 
   function handleDislike() {
-    console.log("Disliked");
+    fetch("http://127.0.1:3000/tracks/dislike", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        track_id: track_id,
+        email: useremail,
+      }),
+    });
+    setDejafait(true);
   }
 
   function resetStore() {
@@ -113,99 +176,71 @@ function Results() {
   }
 
   return (
-    <div>
-      <main className={styles.main}>
-        <h1 className={styles.title}>HEADER</h1>
-        <h2 className={styles.title}>Résultats de l'analyse</h2>
-        <div>
+    <>
+      {/* HEADER */}
+      <header className={styles.headerContainer}>
+        <Header />
+      </header>
+      <div className={styles.resultsContainer}>
+        {/* LYRICS */}
+        <section className={styles.lyricsContainer}>
           <Lyrics
             title={lyrics.title}
+            id={track_id}
             artist={lyrics.artist}
-            lyrics={replaceLinesBreacksWithBr(lyrics.lyrics)}
+            lyrics={formatedlyrics}
             uri={uri}
+            email={useremail}
           />
-        </div>
-        <div>
-          <Album
-            name={album.name}
-            image={album.image}
-            tracks={album.tracks}
-            date={album.date}
-          />
-        </div>
-        <div>
-          <Genres genres={genres} function={saveCritere} />
-        </div>
-        <div>
-          <div>
-            <Interpretation
-              track_id={track_id}
-              launchInterpretation={() =>
-                interpretationFunction(lyrics.lyrics, lyrics.artist)
-              }
-            />
-          </div>
-          <div>
-            <Thematiques />
-          </div>
-          <div style={{ textAlign: "center", fontFamily: "sans-serif" }}>
-            <p>Êtes-vous d'accord avec cette interpretation?</p>
-            <button
-              onClick={handleLike}
-              style={{
-                padding: "8px 16px",
-                margin: "10px",
-                // backgroundColor: liked ? "green" : "#eee",
-                // color: liked ? "white" : "black",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              D'accord ()
-            </button>
+        </section>
 
-            <button
-              onClick={handleDislike}
-              style={{
-                padding: "8px 16px",
-                margin: "10px",
-                // backgroundColor: disliked ? "red" : "#eee",
-                // color: disliked ? "white" : "black",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Pas d'accord ()
-            </button>
-          </div>
-        </div>
-        <div>
+        {/* ALBUM */}
+        <section className={styles.albumContainer}>
+          <Album />
+        </section>
+
+        {/* INTERPRETATION */}
+        <section className={styles.interpretationContainer}>
+          <Interpretation
+            track_id={track_id}
+            databaseid={storeData.track_id}
+            launchInterpretation={() =>
+              interpretationFunction(lyrics.lyrics, lyrics.artist)
+            }
+            handleLike={() => handleLike()}
+            handleDislike={() => handleDislike()}
+            email={useremail}
+            dejafait={dejaFait}
+          />
+        </section>
+
+        {/* THEMES */}
+        <section className={styles.themesContainer}>
+          <Thematiques />
+        </section>
+
+        {/* GENRES */}
+        <section className={styles.genresContainer}>
+          <Genres genres={genres} function={saveCritere} />
+        </section>
+
+        {/* FEATURES */}
+        <section className={styles.featuresContainer}>
           <Audiofeatures metadatas={metadatas} function={saveCritere} />
-        </div>
-        <div>
-          <button
-            onClick={() => {
-              getRecommendations(criteres);
-              router.push("/musiclab/recommandations");
-            }}
-          >
-            FOOTER RECOMMANDATIONS PAR CRITERES
-          </button>
-        </div>
-        <div>
+        </section>
+
+        {/* FOOTER */}
+        <footer className={styles.footerContainer}>
           <button
             onClick={() => {
               resetStore();
             }}
           >
-            {" "}
             RESET
           </button>
-        </div>
-      </main>
-    </div>
+        </footer>
+      </div>
+    </>
   );
 }
 

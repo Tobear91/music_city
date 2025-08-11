@@ -3,10 +3,10 @@ const OpenAI = require("openai");
 async function interpreterParoles(paroles, artiste) {
   const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-  });
+  });  const prompt = `
 
-  const prompt = `
-Tu es un expert en analyse de textes et paroles de chansons.
+
+Tu es un expert en analyse de textes et paroles de chansons. 
 Analyse les paroles suivantes:"${paroles}" de l'artiste "${artiste}".
 
 1. Propose une interprétation synthétique du sens global du texte, en citant les paroles si c'est necessaire.

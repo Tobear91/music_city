@@ -8,6 +8,7 @@ import {
   getLyrics,
   getGenres,
   getAudioFeatures,
+  getTrackFromDatabase,
 } from "../../reducers/analyses";
 
 import {
@@ -23,10 +24,42 @@ function Launch() {
   const [trackId, setTrackId] = useState("");
 
   async function searchTrack(query) {
-    let data = await getTrackData(query)
+    // 1. Récupération des données Spotify
+    let spotifyData = await getTrackData(query);
+    // console.log("Data from Spotify:", spotifyData);
+    const artiste_id = spotifyData.tracks.items[0].artists[0].id;
+    const track_id = spotifyData.tracks.items[0].id;
 
-    // console.log(data.tracks.items[0]);
-    const artiste = data.tracks.items[0].artists[0].name
+    try {
+      // 2. Vérification si la track existe déjà dans la base locale
+      const res = await fetch(
+        `http://127.0.0.1:3000/tracks?track_id=${spotifyData.tracks.items[0].id}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Track not found in DB");
+      }
+
+      const dbData = await res.json();
+      // console.log("Track already exists in the database:", dbData);
+      dispatch(getTrackFromDatabase(dbData));
+    } catch (err) {
+      // console.log(
+      //   "Track not found in the database, adding new track:",
+      //   err.message
+      // );
+
+      // 2. Ajout de la nouvelle track dans la base de données
+      dispatch(newTrackFromSPO(spotifyData));
+
+      // 2.1 Récupération des genres
+      const artistData = await getArtistData(artiste_id);
+      // console.log("Artist data:", artistData);
+      dispatch(getGenres(artistData.genres));
+    }
+
+    // 3. Récupération des paroles
+    const artiste = spotifyData.tracks.items[0].artists[0].name
       .split("(")[0]
       .toLowerCase()
       .normalize("NFD")
@@ -34,7 +67,7 @@ function Launch() {
       .replace(/\$/g, "s")
       .replace(/[^a-zà-ÿ0-9]/gi, "");
 
-    const titre = data.tracks.items[0].name
+    const titre = spotifyData.tracks.items[0].name
       .split(/-|\(feat/i)[0]
       .toLowerCase()
       .normalize("NFD")
@@ -42,44 +75,19 @@ function Launch() {
       .replace(/\$/g, "s")
       .replace(/[^a-zà-ÿ0-9]/g, "");
 
-    const artiste_id = data.tracks.items[0].artists[0].id;
-
-    const track_id = data.tracks.items[0].id;
-
-    dispatch(newTrackFromSPO(data));
-
-    data = await getAlbumDataFromTrackData(data)
-
-    dispatch(getAlbumTracks(data.items));
-
-    //audiofeatures ne fonctionne plus chez spotify
-    //   res = await fetch(
-    //   `https://api.spotify.com/v1/audio-features/${track_id}`,
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   }
-    // );
-    // data = await res.json();
-    // console.log(data)
-    // dispatch(getAudioFeatures(data));
-
-    data = await getArtistData(artiste_id)
-
-    dispatch(getGenres(data.genres));
-
-
-    data = await fetch(
+    const lyricsRes = await fetch(
       `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste}&titre=${titre}`
     );
-    const res = await data.json();
+    const lyricsData = await lyricsRes.json();
+    dispatch(getLyrics(lyricsData.lyrics));
 
-    dispatch(getLyrics(res.lyrics));
+    // 4. Récupération de l’album et des pistes associées
+    const albumData = await getAlbumDataFromTrackData(spotifyData);
+    dispatch(getAlbumTracks(albumData.items));
 
+    // 5. Redirection vers la page résultats
     router.push("/MusicLab/results");
   }
-
 
   return (
     <div>

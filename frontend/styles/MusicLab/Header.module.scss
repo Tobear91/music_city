@@ -1,0 +1,58 @@
+@import "../../assets/scss/core/variables.scss";
+
+.header {
+  display: flex;
+  align-items: center;
+  width: calc(100% - 40px);
+  background: #ffffff;
+  gap: 20px;
+  padding: 30px 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 50px; /* hauteur fixe */
+  z-index: 10;
+  background: white;
+}
+
+/* Tous les sélecteurs enfants doivent commencer par .header */
+.header span {
+  font-family: "Wedges", sans-serif;
+  font-size: 3.2rem;
+  color: $purple;
+}
+
+.header span + button {
+  margin-left: auto;
+}
+
+.header form {
+  display: flex;
+  align-items: center;
+}
+
+.header form input {
+  width: 400px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.header form button {
+  height: 56px;
+  background-color: $purple;
+  color: #ffffff;
+  border: none;
+  border: 1px solid #e5e6e7;
+  border-radius: 8px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  font-weight: 400;
+  font-size: 1.6rem;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.header form button svg {
+  width: 18px;
+  height: 18px;
+}

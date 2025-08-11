@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../../styles/MusicLab/Audiofeatures.module.css";
+import styles from "../../styles/MusicLab/Composants.module.css";
 
 const Audiofeatures = (props) => {
   if (!props.features || Object.keys(props.features).length === 0) {

@@ -2,18 +2,16 @@ var express = require("express");
 var router = express.Router();
 const scraperLyrics = require("../modules/MusicLab/getlyrics");
 
+const User = require("../models/users");
 const Track = require("../models/tracks");
 const interpreterParoles = require("../modules/MusicLab/lyricsinterpretation");
+const spotifyPreviewFinder = require('spotify-preview-finder');
 
 //ajout d'un nouveau track
 router.post("/", async (req, res) => {
-  // console.log("Ajout d'un nouveau track :", req.body);
   try {
-    // const date = new Date();
-    // console.log(date);
-
     const track = await Track.findOne({ track_spotify_id: req.body.track_id });
-    
+
     if (track) {
       return res.json({ result: false, error: "Track already exists" });
     }
@@ -28,6 +26,7 @@ router.post("/", async (req, res) => {
       lyrics: req.body.lyrics.lyrics,
       album: req.body.album.name,
       album_tracks_id: req.body.album.tracks,
+      album_image: req.body.album.image,
       release_date: req.body.release_date,
       likes_interpretation: 0,
       dislikes_interpretation: 0,
@@ -41,12 +40,28 @@ router.post("/", async (req, res) => {
   }
 });
 
+//recupere la track dans la db
+router.get("/", async (req, res) => {
+  const { track_id } = req.query;
+  if (!track_id) {
+    return res.status(400).json({ error: "Track ID manquant" });
+  }
+  try {
+    const track = await Track.findOne({ track_spotify_id: track_id });
+    if (!track) {
+      return res.status(404).json({ error: "Track non trouvé" });
+    }
+    res.json({ track });
+  } catch (err) {
+    console.error("Erreur lors de la récupération du track :", err);
+    res.status(500).json({ error: "Erreur lors de la récupération du track" });
+  }
+});
 
 //ajout/update des resultats d'une analyse de track
 router.put("/updateanalyse", (req, res) => {
   const { track_id, interpretation, thematiques } = req.body;
   console.log(req.body.track_id);
-
   Track.findOneAndUpdate(
     { track_spotify_id: req.body.track_id },
     {
@@ -62,11 +77,9 @@ router.put("/updateanalyse", (req, res) => {
     });
 });
 
+//pour avoir la liste des likes et dislikes de l'interpretation (optionnel car provoquait un rerender chelou)
 router.get("/like", async (req, res) => {
   const { track_id } = req.query;
-  if (!track_id) {
-    return res.status(400).json({ error: "Track ID manquant" });
-  }
   Track.findOne({ track_spotify_id: track_id })
     .then((track) => {
       res.json({
@@ -81,7 +94,47 @@ router.get("/like", async (req, res) => {
     });
 });
 
-router.put("/like", async (req, res) => {});
+//like sur interpretation + update clés étrangères users
+router.put("/like", async (req, res) => {
+  const { track_id, email } = req.body;
+
+  try {
+    await Track.findOneAndUpdate(
+      { track_spotify_id: track_id },
+      { $inc: { likes_interpretation: 1 } }
+    );
+
+    const trackdocument = await Track.findOne({ track_spotify_id: track_id });
+    await User.findOneAndUpdate(
+      { email: email },
+      { $addToSet: { avisInterpretations: trackdocument._id } }
+    );
+    res.json({ result: true }); // ✅ Un seul envoi
+  } catch (err) {
+    res.status(500).json({ result: false, error: err.message });
+  }
+});
+
+//dislike sur interpretation + update clés étrangères users
+router.put("/dislike", async (req, res) => {
+  const { track_id, email } = req.body;
+  try {
+    await Track.findOneAndUpdate(
+      { track_spotify_id: track_id },
+      { $inc: { dislikes_interpretation: 1 } }
+    );
+    const trackdocument = await Track.findOne({ track_spotify_id: track_id });
+
+    await User.findOneAndUpdate(
+      { email: email },
+      { $addToSet: { avisInterpretations: trackdocument._id } }
+    );
+
+    res.json({ result: true }); // ✅ Un seul envoi
+  } catch (err) {
+    res.status(500).json({ result: false, error: err.message });
+  }
+});
 
 //scrap des lyrics (coté backend car doit recreer un DOM coté serveur)
 router.get("/lyrics", async (req, res) => {
@@ -117,5 +170,14 @@ router.get("/lyrics/interpretation", async (req, res) => {
       .json({ error: "Paramètres du GETlyricsinterpretation invalides" });
   }
 });
+
+router.post('/previewUrl', async (req,res)=>{
+    const artistName = req.body.artistName;
+    const trackName = req.body.trackName;
+    const result = await spotifyPreviewFinder(trackName,artistName, 1);
+    console.log(result.results[0].previewUrls[0])
+    res.json({result:true, previewUrl : result.results[0].previewUrls[0]})
+})
+
 
 module.exports = router;
