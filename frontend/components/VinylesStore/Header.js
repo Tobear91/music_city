@@ -1,11 +1,12 @@
 import { faXmark, faBars, faMagnifyingGlass, faBarcode, faHeart } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Header.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { leaveApplication } from "../../modules/appinteraction";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
-function Header({ q, nbWants }) {
+function Header({ q }) {
   const router = useRouter();
   const discogs = useSelector((state) => state.discogs);
   const [searchValue, setSearchValue] = useState(q || "");
@@ -54,9 +55,9 @@ function Header({ q, nbWants }) {
   return (
     <>
       <header className={styles.header}>
-        <button className="button-bulle purple">
+        {/* <button className="button-bulle purple">
           <FontAwesomeIcon icon={faBars} />
-        </button>
+        </button> */}
         <span>Vinyles Store</span>
         <button className="button-square pink" onClick={() => router.push("/vinyles-store/wantlist")}>
           <span>{discogs.wantlist_items.length}</span>
@@ -71,7 +72,7 @@ function Header({ q, nbWants }) {
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </button>
         </form>
-        <button className="button-bulle pink">
+        <button className="button-bulle pink" onClick={() => leaveApplication(router)}>
           <FontAwesomeIcon icon={faXmark} />
         </button>
       </header>
