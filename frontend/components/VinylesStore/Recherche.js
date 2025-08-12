@@ -26,7 +26,7 @@ function Recherche() {
           credentials: "include",
         });
         const datas = await response.json();
-        if (datas.result) setResults(datas.results.results);
+        if (datas.result) setResults(datas.results);
       }
     })();
   }, [q]);

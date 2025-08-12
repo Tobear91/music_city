@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Discogs = require("disconnect").Client;
-const helpers = require("../modules/helpers");
 
 const DISCOGS_KEY = process.env.DISCOGS_KEY;
 const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
@@ -60,18 +59,6 @@ router.get("/users/:username/wantlist", async (req, res, next) => {
   }
 });
 
-router.get("/releases/:release_id", async (req, res, next) => {
-  try {
-    const dis = new Discogs(req.session.accessData);
-    const database = dis.database();
-    const release = await database.getRelease(req.params.release_id);
-    res.json({ result: true, release });
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
-
 router.put("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -94,16 +81,73 @@ router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
   }
 });
 
+router.get("/users/:username/collection", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const collection = dis.user().collection();
+    const releases = await collection.getReleases(req.params.username, 0);
+    res.json({ result: true, collection: releases });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/users/:username/collection/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const collection = dis.user().collection();
+    await collection.addRelease(req.params.username, 0, req.params.release_id);
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/users/:username/collection/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const collection = dis.user().collection();
+    const instances = await collection.getReleaseInstances(req.params.username, req.params.release_id);
+    await collection.removeRelease(req.params.username, 0, req.params.release_id, instances.releases[0].instance_id);
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/releases/:release_id", async (req, res, next) => {
+  try {
+    const url = `https://api.discogs.com/releases/${req.params.release_id}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Discogs key=${DISCOGS_KEY}, secret=${DISCOGS_SECRET}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const release = await response.json();
+    res.json({ result: true, release });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/database/search", async (req, res, next) => {
   try {
     const { search, params } = req.body;
+    const url_params = new URLSearchParams({ q: search, ...params });
+    const url = `https://api.discogs.com/database/search?${url_params}`;
 
-    const dis = new Discogs(req.session.accessData);
-    const database = dis.database();
-
-    const results = await database.search(search, params);
-
-    res.json({ result: true, results });
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Discogs key=${DISCOGS_KEY}, secret=${DISCOGS_SECRET}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const datas = await response.json();
+    res.json({ result: true, results: datas.results });
   } catch (error) {
     next(error);
   }

@@ -1,29 +1,24 @@
-import { faMusic, faLink, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faMusic, faLink, faHeart, faEye, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Recherche.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { toggleWantlistItem } from "../../reducers/discogs";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import discogsHelper from "../../modules/discogs";
 
 function RechercheItem({ item }) {
-  const dispatch = useDispatch();
   const discogs = useSelector((state) => state.discogs);
 
-  // Ajouter dans la wantlist Discogs
-  const handleAddToWantlist = async (e) => {
+  const handleToggleWantlist = (e, action) => {
     e.preventDefault();
-
-    const response = await fetch(`http://127.0.0.1:3000/discogs/users/${discogs.username}/wants/${item.id}`, {
-      method: "PUT",
-      credentials: "include",
-    });
-    const datas = await response.json();
-
-    if (datas.result) dispatch(toggleWantlistItem(item.id));
+    discogsHelper.toggleWantlist(action, item.id);
   };
 
-  const isInWantList = () => {
-    return discogs.wantlist_items.includes(item.id);
+  const handleToggleCollection = (e, action) => {
+    e.preventDefault();
+    discogsHelper.toggleCollection(action, item.id);
   };
+
+  const isInCollection = () => discogs.collection_items.includes(item.id);
+  const isInWantList = () => discogs.wantlist_items.includes(item.id);
 
   return (
     <div className={styles.item}>
@@ -34,13 +29,26 @@ function RechercheItem({ item }) {
       <div>
         <p>{item.title}</p>
         <div>
+          <a className="button-square small purple" href={`/vinyles-store/release/${item.id}`}>
+            <FontAwesomeIcon icon={faEye} />
+          </a>
+          {isInCollection() && (
+            <span className="button-square small green" onClick={(e) => handleToggleCollection(e, "remove")}>
+              <FontAwesomeIcon icon={faCompactDisc} />
+            </span>
+          )}
+          {!isInCollection() && (
+            <button className="button-square small blue" onClick={(e) => handleToggleCollection(e, "add")}>
+              <FontAwesomeIcon icon={faCompactDisc} />
+            </button>
+          )}
           {isInWantList() && (
-            <span className="button-square small green">
+            <span className="button-square small green" onClick={(e) => handleToggleWantlist(e, "remove")}>
               <FontAwesomeIcon icon={faHeart} />
             </span>
           )}
           {!isInWantList() && (
-            <button className="button-square small pink" onClick={(e) => handleAddToWantlist(e)}>
+            <button className="button-square small pink" onClick={(e) => handleToggleWantlist(e, "add")}>
               <FontAwesomeIcon icon={faHeart} />
             </button>
           )}
