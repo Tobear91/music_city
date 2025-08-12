@@ -1,0 +1,43 @@
+@import "../core/variables.scss";
+
+.item {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 5px;
+
+  // Cover
+  & > div:first-child {
+    height: 165px;
+    background: #ffffff url("../../img/vinyle-mockup.png") no-repeat;
+    background-size: contain;
+
+    img {
+      width: 103px;
+      height: 103px;
+      position: relative;
+      top: 0px;
+      left: 37px;
+    }
+  }
+
+  h2 {
+    font-weight: 600;
+    font-size: 2rem;
+    line-height: 24px;
+    color: $purple;
+  }
+
+  p {
+    color: #acacac;
+    margin: 10px 0 20px;
+  }
+
+  & > div:last-child {
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+  }
+}

@@ -1,4 +1,4 @@
-import styles from "../../assets/scss/vinyles_store/Wantlist.module.scss";
+import styles from "../../assets/scss/vinyles_store/Card.module.scss";
 import { faTrash, faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
