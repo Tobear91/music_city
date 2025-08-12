@@ -19,6 +19,7 @@ const spotifyRouter = require("./routes/spotify");
 const discogsRouter = require("./routes/discogs");
 const blindtestRouter = require("./routes/blindtest");
 const tracksRouter = require("./routes/tracks");
+const quizRouter = require("./routes/quiz")
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use("/spotify", spotifyRouter);
 app.use("/discogs", discogsRouter);
 app.use("/blindtest", blindtestRouter);
 app.use("/tracks", tracksRouter);
+app.use("/quiz", quizRouter)
 
 app.use(errorHandler);
 

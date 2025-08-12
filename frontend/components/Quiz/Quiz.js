@@ -1,39 +1,40 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setQuestions, setResult, setUserAnswer } from "../../reducers/quiz";
 import { getQuestions } from "./Questions";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import styles from "../../assets/scss/quiz/Quiz.module.scss";
 import { getTracksUser } from "../../modules/spotify";
 import { useRouter } from "next/router";
 import Header from "./Header";
 
-export default function Quiz({ questions: Questions }) {
-  const spotifyAccessToken = useSelector(
-    (state) => state.user.user.spotify.access_token
-  );
-
-  const [questions, setQuestions] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
+export default function Quiz({ Questions }) {
+  const spotifyAccessToken = useSelector((state) => state.user.user.spotify.access_token);
+  const dispatch = useDispatch();
 
   const router = useRouter();
   const { q } = router.query;
+
+
+  const [questionsList, setQuestionsList] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         if (Questions && Questions.length > 0) {
-          setQuestions(Questions);
+          setQuestionsList(Questions);
+          dispatch(setQuestions(Questions));
         } else {
           const data = await getTracksUser(spotifyAccessToken);
           const tracks = data.items.map((item) => item.track);
           const generatedQuestions = getQuestions(tracks);
-          setQuestions(generatedQuestions);
+          setQuestionsList(generatedQuestions);
+          dispatch(setQuestions(generatedQuestions));
         }
       } catch (err) {
-        console.error("Erreur lors du chargement des questions :", err);
+        console.log("Erreur lors du chargement des questions :", err);
       }
     };
 
@@ -41,13 +42,19 @@ export default function Quiz({ questions: Questions }) {
   }, [spotifyAccessToken, Questions]);
 
   const handleAnswer = (selected) => {
-    if (selected === questions[currentQuestion].correctAnswer) {
+    dispatch(
+      setUserAnswer({ questionIndex: currentQuestion, answer: selected })
+    );
+    if (selected === questionsList[currentQuestion].correctAnswer) {
       setScore(score + 1);
     }
     setCurrentQuestion(currentQuestion + 1);
   };
+  
+  const myQuestion = questionsList[currentQuestion];
 
-  if (currentQuestion >= questions.length) {
+  if (currentQuestion >= questionsList.length) {
+    dispatch(setResult({ score, total: questionsList.length }));
     return (
       <>
         <Header q={q} />
@@ -55,7 +62,7 @@ export default function Quiz({ questions: Questions }) {
           <div className={styles.header}>
             <div>
               <Image
-                src="/img/cloudy_moon.jpg"
+                src="/img/cloudy_moon_nobg.png"
                 alt="Cloudy Moon"
                 width={707}
                 height={194}
@@ -67,20 +74,13 @@ export default function Quiz({ questions: Questions }) {
             </div>
           </div>
           <p className={styles.score}>
-            Score : {score}/{questions.length}
+            Score : {score}/{questionsList.length}
           </p>
           <div className={styles.buttonContainer}>
             <button
               className={styles.endButton}
               onClick={() => {
-                localStorage.setItem(
-                  "quizQuestions",
-                  JSON.stringify(questions)
-                );
-                router.push({
-                  pathname: "/quiz/correction",
-                  query: { score, total: questions.length },
-                });
+                router.push("/quiz/correction");
               }}
             >
               Voir correction
@@ -97,8 +97,6 @@ export default function Quiz({ questions: Questions }) {
     );
   }
 
-  const myQuestion = questions[currentQuestion];
-
   return (
     <>
       <Header q={q} />
@@ -106,7 +104,7 @@ export default function Quiz({ questions: Questions }) {
         <div className={styles.header}>
           <div>
             <Image
-              src="/img/cloudy_moon.jpg"
+              src="/img/cloudy_moon_nobg.png"
               alt="Cloudy Moon"
               width={707}
               height={194}
@@ -114,9 +112,21 @@ export default function Quiz({ questions: Questions }) {
             />
           </div>
         </div>
+        {console.log(myQuestion)};
+        
+        {/* Afficher image si la question concernant une cover pop*/}
+        {myQuestion.image && (
+            <Image
+              className={styles.cover}
+              src={myQuestion.image}
+              alt="Cover track"
+              width={200}
+              height={200}
+            />
+        )}
         <div className={styles.questionCard}>
           <span className={styles.counter}>
-            {currentQuestion + 1}/{questions.length}
+            {currentQuestion + 1}/{questionsList.length}
           </span>
           <h2 className={styles.questionText}>{myQuestion.question}</h2>
         </div>

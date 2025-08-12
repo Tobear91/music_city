@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background-color: #2E1B5C;
+  background: linear-gradient(135deg, #5e36c9 0%, #2e1b5c 50%, #120926 100%);
   color: white;
   display: flex;
   flex-direction: column;
@@ -76,11 +76,16 @@
 }
 
 .title {
-  color:$purple;
-  font-size: 50px; 
-  font-weight: 800;
-  margin-bottom: 24px;
   font-family: "Wedges", sans-serif;
+  font-size: 50px;
+  font-weight: 800;
+  color: $purple;
+  background-color: white;
+  padding: 15px 20px;
+  border-radius: 16px;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px 0px $pink;
+  text-align: center;
 }
 
 .titleHead {
@@ -100,12 +105,10 @@
   display: flex;
   justify-content: center; 
   gap: 20px;
-  flex-wrap: wrap;
   margin-top: 30px;
 }
 
-.endButton {  
-  
+.endButton {    
   background-color: white;
   color: $purple;
   border: none;
@@ -126,6 +129,12 @@
     transition: opacity 0.2s;
     opacity: 0.5;
     
+}
+
+.cover {
+  border-radius: 16px;
+  margin-bottom: 24px;
+  display: block;
 }
 
 

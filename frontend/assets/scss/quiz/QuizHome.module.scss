@@ -4,6 +4,7 @@
   display: flex;
   height: 100vh;
   font-family: Arial, sans-serif;
+  position: rel
 }
 
 /* Partie gauche */
@@ -46,14 +47,7 @@
   justify-content: center;
 }
 
-.closeIcon {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 24px;
-  color: $pink;
-  cursor: pointer;
-}
+
 
 .welcomeTitle {
   font-size: 20px;

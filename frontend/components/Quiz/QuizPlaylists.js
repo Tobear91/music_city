@@ -1,9 +1,10 @@
 import styles from "../../assets/scss/quiz/QuizPlaylists.module.scss";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { faArrowRight} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { getPlaylistsUser } from "../../modules/spotify";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { getPlaylistTracks } from "../../modules/spotify";
 import { getQuestions } from "./Questions";
 import Quiz from "./Quiz";
@@ -65,7 +66,7 @@ function QuizPlaylists() {
       <div className={styles.playlistsContainer}>
         <div className={styles.header}>
           <Image
-            src="/img/cloudy_moon.jpg"
+            src="/img/cloudy_moon_nobg.png"
             alt="Bannière"
             width={707}
             height={194}
@@ -78,10 +79,14 @@ function QuizPlaylists() {
             playlists.map((playlist) => (
               <button
                 key={playlist.id}
-                className={styles.playlistButton}
+                className={"form-button primary"}
                 onClick={() => handlePlaylistTrack(playlist.id)}
               >
                 {playlist.name}
+                <FontAwesomeIcon
+                                  icon={faArrowRight}
+                                  style={{ color: "#fb6ca2" }}
+                                />
               </button>
             ))
           )}

@@ -21,7 +21,7 @@ function Spotify() {
   }, [router.isReady]);
 
   useEffect(() => {
-    if (user?.email) router.push("/");
+    if (user?.email) router.push("/map");
   }, [user?.email]);
 
   const handleLogin = async () => {
