@@ -54,7 +54,7 @@ function Interpretation(props) {
   if (interpretationState) {
     return (
       <div>
-        <h1 className={styles.title}>Interpretation de la chanson:</h1>
+        <h1 className={styles.title}>INTERPRETATION DES PAROLES:</h1>
         <div>
           <p>{interpretationState}</p>
         </div>
@@ -65,7 +65,7 @@ function Interpretation(props) {
 
   return (
     <div>
-      <h1 className={styles.title}>INTERPRETATION DE LA CHANSON :</h1>
+      <h1 className={styles.title}>INTERPRETATION DES PAROLES:</h1>
       <button onClick={() => handleClick()}>Launch</button>
     </div>
   );

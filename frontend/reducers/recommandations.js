@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   value: {
-    tracks: [] 
+    tracks: [],
   },
 };
 
@@ -11,10 +11,20 @@ export const recommandationsSlice = createSlice({
 
   initialState,
   reducers: {
-    fetchedRecommandations: (state, action) => {
-      console.log("recommandations tracks from action.payload")
-}}});
+    setRecommandationsList: (state, action) => {
+      state.value.tracks = action.payload.map((e) => ({
+        track_id: e.track_spotify_id,
+        title: e.title,
+        artist: e.artist,
+        duration_ms: e.duration_ms,
+        uri: e.uri,
+      }));
+    },
+    resetRecommandationsList: (state, action) => {
+      state.value.tracks = []
+    }
+  },
+});
 
-export const { fetchedRecommandations } =
-  recommandationsSlice.actions;
+export const { setRecommandationsList, resetRecommandationsList } = recommandationsSlice.actions;
 export default recommandationsSlice.reducer;

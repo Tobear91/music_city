@@ -7,9 +7,11 @@ import blindtest from "../reducers/blindtest";
 import analyses from "../reducers/analyses";
 import discogs from "../reducers/discogs";
 import character from "../reducers/character"
+import criteres from "../reducers/criteres"
+import recommandations from "../reducers/recommandations"
 
 const persistConfig = { key: "music_city", storage };
-const rootReducer = combineReducers({ user, analyses, blindtest, discogs,character });
+const rootReducer = combineReducers({ user, analyses, blindtest, discogs,character, criteres, recommandations });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

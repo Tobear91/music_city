@@ -201,7 +201,7 @@ router.get("/avisInterpretations", async (req, res) => {
 
 // ajout/retrait d'un object_id des favoris à partir d'un id spotify + email
 router.post("/addtofavorites", async (req, res) => {
-  const {  email , track_id, uri, artist, title} = req.body;
+  const { email, track_id, uri, artist, title } = req.body;
   if (!email || !track_id) {
     return res.status(400).json({ error: "Email and Id are required" });
   }
@@ -209,22 +209,21 @@ router.post("/addtofavorites", async (req, res) => {
   try {
     let track = await Track.findOne({ track_spotify_id: track_id });
     if (!track) {
-      console.log(email)
+      console.log(email);
       const newtrack = new Track({
         title: title,
         artist: artist,
         spotify_uri: uri,
         track_spotify_id: track_id,
-      })
+      });
       track = await newtrack.save();
     }
 
     const doc = await User.findOne({ email: email });
     if (!doc) {
-      
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     const id = track._id;
 
     if (!doc.favorites.includes(id)) {
@@ -248,10 +247,22 @@ router.post("/addtofavorites", async (req, res) => {
   }
 });
 
-router.post('/favorites', async (req, res) =>{
-  const {email} = req.body;
-  const user = await User.findOne({ email }).populate('favorites');
-  res.json({result: true, favorites: user.favorites})
-})
+router.post("/favorites", async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email }).populate("favorites");
+  res.json({ result: true, favorites: user.favorites });
+});
 
+router.post("/removefromfavorites", async (req, res) => {
+  const { track_id, email } = req.body;
+
+  const track = await Track.findOne({ track_spotify_id: track_id });
+
+  await User.findOneAndUpdate(
+    { email: email },
+    { $pull: { favorites: track._id } }
+  );
+
+  res.json({ result: true });
+});
 module.exports = router;

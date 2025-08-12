@@ -4,7 +4,11 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { addToCriteres } from "../../reducers/criteres";
+
 function Thematiques(props) {
+  const dispatch = useDispatch()
+
   const thematiquesState = useSelector(
     (state) => state.analyses.value.interpretation_by_ai.themes
   );
@@ -14,7 +18,7 @@ function Thematiques(props) {
       <li key={index}>
         {theme}
         <button
-          onClick={() => props.function({ genre })}
+          onClick={() => dispatch(addToCriteres(theme))}
           style={{
             background: "none",
             border: "none",

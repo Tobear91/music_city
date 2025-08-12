@@ -14,42 +14,19 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function Track(props) {
-  const audioRef = useRef(null); //pour lecture preview *pourquoi useRef?
-
   const [isFav, setIsFav] = useState(false);
-  const [isPremium, setIsPremium] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const useremail = useSelector((state) => state.user.user.email);
   const storeData = useSelector((state) => state.analyses.value);
   const [previewUrl, setPreviewUrl] = useState("");
 
-  const playPreview = (url) => {
-    if (isPlaying) {
-      // Mettre en pause si déjà en train de jouer
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      return;
-    }
-
-    // Sinon lancer la lecture
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-
-    audioRef.current = new Audio(url);
-    audioRef.current.volume = 0.3;
-
-    audioRef.current
-      .play()
-      .then(() => setIsPlaying(true))
-      .catch((err) => console.error("Erreur lors de la lecture :", err));
-  };
 
   useEffect(() => {
+    if(props.globalIsPlaying === false){
+      setIsPlaying(false)
+    }
     async function fetchFavorites() {
-      //creation de fonction async dans le scope du useEffect car useEffect ne peux pas l'etre (j'ai été tznté de faire un const data = await fetchfavorite)
       const data = await getFavorites(useremail);
       if (data && data.favorites) {
         const bool = data.favorites.some(
@@ -69,11 +46,11 @@ function Track(props) {
       }
     }
     fetchPreview();
-  }, []);
+  }, [props.globalIsPlaying]);
 
   return (
     <div>
-      <div key={props.index}>
+      <div key={props.index} >
         <p className={styles.titleRow}>
           <div className={styles.title}>
             {storeData.album.tracks[props.index].track_number} -{" "}
@@ -109,14 +86,8 @@ function Track(props) {
                 transition: "background-color 0.3s ease",
               }}
               onClick={() => {
-                // if(isPremium){
-                //   playFullMusic(uri)
-                //   console.log("play the music")
-                // } else {
-                //   console.log("play the preview")
-                  playPreview(previewUrl)
-                // }
-
+                    props.playpreview(previewUrl)
+                    setIsPlaying(true)
               }}
             >
               <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />

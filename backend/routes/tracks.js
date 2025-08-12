@@ -5,17 +5,15 @@ const scraperLyrics = require("../modules/MusicLab/getlyrics");
 const User = require("../models/users");
 const Track = require("../models/tracks");
 const interpreterParoles = require("../modules/MusicLab/lyricsinterpretation");
-const spotifyPreviewFinder = require('spotify-preview-finder');
+const spotifyPreviewFinder = require("spotify-preview-finder");
 
 //ajout d'un nouveau track
 router.post("/", async (req, res) => {
   try {
     const track = await Track.findOne({ track_spotify_id: req.body.track_id });
-
     if (track) {
       return res.json({ result: false, error: "Track already exists" });
     }
-
     const newTrack = new Track({
       title: req.body.title,
       artist: req.body.artist,
@@ -24,12 +22,13 @@ router.post("/", async (req, res) => {
       previewUrl: req.body.preview_uri,
       genres: req.body.genres,
       lyrics: req.body.lyrics.lyrics,
-      album: req.body.album.name,
+      album_name: req.body.album,
       album_tracks_id: req.body.album.tracks,
-      album_image: req.body.album.image,
+      album_image: req.body.album_image,
       release_date: req.body.release_date,
       likes_interpretation: 0,
       dislikes_interpretation: 0,
+      duration_ms: req.body.duration_ms
     });
 
     await newTrack.save();
@@ -61,7 +60,6 @@ router.get("/", async (req, res) => {
 //ajout/update des resultats d'une analyse de track
 router.put("/updateanalyse", (req, res) => {
   const { track_id, interpretation, thematiques } = req.body;
-  console.log(req.body.track_id);
   Track.findOneAndUpdate(
     { track_spotify_id: req.body.track_id },
     {
@@ -171,13 +169,35 @@ router.get("/lyrics/interpretation", async (req, res) => {
   }
 });
 
-router.post('/previewUrl', async (req,res)=>{
-    const artistName = req.body.artistName;
-    const trackName = req.body.trackName;
-    const result = await spotifyPreviewFinder(trackName,artistName, 1);
-    console.log(result.results[0].previewUrls[0])
-    res.json({result:true, previewUrl : result.results[0].previewUrls[0]})
-})
+router.post("/previewUrl", async (req, res) => {
+  const artistName = req.body.artistName;
+  const trackName = req.body.trackName;
+  const result = await spotifyPreviewFinder(trackName, artistName, 1);
+  try {
+    res.json({ result: true, previewUrl: result.results[0].previewUrls[0] });
+  } catch {
+    res.json({ result: false });
+  }
+});
 
+router.post("/recommandations", async (req, res) => {
+  try {
+    const criteres = req.body; // tableau de strings
+
+    const tracks = await Track.find({     
+      $and: criteres.map(critere => ({    //$and: cherche toutes les combinaisons key:value qui suivent
+        $or: [                            //$or: au moins l'une des options doit matcher
+          { genres: critere },
+          { thematiques: critere }
+        ]
+      }))
+    });
+
+    res.json({ result: true, tracks });
+  } catch (err) {
+    console.error(err);
+    res.json({ result: false, error: err.message });
+  }
+});
 
 module.exports = router;
