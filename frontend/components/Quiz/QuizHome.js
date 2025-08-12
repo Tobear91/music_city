@@ -1,12 +1,13 @@
 import { useState } from "react";
 import styles from "../../assets/scss/quiz/QuizHome.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import Quiz from "./Quiz";
 import QuizPlaylists from "./QuizPlaylists";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Header from "./Header";
+import {leaveApplication} from '../../modules/appinteraction'
+
 
 export default function QuizHome() {
   const [startQuiz, setStartQuiz] = useState(false);
@@ -14,6 +15,10 @@ export default function QuizHome() {
 
   const router = useRouter();
   const { q } = router.query;
+
+  const handleLeaveBuilding = () => {
+      leaveApplication(router)
+  }
 
   // Quiz Playlist
   const handlePlaylistQuiz = () => {
@@ -44,6 +49,9 @@ export default function QuizHome() {
             <h1 className={styles.quizTitle}>QUIZ</h1>
           </div>
 
+          <button className="button-bulle pink "  style={{ position: 'fixed', top: 20, right: 20, zIndex: 1 }} onClick={handleLeaveBuilding}>
+            <FontAwesomeIcon icon={faXmark}/>
+          </button>
           <div className={styles.quizRight}>
             <h2 className={styles.welcomeTitle}>
               Bienvenue sur le Quiz de Music City
@@ -60,20 +68,18 @@ export default function QuizHome() {
 
             <div className={styles.buttonContainer}>
               <button
-                className={styles.quizButton}
+                className={"form-button primary"}
                 onClick={handlePlaylistQuiz}
               >
                 En fonction d'une de mes playlists
                 <FontAwesomeIcon
                   icon={faArrowRight}
-                  style={{ color: "#fb6ca2" }}
                 />
               </button>
-              <button className={styles.quizButton} onClick={handleStartQuiz}>
+              <button className={"form-button primary"} onClick={handleStartQuiz}>
                 Morceaux aléatoire favoris
                 <FontAwesomeIcon
                   icon={faArrowRight}
-                  style={{ color: "#fb6ca2" }}
                 />
               </button>
             </div>
