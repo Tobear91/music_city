@@ -32,7 +32,7 @@
   display: inline-flex; 
   flex-direction: column;
   text-align: center;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   grid-column: auto; 
   padding: 100px;
@@ -40,39 +40,7 @@
 
 
 
-.instruction{
-  font-size: 1.8rem;
-  color: $purple;
-  margin-block: 10px;
-  text-align: justify;
-  line-height: 1.6;
-
-}
-
-.separator {
-  width: 100%;
-  border: none;
-  border-top: 2px solid $purple; 
-}
 
 
-.subtitle {
-    font-size: 3rem;
-    font-weight: 600;
-    color: $purple;
-    margin-bottom: 20px;
-}
-
-.bodyTxt {
-  font-size: 1.8rem;
-  color: $purple;
-  margin-block: 10px;
-  line-height: 1.4;
-}
 
 
-.pointCpt{
-    font-family: "Wedges", sans-serif;
-    font-size: 2rem;
-    color: $purple;
-}
