@@ -41,7 +41,6 @@ export const analysesSlice = createSlice({
       state.value.album.album_id = track.album.id;
       state.value.album.date = track.album.release_date;
       state.value.album.image = track.album.images[0].url;
-
       state.value.album.tracks = []; // à remplir après appel à `/albums/:id/tracks`
 
       state.value.genres = []; // à remplir après appel à `/artists/:id` ou ???
@@ -63,14 +62,15 @@ export const analysesSlice = createSlice({
       state.value.lyrics.title = track.title;
       state.value.lyrics.artist = track.artist;
       state.value.lyrics.lyrics = track.lyrics;
+
       state.value.album.name = track.album;
       state.value.album.album_id = track.album_tracks_id;
-      state.value.album.tracks = []; // à remplir après appel à `/albums/:id/tracks`
       state.value.album.date = track.release_date;
-      state.value.album.image = track.album_image; // à remplir après appel à `/albums/:id`
-      state.value.genres = track.genres || []; // à remplir après appel à `/artists/:id` ou ???
-      state.value.interpretation_by_ai.interpretation =
-        track.interpretation || "";
+      state.value.album.image = track.album_image;
+      state.value.album.tracks = []; 
+
+      state.value.genres = track.genres || [];
+      state.value.interpretation_by_ai.interpretation = track.interpretation || "";
       state.value.interpretation_by_ai.themes = track.thematiques || [];
       state.value.interpretation_by_ai.likes = 0;
       state.value.interpretation_by_ai.dislikes = 0;

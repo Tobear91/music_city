@@ -325,4 +325,16 @@ router.put("/toggle-collection", async (req, res, next) => {
   }
 });
 
+router.post("/removefromfavorites", async (req, res) => {
+  const { track_id, email } = req.body;
+
+  const track = await Track.findOne({ track_spotify_id: track_id });
+
+  await User.findOneAndUpdate(
+    { email: email },
+    { $pull: { favorites: track._id } }
+  );
+
+  res.json({ result: true });
+});
 module.exports = router;

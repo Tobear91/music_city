@@ -5,11 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { replaceMsWithMinutesAndSeconds } from "../../modules/formatages";
 import Track from "./Track";
 
-function Album() {
+function Album(props) {
   const storeData = useSelector((state) => state.analyses.value);
 
   let trackslist = storeData.album.tracks.map((track, index) => (
-    <Track index={index} />
+    <Track index={index} playpreview={props.playpreview} globalIsPlaying={props.isPlaying}/>
   ));
   return (
     <div>
@@ -17,7 +17,7 @@ function Album() {
         <img
           src={storeData.album.image}
           alt="image de l'album"
-          style={{ width: "330px", height: "auto", justifyContent:"center", display: 'flex'}} // optionnel pour taille
+          style={{ width: "300px", height: "auto", justifyContent:"center", display: 'flex'}} // optionnel pour taille
         />
         <div>
           <p className={styles.titleRow}>

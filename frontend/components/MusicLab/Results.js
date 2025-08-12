@@ -1,5 +1,5 @@
 import styles from "../../styles/MusicLab/Results.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "./Header";
@@ -9,7 +9,7 @@ import Genres from "./Genres";
 import Interpretation from "./Interpretation";
 import Thematiques from "./Thematiques";
 import Audiofeatures from "./Audiofeatures";
-import Recommandations from "./Recommandations";
+import Footer from "./Footer";
 import {
   getInterpretationAndThemes,
   resetAnalyses,
@@ -22,28 +22,41 @@ import { store } from "../../modules/store";
 function Results() {
   const dispatch = useDispatch();
   const router = useRouter();
+  const audioRef = useRef(null);
   const storeData = useSelector((state) => state.analyses.value);
   const useremail = useSelector((state) => state.user.user.email);
 
+
   const [dejaFait, setDejafait] = useState(false);
   const [criteres, setCriteres] = useState([]);
-  // const [likes, setLikes] = useState(0);
-  // const [dislikes, setDislikes] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const {
-    track_id,
-    artist_id,
-    uri,
-    lyrics,
-    album,
-    duration_ms,
-    metadatas,
-    genres,
-  } = storeData;
+  const playPreview = (url) => {
+    if (isPlaying) {
+      // Mettre en pause si déjà en train de jouer
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+      return;
+    }
+
+    // Sinon lancer la lecture
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+
+    audioRef.current = new Audio(url);
+    audioRef.current.volume = 0.3;
+
+    audioRef.current
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch((err) => console.error("Erreur lors de la lecture :", err));
+  };
 
   const interpretation = storeData.interpretation_by_ai.interpretation;
   const themes = storeData.interpretation_by_ai.themes;
-  let formatedlyrics = replaceLinesBreacksWithBr(lyrics.lyrics);
+  let formatedlyrics = replaceLinesBreacksWithBr(storeData.lyrics.lyrics);
 
   async function interpretationFunction(lyrics, artiste) {
     if (lyrics === "") {
@@ -64,7 +77,7 @@ function Results() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        track_id: track_id,
+        track_id: storeData.track_id,
         interpretation: res.interpretation.interpretation,
         thematiques: res.interpretation.themes,
       }),
@@ -75,6 +88,7 @@ function Results() {
 
   useEffect(() => {
     const tracksIdFromAlbum = storeData.album.tracks.map((track) => track.id);
+    console.log(typeof storeData.duration_ms);
     fetch("http://127.0.0.1:3000/tracks", {
       method: "POST",
       headers: {
@@ -87,7 +101,7 @@ function Results() {
         artist: storeData.lyrics.artist,
         genres: storeData.genres,
         lyrics: storeData.lyrics.lyrics,
-        album: tracksIdFromAlbum,
+        album: storeData.album.name,
         duration_ms: storeData.duration_ms,
         album_image: storeData.album.image,
         release_date: storeData.release_date,
@@ -101,23 +115,18 @@ function Results() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        track_id: track_id,
+        track_id: storeData.track_id,
         interpretation: interpretation,
         thematiques: themes,
       }),
     }).then((response) => response.json());
-    // fetch(`http://127.0.0.1:3000/tracks/like?track_id=${track_id}`)
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     setLikes(data.likes);
-    //     setDislikes(data.dislikes);
-    //   });
+
     fetch(`http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`)
       .then((response) => response.json())
       .then((data) => {
         if (
           data.some((database_id) => {
-            return database_id === track_id;
+            return database_id === storeData.track_id;
           })
         ) {
           setDejafait(true);
@@ -128,19 +137,10 @@ function Results() {
       .catch((error) => {
         console.error("Error fetching user data:", error);
       });
-  }, [track_id, interpretation, themes, storeData]);
+  }, []);
 
   function saveCritere(newcritere) {
-    // console.log("ajout d'un nouveau critère :", newcritere);
     setCriteres((prev) => [...prev, newcritere]);
-  }
-
-  function getRecommendations(criteresparam) {
-    // console.log(
-    //   "gros fetch du turfu dans le backend avec la base de donnée secrete"
-    // );
-
-    dispatch(fetchedRecommandations(criteresparam));
   }
 
   function handleLike() {
@@ -150,7 +150,7 @@ function Results() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        track_id: track_id,
+        track_id: storeData.track_id,
         email: useremail,
       }),
     });
@@ -164,15 +164,11 @@ function Results() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        track_id: track_id,
+        track_id: storeData.track_id,
         email: useremail,
       }),
     });
     setDejafait(true);
-  }
-
-  function resetStore() {
-    dispatch(resetAnalyses());
   }
 
   return (
@@ -185,27 +181,32 @@ function Results() {
         {/* LYRICS */}
         <section className={styles.lyricsContainer}>
           <Lyrics
-            title={lyrics.title}
-            id={track_id}
-            artist={lyrics.artist}
+            title={storeData.lyrics.title}
+            id={storeData.track_id}
+            artist={storeData.lyrics.artist}
             lyrics={formatedlyrics}
-            uri={uri}
+            uri={storeData.uri}
             email={useremail}
+            playpreview={playPreview}
+            globalIsPlaying={isPlaying}
           />
         </section>
 
         {/* ALBUM */}
         <section className={styles.albumContainer}>
-          <Album />
+          <Album playpreview={playPreview} isPlaying={isPlaying} />
         </section>
 
         {/* INTERPRETATION */}
         <section className={styles.interpretationContainer}>
           <Interpretation
-            track_id={track_id}
+            track_id={storeData.track_id}
             databaseid={storeData.track_id}
             launchInterpretation={() =>
-              interpretationFunction(lyrics.lyrics, lyrics.artist)
+              interpretationFunction(
+                storeData.lyrics.lyrics,
+                storeData.lyrics.artist
+              )
             }
             handleLike={() => handleLike()}
             handleDislike={() => handleDislike()}
@@ -221,23 +222,12 @@ function Results() {
 
         {/* GENRES */}
         <section className={styles.genresContainer}>
-          <Genres genres={genres} function={saveCritere} />
-        </section>
-
-        {/* FEATURES */}
-        <section className={styles.featuresContainer}>
-          <Audiofeatures metadatas={metadatas} function={saveCritere} />
+          <Genres genres={storeData.genres} function={saveCritere} />
         </section>
 
         {/* FOOTER */}
         <footer className={styles.footerContainer}>
-          <button
-            onClick={() => {
-              resetStore();
-            }}
-          >
-            RESET
-          </button>
+          <Footer />
         </footer>
       </div>
     </>

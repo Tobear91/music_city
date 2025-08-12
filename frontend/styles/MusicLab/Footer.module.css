@@ -1,0 +1,17 @@
+.footer {
+  display: flex;
+}
+
+.criteresList {
+  display: flex;
+  gap: 12px; /* espace entre chaque critère */
+  flex-wrap: wrap; /* retour à la ligne si ça dépasse */
+}
+
+.criteres {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}

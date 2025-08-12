@@ -26,7 +26,6 @@ function Launch() {
   async function searchTrack(query) {
     // 1. Récupération des données Spotify
     let spotifyData = await getTrackData(query);
-    // console.log("Data from Spotify:", spotifyData);
     const artiste_id = spotifyData.tracks.items[0].artists[0].id;
     const track_id = spotifyData.tracks.items[0].id;
 
@@ -44,17 +43,16 @@ function Launch() {
       // console.log("Track already exists in the database:", dbData);
       dispatch(getTrackFromDatabase(dbData));
     } catch (err) {
-      // console.log(
-      //   "Track not found in the database, adding new track:",
-      //   err.message
-      // );
+      console.log(
+        "Track not found in the database, adding new track:",
+        err.message
+      );
 
       // 2. Ajout de la nouvelle track dans la base de données
       dispatch(newTrackFromSPO(spotifyData));
 
       // 2.1 Récupération des genres
       const artistData = await getArtistData(artiste_id);
-      // console.log("Artist data:", artistData);
       dispatch(getGenres(artistData.genres));
     }
 

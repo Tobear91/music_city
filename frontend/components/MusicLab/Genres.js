@@ -4,13 +4,15 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { addToCriteres } from "../../reducers/criteres";
 
 function Genres(props) {
+  const dispatch = useDispatch()
   let genreslist = props.genres.map((genre, index) => (
     <li key={index}>
       <span>{genre}</span>
       <button
-        onClick={() => props.function({ genre })}
+        onClick={() =>dispatch(addToCriteres(genre))}
         style={{
           background: "none",
           border: "none",
