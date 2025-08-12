@@ -1,19 +1,19 @@
-import React, { useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "../../assets/scss/blindtest/Questions.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-import QuestionElement from "./QuestionElement";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  nextQuestion,
+  addAnswerToStore,
+  setCorrectionAndScore,
+} from "../../reducers/blindtest";
 import Image from "next/image";
-import ResponseElement from "./ResponseElement";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { nextQuestion, addAnswerToStore } from "../../reducers/blindtest";
 import { useRouter } from "next/router";
-import { leaveApplication } from "../../modules/appinteraction";
 import { checkCorrection } from "../../modules/checkCorrection";
-import { setCorrectionAndScore } from "../../reducers/blindtest";
 import Header from "./Header";
+import QuestionElement from "./QuestionElement";
+import ResponseElement from "./ResponseElement";
 
 export default function Questions() {
   const dispatch = useDispatch();
@@ -69,7 +69,6 @@ export default function Questions() {
 
   const handleFinishQuiz = async () => {
     const updatedAnswerList = [...blindtestInfo.answerList, currentAnswer];
-
     const correctionList = blindtestInfo.questionList.map((q) => q.title);
     let correction = [];
     for (let i = 0; i < correctionList.length; i++) {

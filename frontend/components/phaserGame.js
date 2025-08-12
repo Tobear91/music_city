@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import Phaser from "phaser";
 import styles from "../styles/PhaserGame.module.css";
 import { preload, update, create } from "../modules/phaser";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
 import EnterScreen from "./globalapp/EnterScren";
@@ -21,7 +21,7 @@ const PhaserGame = () => {
       setShowEnterScreen(true);
       setTimeout(() => {
         router.push(`/${characterPosition.name}`);
-      }, 1000);
+      }, 700);
     } else if (!characterPosition.name && router.asPath !== "/map") {
       router.push("/map");
     }

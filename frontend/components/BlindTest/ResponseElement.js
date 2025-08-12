@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import styles from "../../assets/scss/blindtest/ReponseElement.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";

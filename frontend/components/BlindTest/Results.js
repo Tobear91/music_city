@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
 import styles from "../../assets/scss/blindtest/Results.module.scss";
-import { checkCorrection } from "../../modules/checkCorrection";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { leaveApplication } from "../../modules/appinteraction";
 import Image from "next/image";

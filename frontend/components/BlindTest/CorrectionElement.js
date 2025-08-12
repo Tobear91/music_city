@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import styles from "../../assets/scss/blindtest/CorrectionElement.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";

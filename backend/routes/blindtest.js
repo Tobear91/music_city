@@ -1,31 +1,44 @@
 const express = require("express");
 const router = express.Router();
 
-const spotifyPreviewFinder = require('spotify-preview-finder');
+const spotifyPreviewFinder = require("spotify-preview-finder");
 const { getRandomSeries } = require("../modules/tmdb");
 
-const Show = require('../models/blindtests/shows')
-const BlindTest = require('../models/blindtests/blindtests')
-const User = require('../models/users')
+const Show = require("../models/blindtests/shows");
+const BlindTest = require("../models/blindtests/blindtests");
+const User = require("../models/users");
 
+// Route permettant de récupérer 10 séries aléatoires
+router.get("/randomshow", async (req, res) => {
+  try {
+    // on attend que les 10 éries soient récupérées.
+    const results = await Promise.all(
+      Array.from({ length: 10 }, () => getRandomSeries())
+    );
+    //si certaines séries ont mal été récupéré on les supprime
+    const series = results.filter((s) => s !== null);
+    res.json({ series });
+  } catch (error) {
+    console.error("Erreur /randomshow:", error);
+    res.status(500).json({ error: "Impossible de récupérer les séries" });
+  }
+});
 
-router.get('/randomshow',async (req,res)=>{
-    const series = [];
-    for (let cpt =0; cpt < 10; cpt ++){
-        series.push(await getRandomSeries())
-    }
-    res.json({series});
-})
-
-
-router.post('/previewUrl', async (req, res) => {
+//on récupère une preview avec le nom de la musque et de l'artiste
+router.post("/previewUrl", async (req, res) => {
   try {
     const artistName = req.body.artistName;
     const trackName = req.body.trackName;
 
     const result = await spotifyPreviewFinder(trackName, artistName, 1);
 
-    if (!result || !result.results || !result.results[0] || !result.results[0].previewUrls || result.results[0].previewUrls.length === 0) {
+    if (
+      !result ||
+      !result.results ||
+      !result.results[0] ||
+      !result.results[0].previewUrls ||
+      result.results[0].previewUrls.length === 0
+    ) {
       return res.json({ result: false, previewUrl: null });
     }
     res.json({ result: true, previewUrl: result.results[0].previewUrls[0] });
@@ -34,9 +47,8 @@ router.post('/previewUrl', async (req, res) => {
   }
 });
 
-
 // route permettant de récupérer tous les hsow pour vérifier
-router.get('/allshows', async (req, res) => {
+router.get("/allshows", async (req, res) => {
   try {
     const showData = await Show.find({});
     res.json({ result: true, allShow: showData });
@@ -45,9 +57,9 @@ router.get('/allshows', async (req, res) => {
     res.status(500).json({ result: false, error: "Can't get shows" });
   }
 });
-// route permettant de récupérer tous les blindtest pour vérifier
 
-router.get('/all', async (req, res) => {
+// route permettant de récupérer tous les blindtest pour vérifier
+router.get("/all", async (req, res) => {
   try {
     const blindtestData = await BlindTest.find({});
     res.json({ result: true, allblindtest: blindtestData });
@@ -57,23 +69,13 @@ router.get('/all', async (req, res) => {
   }
 });
 
+// ajoute un show à la bdd
+router.post("/newshow", async (req, res) => {
+  const tmbdId = req.body.tmbdId;
 
-router.delete('/allshows', async (req, res) => {
-  try {
-    const result = await Show.deleteMany({});
-    res.json({ result: true, deletedCount: result.deletedCount });
-  } catch (error) {
-    console.error("Can't delete show", error);
-    res.status(500).json({ result: false, error: "Can't delete show" });
-  }
-});
-
-router.post('/newshow',async(req,res)=>{
-    const tmbdId = req.body.tmbdId;
-    
-    const isShowSaved = await Show.findOne({ tmbdId: tmbdId});
-    if(isShowSaved===null){
-        const newShow = new Show({
+  const isShowSaved = await Show.findOne({ tmbdId: tmbdId });
+  if (isShowSaved === null) {
+    const newShow = new Show({
       type: req.body.type,
       tmbdId,
       name: req.body.name,
@@ -85,21 +87,21 @@ router.post('/newshow',async(req,res)=>{
       soundtrackPreview: req.body.soundtrackPreview,
       soundtrackSpotifyId: req.body.soundtrackSpotifyId,
       isPreviewCertain: req.body.isPreviewCertain,
-        })
-        
-        const showSaved = await newShow.save()
-        res.json({result: true, show: showSaved })
-    }else {
-			// show already exists in database
-			res.json({ result: false, error: 'show already saved' });
-		}
-})
+    });
 
+    const showSaved = await newShow.save();
+    res.json({ result: true, show: showSaved });
+  } else {
+    // show already exists in database
+    res.json({ result: false, error: "show already saved" });
+  }
+});
 
+// Ajoute le blindtest fini a la base de données
 router.post("/", async (req, res) => {
   try {
     const { email, Score, Type, questions } = req.body;
-    const user = await User.findOne({ email : email });
+    const user = await User.findOne({ email: email });
 
     const questionDocs = [];
     for (const q of questions) {
@@ -108,8 +110,8 @@ router.post("/", async (req, res) => {
       questionDocs.push({
         show: show._id,
         userAnswer: q.userAnswer || "",
-        actorRevealed: q.actorRevealed ,
-        posterRevealed: q.posterRevealed ,
+        actorRevealed: q.actorRevealed,
+        posterRevealed: q.posterRevealed,
         isCorrect: q.isCorrect,
       });
     }
@@ -117,7 +119,7 @@ router.post("/", async (req, res) => {
       user: user._id,
       Score: Number(Score),
       Type,
-      question: questionDocs
+      question: questionDocs,
     });
 
     const savedBlindtest = await newBlindtest.save();
@@ -127,7 +129,5 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Impossible to create blindtest" });
   }
 });
-
-
 
 module.exports = router;

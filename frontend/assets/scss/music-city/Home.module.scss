@@ -2,10 +2,10 @@
 
 .modalOverlay {
   position: fixed;
-  top: 0; /*permet de mettre la modale en dessous le menu si on change la bien penser à changer la talille du menu aussi */
+  top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh; /*permet de mettre la modale en dessous le menu */
+  height: 100vh;
   background-color: $purple;
 }
 
@@ -13,50 +13,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: flex-start;
   margin-top: 100px;
   position: relative;
 }
 
 .overlaySection {
   position: absolute;
-  top: 50px;
-}
-
-.buttonContainer {
+  top: 50px; 
   display: flex;
-  justify-content: flex-end;
-  margin-right: 50px;
-}
+  flex-wrap: wrap;
+  gap: 10rem;
+  justify-content: center;
+  padding: 2rem;
+  max-height: calc(100vh - 200px); 
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: $purple #f0f0f0;
 
-.nextButton {
-  background-color: white;
-  width: 300px;
-  color: $purple;
-  font-weight: 600;
-  font-size: 1.6rem;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  height: 56px;
-  color: $purple;
-  position: relative;
-}
-
-.nextButton:hover {
-  background-color: $pink;
-  color: $purple;
-  transition: all 0.2s ease-in;
-}
-
-.nextFa {
-  position: absolute;
-  right: 20px;
-}
-
-.buttonTriple {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 150px;
 }

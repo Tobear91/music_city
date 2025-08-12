@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import styles from "../../assets/scss/blindtest/Home.module.scss";
 import LoadingScreens from "./LoadingScreens";
 import { useState } from "react";
@@ -119,7 +118,7 @@ export default function Home() {
             height={194}
             priority
           />
-          <h1 className={styles.titlePage}>Blind Test</h1>
+          <h1 className={styles.titlePage}>Blindtest</h1>
         </div>
         <div className={styles.modalTxt}>
           <button
@@ -134,7 +133,9 @@ export default function Home() {
           >
             <FontAwesomeIcon icon={faXmark} />
           </button>
-          <h2 className={styles.subtitle}>Bienvenue dans le BlindTest</h2>
+          <h2 className={styles.subtitle}>
+            Bienvenue dans le Blindtest - série
+          </h2>
           <p className={styles.instruction}>
             Dans ce bâtiment, vous allez pouvoir tester vos connaissances
             musicales sur les séries. Il vous sera possible d'écouter des

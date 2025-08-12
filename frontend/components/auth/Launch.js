@@ -23,28 +23,11 @@ export default function Launch() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      audioRef.current.play();
       audioRef.current.volume = 0.05;
-      audioRef.current.play().catch((err) => {
-        console.warn("Lecture bloquée par le navigateur :", err);
-      });
       setIsPlaying(true);
     }
   };
-
-  useEffect(() => {
-    // Essayer de jouer l'audio au montage du composant
-    const playAudio = async () => {
-      try {
-        audioRef.current.volume = 0.05;
-        await audioRef.current.play();
-        console.log("Lecture automatique démarrée !");
-      } catch (err) {
-        console.warn("Lecture automatique bloquée par le navigateur :", err);
-      }
-    };
-
-    playAudio();
-  }, []);
 
   return (
     <>
@@ -77,7 +60,7 @@ export default function Launch() {
             onClick={toggleMusic}
           />
           <button className={"form-button primary"} onClick={handleLaunchGame}>
-            Lancer le jeu
+            Entrer dans Music City
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
         </div>
