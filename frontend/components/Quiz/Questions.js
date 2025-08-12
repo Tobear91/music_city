@@ -56,7 +56,7 @@ export function getQuestions(tracks) {
     const index = i < shuffledTracks.length ? i : i % shuffledTracks.length;
     const track = shuffledTracks[index];
 
-    const questionType = Math.floor(Math.random() * 7);
+    const questionType = Math.floor(Math.random() * 8);
     let newQuestion;
 
     switch (questionType) {
@@ -133,24 +133,21 @@ export function getQuestions(tracks) {
 
       case 5:
         const numArtists = track.artists.length;
-        const baseOptions = new Set([
+        let artistCountOptions = [
           numArtists,
           numArtists + 1,
           Math.max(1, numArtists - 1),
           numArtists + 2,
-        ]);
-        const artistCountOptions = [...baseOptions].map(String);
-        while (artistCountOptions.length < 4) {
-          if (!artistCountOptions.includes("Autre")) {
-            artistCountOptions.push("Autre");
-          } else {
-            let randomOption = String(Math.floor(Math.random() * 5) + 1);
-            if (!artistCountOptions.includes(randomOption)) {
-              artistCountOptions.push(randomOption);
-            }
-          }
+          "Autre",
+        ];
+        // Si moins de 4 options uniques, complète avec des nombres aléatoires
+        while (new Set(artistCountOptions).size < 4) {
+          artistCountOptions.push(Math.floor(Math.random() * 5) + 1);
         }
-
+        // On garde 4 réponses uniques
+        artistCountOptions = [...new Set(artistCountOptions)]
+          .slice(0, 4)
+          .map(String);
         newQuestion = {
           question: `Combien d’artistes sont crédités sur "${track.name}" de ${track.artists[0].name} ?`,
           correctAnswer: String(numArtists),
@@ -160,17 +157,21 @@ export function getQuestions(tracks) {
 
       case 6:
         const albumType = track.album.album_type;
-        const albumTypeMap = {
-          album: "Album",
-          single: "Single",
-          compilation: "Compilation",
-        };
         const typeOptions = ["Album", "Single", "Compilation"];
 
         newQuestion = {
           question: `"${track.name}" de ${track.artists[0].name} est issu de quel type de publication ?`,
-          correctAnswer: albumTypeMap[albumType] || "Autre",
+          correctAnswer: albumType.charAt(0).toUpperCase() + albumType.slice(1), // première lettre en Majuscule
           options: shuffleArray(typeOptions),
+        };
+        break;
+
+      case 7:
+        newQuestion = {
+          question: `Quel est le titre de ce morceau ?`,
+          image: track.album.images[0]?.url || null,
+          correctAnswer: track.name,
+          options: generateAnswers(track.name, "title", track),
         };
         break;
 
