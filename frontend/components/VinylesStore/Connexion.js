@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { setDiscogs } from "../../reducers/user.js";
 import styles from "../../assets/scss/vinyles_store/Connexion.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useRouter } from "next/router.js";
+import { setUsername } from "../../reducers/discogs.js";
 import { useDispatch, useSelector } from "react-redux";
+import { setDiscogs } from "../../reducers/user.js";
+import { useRouter } from "next/router.js";
+import { useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
-import { setUsername } from "../../reducers/discogs.js";
 
 function Connexion() {
   const dispatch = useDispatch();
@@ -37,7 +37,7 @@ function Connexion() {
         if (datas.result) {
           const { username } = datas.identity;
           dispatch(setUsername(username));
-          router.push("/vinyles-store/wantlist");
+          router.push("/vinyles-store/collection");
         }
       }
     })();
@@ -68,7 +68,7 @@ function Connexion() {
             Discogs
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
-          <Link href="/vinyles-store/wantlist">Continuer sans se connecter à Discogs</Link>
+          <Link href="/vinyles-store/collection">Continuer sans se connecter à Discogs</Link>
         </div>
       </main>
     </section>
