@@ -11,7 +11,6 @@ function Wantlist() {
   useEffect(() => {
     (async () => {
       const releases = await discogsHelper.getWantlist();
-      console.log(releases);
       setWantedlist(releases);
     })();
   }, []);
