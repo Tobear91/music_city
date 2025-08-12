@@ -1,12 +1,11 @@
 import styles from "../../assets/scss/vinyles_store/Wantlist.module.scss";
-import { useSelector, useDispatch } from "react-redux";
-import { setWantlist } from "../../reducers/discogs";
+import discogsHelper from "../../modules/discogs";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import WantlistList from "./WantlistItem";
 import Header from "./Header";
 
 function Wantlist() {
-  const dispatch = useDispatch();
   const discogs = useSelector((state) => state.discogs);
   const [wantedlist, setWantedlist] = useState([]);
 
@@ -18,15 +17,17 @@ function Wantlist() {
       });
       const datas = await response.json();
 
-      const ids = datas.wantlist.wants.map((item) => item.id);
-      dispatch(setWantlist(ids));
-      setWantedlist(datas.wantlist.wants);
+      if (datas.result) {
+        setWantedlist(datas.wantlist.wants);
+        discogsHelper.setWantedlist(datas.wantlist.wants);
+      }
     })();
   }, []);
 
-  // Suppression de la release dans le useState
-  const handleDeleteRelease = async (indexToRemove) => {
+  // Suppression de la release partout : state, store, bdd, discogs
+  const handleDeleteRelease = async (id, indexToRemove) => {
     setWantedlist((prev) => prev.filter((_, i) => i !== indexToRemove));
+    discogsHelper.toggleWantlist("remove", id);
   };
 
   return (

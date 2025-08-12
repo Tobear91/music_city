@@ -1,26 +1,8 @@
 import styles from "../../assets/scss/vinyles_store/Wantlist.module.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { toggleWantlistItem } from "../../reducers/discogs";
 import { faTrash, faEye } from "@fortawesome/free-solid-svg-icons";
-import { useSelector, useDispatch } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function WantlistList({ index, item, deleteRelease }) {
-  const dispatch = useDispatch();
-  const discogs = useSelector((state) => state.discogs);
-
-  // Suppresion de la release dans la wanted list sur Discogs
-  const handleDelete = async () => {
-    const response = await fetch(`http://127.0.0.1:3000/discogs/users/${discogs.username}/wants/${item.id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-    const datas = await response.json();
-    if (datas.result) {
-      dispatch(toggleWantlistItem(item.id));
-      deleteRelease(index);
-    }
-  };
-
   return (
     <div className={styles.item}>
       <div>
@@ -32,7 +14,7 @@ function WantlistList({ index, item, deleteRelease }) {
         <a className="button-square small purple" href={`http://127.0.0.1:3001/vinyles-store/release/${item.id}`}>
           <FontAwesomeIcon icon={faEye} />
         </a>
-        <button className="button-square small red" onClick={() => handleDelete()}>
+        <button className="button-square small red" onClick={() => deleteRelease(item.id, index)}>
           <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>

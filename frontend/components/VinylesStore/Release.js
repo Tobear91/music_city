@@ -1,10 +1,11 @@
-import styles from "../../assets/scss/vinyles_store/Release.module.scss";
-import { useEffect, useState } from "react";
-import Header from "./Header";
-import { useRouter } from "next/router";
 import { faHeart, faLink, faArrowLeft, faCoins } from "@fortawesome/free-solid-svg-icons";
+import styles from "../../assets/scss/vinyles_store/Release.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import discogsHelper from "../../modules/discogs";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import Header from "./Header";
 
 function Release() {
   const router = useRouter();
@@ -16,66 +17,66 @@ function Release() {
     if (!router.isReady) return;
 
     (async () => {
-      const response = await fetch(`http://127.0.0.1:3000/discogs/releases/${router.query.id}`, {
-        credentials: "include",
-      });
-      const datas = await response.json();
-      console.log(datas.release);
+      const datas = await discogsHelper.getRelease(router.query.id);
       if (datas.result) setRelease(datas.release);
+      else setRelease(false);
     })();
   }, [router.isReady]);
 
-  const isInWantList = (id) => {
-    return discogs.wantlist_items.includes(parseInt(id));
+  // Toggle de la release en BDD
+  const handleToggleWantlist = (e, action) => {
+    e.preventDefault();
+    discogsHelper.toggleWantlist(action, release.id);
   };
+
+  const isInWantList = () => discogs.wantlist_items.includes(release.id);
 
   return (
     <div className={styles.content}>
       <Header className={styles.header} />
       <main className={styles.main}>
+        <button
+          type="button"
+          onClick={() => {
+            router.back();
+          }}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} /> Retour
+        </button>
         {release && (
-          <>
-            <button
-              type="button"
-              onClick={() => {
-                router.back();
-              }}
-            >
-              <FontAwesomeIcon icon={faArrowLeft} /> Retour
-            </button>
-            <div>
-              <div className={styles.cover}>
-                <img src={release.images[0].resource_url} alt="" />
-              </div>
-              <div className={styles.infos}>
-                <h1>{release.artists[0].name}</h1>
-                <h2>{release.title}</h2>
-                {release.styles.length > 0 && <h3>{release.styles[0]}</h3>}
-                {release.lowest_price && (
-                  <p>
-                    <FontAwesomeIcon icon={faCoins} /> Prix le plus bas : {release.lowest_price}€
-                  </p>
-                )}
+          <div>
+            <div className={styles.cover}>
+              <img src={release.images[0].resource_url} alt="" />
+            </div>
+            <div className={styles.infos}>
+              <h1>{release.artists[0].name}</h1>
+              <h2>{release.title}</h2>
+              {release.styles.length > 0 && <h3>{release.styles[0]}</h3>}
+              {release.lowest_price && (
+                <p>
+                  <FontAwesomeIcon icon={faCoins} /> Prix le plus bas : {release.lowest_price}€
+                </p>
+              )}
 
-                <div className={styles.links}>
-                  {isInWantList(router.query.id) && (
-                    <span className="button-square small green">
-                      <FontAwesomeIcon icon={faHeart} />
-                    </span>
-                  )}
-                  {!isInWantList(router.query.id) && (
-                    <button className="button-square small pink" onClick={(e) => handleAddToWantlist(e)}>
-                      <FontAwesomeIcon icon={faHeart} />
-                    </button>
-                  )}
-                  <a className="button-square small white" href={release.uri} target="_blank">
-                    <FontAwesomeIcon icon={faLink} />
-                  </a>
-                </div>
+              <div className={styles.links}>
+                {isInWantList(router.query.id) && (
+                  <span className="button-square small green" onClick={(e) => handleToggleWantlist(e, "remove")}>
+                    <FontAwesomeIcon icon={faHeart} />
+                  </span>
+                )}
+                {!isInWantList(router.query.id) && (
+                  <button className="button-square small pink" onClick={(e) => handleToggleWantlist(e, "add")}>
+                    <FontAwesomeIcon icon={faHeart} />
+                  </button>
+                )}
+                <a className="button-square small white" href={release.uri} target="_blank">
+                  <FontAwesomeIcon icon={faLink} />
+                </a>
               </div>
             </div>
-          </>
+          </div>
         )}
+        {release === false && <h1>Le vinyle est introuvable</h1>}
       </main>
     </div>
   );
