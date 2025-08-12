@@ -2,9 +2,10 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
 function VSConnexionPage() {
-  const router = useRouter();
   const user = useSelector((state) => state.user.user);
-  user.discogs ? router.push("/vinyles-store/wantlist") : router.push("/vinyles-store/connexion");
+  const router = useRouter();
+  if (!user) router.push("/connexion");
+  else user.discogs ? router.push("/vinyles-store/collection") : router.push("/vinyles-store/connexion");
 }
 
 export default VSConnexionPage;

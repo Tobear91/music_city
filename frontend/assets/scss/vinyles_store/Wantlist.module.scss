@@ -26,48 +26,6 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 20px;
-
-      .item {
-        display: flex;
-        flex-direction: column;
-        width: 200px;
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 5px;
-
-        // Cover
-        & > div:first-child {
-          height: 165px;
-          background: #ffffff url("../../img/background-vinyle.png") no-repeat;
-          background-size: contain;
-
-          img {
-            width: 131px;
-            height: 131px;
-            position: relative;
-            top: 10px;
-            left: 10px;
-          }
-        }
-
-        h2 {
-          font-weight: 600;
-          font-size: 2rem;
-          line-height: 24px;
-          color: $purple;
-        }
-
-        p {
-          color: #acacac;
-          margin: 10px 0 20px;
-        }
-
-        & > div:last-child {
-          display: flex;
-          justify-content: space-between;
-          margin-top: auto;
-        }
-      }
     }
   }
 }

@@ -17,8 +17,8 @@ function Header({ q }) {
         <FontAwesomeIcon icon={faBars} />
       </button>
       <span>Quiz</span>
-      <button className="button-bulle pink">
-        <FontAwesomeIcon icon={faXmark} onClick={handleLeaveBuilding}/>
+      <button className="button-bulle pink" onClick={handleLeaveBuilding}>
+        <FontAwesomeIcon icon={faXmark}/>
       </button>
     </header>
   );
