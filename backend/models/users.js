@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const wantitemSchema = mongoose.Schema({
-  id: String,
+  release_id: Number,
+  title: String,
+  artist: String,
+  thumb: String,
+  uri: String,
 });
 
 const userSchema = mongoose.Schema(

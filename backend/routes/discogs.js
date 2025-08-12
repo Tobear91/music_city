@@ -121,26 +121,4 @@ router.post("/database/search", async (req, res, next) => {
   }
 });
 
-router.post("/add-in-wantlist/:release_id", async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const release_id = req.params.release_id;
-    await User.findOneAndUpdate({ email }, { $push: { wantlist: { id: release_id } } }, { new: true });
-    res.json({ result: true });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post("/remove-in-wantlist/:release_id", async (req, res, next) => {
-  try {
-    const { email } = req.body;
-    const release_id = req.params.release_id;
-    await User.findOneAndUpdate({ email }, { $pull: { wantlist: { id: release_id } } }, { new: true });
-    res.json({ result: true });
-  } catch (error) {
-    next(error);
-  }
-});
-
 module.exports = router;

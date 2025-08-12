@@ -81,8 +81,7 @@ router.post("/signup", async (req, res, next) => {
 
     // Check user in database
     let user = await User.findOne({ email, type: "app" });
-    if (user)
-      throw Object.assign(new Error("User already exist"), { status: 409 });
+    if (user) throw Object.assign(new Error("User already exist"), { status: 409 });
 
     // Add user in database
     user = await User.create({
@@ -160,8 +159,7 @@ router.post("/login", async (req, res, next) => {
 
     // Check user in database
     let user = await User.findOne({ email, type: "app" });
-    if (!user || (user && !bcrypt.compareSync(password, user.password)))
-      throw Object.assign(new Error("Unauthorized"), { status: 401 });
+    if (!user || (user && !bcrypt.compareSync(password, user.password))) throw Object.assign(new Error("Unauthorized"), { status: 401 });
 
     // Generate tokens
     const access_token = auth.generateAccessToken(email);
@@ -192,16 +190,14 @@ router.get("/avisInterpretations", async (req, res) => {
   User.findOne({ email: email })
     .populate("avisInterpretations")
     .then((user) => {
-      const spotifyIds = user.avisInterpretations.map(
-        (avis) => avis.track_spotify_id
-      );
+      const spotifyIds = user.avisInterpretations.map((avis) => avis.track_spotify_id);
       res.json(spotifyIds);
     });
 });
 
 // ajout/retrait d'un object_id des favoris à partir d'un id spotify + email
 router.post("/addtofavorites", async (req, res) => {
-  const {  email , track_id, uri, artist, title} = req.body;
+  const { email, track_id, uri, artist, title } = req.body;
   if (!email || !track_id) {
     return res.status(400).json({ error: "Email and Id are required" });
   }
@@ -209,36 +205,29 @@ router.post("/addtofavorites", async (req, res) => {
   try {
     let track = await Track.findOne({ track_spotify_id: track_id });
     if (!track) {
-      console.log(email)
+      console.log(email);
       const newtrack = new Track({
         title: title,
         artist: artist,
         spotify_uri: uri,
         track_spotify_id: track_id,
-      })
+      });
       track = await newtrack.save();
     }
 
     const doc = await User.findOne({ email: email });
     if (!doc) {
-      
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     const id = track._id;
 
     if (!doc.favorites.includes(id)) {
-      await User.findOneAndUpdate(
-        { email: email },
-        { $addToSet: { favorites: id } }
-      );
+      await User.findOneAndUpdate({ email: email }, { $addToSet: { favorites: id } });
       console.log("id ajouté");
       return res.json({ result: true });
     } else {
-      await User.findOneAndUpdate(
-        { email: email },
-        { $pull: { favorites: id } }
-      );
+      await User.findOneAndUpdate({ email: email }, { $pull: { favorites: id } });
       console.log("id supprimé");
       return res.json({ result: true });
     }
@@ -248,10 +237,41 @@ router.post("/addtofavorites", async (req, res) => {
   }
 });
 
-router.post('/favorites', async (req, res) =>{
-  const {email} = req.body;
-  const user = await User.findOne({ email }).populate('favorites');
-  res.json({result: true, favorites: user.favorites})
-})
+router.post("/favorites", async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email }).populate("favorites");
+  res.json({ result: true, favorites: user.favorites });
+});
+
+router.post("/set-wantlist", async (req, res, next) => {
+  try {
+    const { email, releases } = req.body;
+    await User.updateOne({ email }, { $set: { wantlist: [] } });
+
+    releases.forEach(async (release) => {
+      await User.findOneAndUpdate({ email }, { $push: { wantlist: release } }, { new: true });
+    });
+
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/toggle-wantlist", async (req, res, next) => {
+  try {
+    const { action, email, release } = req.body;
+
+    if (action === "add") {
+      await User.findOneAndUpdate({ email }, { $push: { wantlist: release } }, { new: true });
+    } else {
+      await User.findOneAndUpdate({ email }, { $pull: { wantlist: { release_id: release.release_id } } }, { new: true });
+    }
+
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
