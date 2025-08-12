@@ -5,7 +5,6 @@ const wantitemSchema = mongoose.Schema({
   title: String,
   artist: String,
   thumb: String,
-  uri: String,
 });
 
 const userSchema = mongoose.Schema(

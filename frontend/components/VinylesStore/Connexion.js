@@ -68,7 +68,7 @@ function Connexion() {
             Discogs
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
-          <Link href="/">Où continuer sans se connecter</Link>
+          <Link href="/vinyles-store/wantlist">Continuer sans se connecter à Discogs</Link>
         </div>
       </main>
     </section>

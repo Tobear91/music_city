@@ -2,32 +2,57 @@ import { store } from "./store";
 import { toggleWantlistItem } from "../reducers/discogs";
 import { setWantlist } from "../reducers/discogs";
 
-const setWantedlist = async (datas_releases) => {
+const getWantlist = async () => {
   const user = store.getState().user.user;
+  const discogs = store.getState().discogs;
+  let releases = {};
 
-  const releases = await Promise.all(
-    datas_releases.map(async (release) => {
-      return {
-        release_id: release.id,
-        title: release.basic_information.title,
-        artist: release.basic_information.artists[0].name,
-        thumb: release.basic_information.thumb,
-      };
-    })
-  );
+  if (user.discogs) {
+    const response = await fetch(`http://127.0.0.1:3000/discogs/users/${discogs.username}/wantlist`, {
+      credentials: "include",
+    });
+    const datas = await response.json();
 
+    if (datas.result && datas.wantlist.wants.length > 0) {
+      releases = datas.wantlist.wants.map((release) => {
+        return {
+          release_id: release.id,
+          title: release.basic_information.title,
+          artist: release.basic_information.artists[0].name,
+          thumb: release.basic_information.thumb,
+        };
+      });
+      setWantedlist(releases);
+    } else {
+      releases = [];
+    }
+  } else {
+    const response = await fetch(`http://127.0.0.1:3000/users/wantlist`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: user.email }),
+    });
+    const datas = await response.json();
+    console.log(datas);
+
+    releases = datas.wantlist;
+  }
+
+  if (releases.length > 0) {
+    const ids = releases.map((item) => item.id);
+    store.dispatch(setWantlist(ids));
+  }
+
+  return releases;
+};
+
+const setWantedlist = async (releases) => {
+  const user = store.getState().user.user;
   const response = await fetch(`http://127.0.0.1:3000/users/set-wantlist`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: user.email, releases }),
   });
-
-  const datas = await response.json();
-
-  if (datas.result) {
-    const ids = datas_releases.map((item) => item.id);
-    store.dispatch(setWantlist(ids));
-  }
 };
 
 const toggleWantlist = async (action, release_id) => {
@@ -82,4 +107,4 @@ const getRelease = async (release_id) => {
   return await response.json();
 };
 
-module.exports = { toggleWantlist, getRelease, setWantedlist };
+module.exports = { getWantlist, toggleWantlist, getRelease, setWantedlist };

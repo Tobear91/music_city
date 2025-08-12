@@ -243,6 +243,18 @@ router.post("/favorites", async (req, res) => {
   res.json({ result: true, favorites: user.favorites });
 });
 
+router.post("/wantlist", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email }, { wantlist: 1, _id: 0 });
+    console.log(user);
+
+    res.json({ result: true, wantlist: user?.wantlist || [] });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/set-wantlist", async (req, res, next) => {
   try {
     const { email, releases } = req.body;
