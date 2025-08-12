@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import {leaveApplication} from '../../modules/appinteraction'
 import Image from 'next/image';
 import CorrectionElement from './CorrectionElement';
+import Header from './Header';
 
 export default function Correction (){
     const router = useRouter();   
@@ -28,9 +29,7 @@ export default function Correction (){
     
     return (
         <div className={styles.modalOverlay}>
-    <div className={styles.menuBar}>
-         <FontAwesomeIcon icon={faCircleXmark}  className={styles.crossClose}  style={{ width: "40px", height: "40px" }} onClick={handleLeaveBuilding}/>
-    </div>
+            <Header></Header>
         <div className={styles.mainContainer}> 
                         <Image src="/img/cloudy_moon.jpg" alt="Cloudy Moon" width={707} height={194} priority />
             <div className={styles.overlaySection}>

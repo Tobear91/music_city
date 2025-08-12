@@ -35,14 +35,20 @@ function Connexion() {
 
     if (datas.result) {
       dispatch(setUser(datas.user));
-      router.push("/");
+      router.push("/map");
     } else setError(datas.error);
   };
 
   return (
     <section className={styles.connexion}>
       <aside>
-        <Image src="/img/cloudy_moon.jpg" alt="Cloudy Moon" width={707} height={194} priority />
+        <Image
+          src="/img/cloudy_moon.jpg"
+          alt="Cloudy Moon"
+          width={707}
+          height={194}
+          priority
+        />
         <h1>Connexion</h1>
       </aside>
       <main>
@@ -50,8 +56,20 @@ function Connexion() {
           <h2>Connexion</h2>
           {error && <p>{error}</p>}
           <form onSubmit={(e) => handleSubmit(e)}>
-            <input className="form-input" type="email" placeholder="john@gmail.com" name="email" required />
-            <input className="form-input" type="password" placeholder="**********" name="password" required />
+            <input
+              className="form-input"
+              type="email"
+              placeholder="john@gmail.com"
+              name="email"
+              required
+            />
+            <input
+              className="form-input"
+              type="password"
+              placeholder="**********"
+              name="password"
+              required
+            />
             <button type="submit" className="form-button primary">
               Se connecter
               <FontAwesomeIcon icon={faArrowRight} />

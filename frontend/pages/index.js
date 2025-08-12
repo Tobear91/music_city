@@ -1,4 +1,4 @@
-import Launch from '../components/Launch';
+import Launch from "../components/auth/Launch";
 
 function Index() {
   return <Launch />;
