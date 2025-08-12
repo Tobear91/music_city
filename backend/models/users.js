@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const wantitemSchema = mongoose.Schema({
+const releaseSchema = mongoose.Schema({
   release_id: Number,
   title: String,
   artist: String,
@@ -17,7 +17,8 @@ const userSchema = mongoose.Schema(
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "vinyles" }],
     avisInterpretations: [{ type: mongoose.Schema.Types.ObjectId, ref: "tracks" }],
-    wantlist: [wantitemSchema],
+    wantlist: [releaseSchema],
+    collection: [releaseSchema],
   },
   { timestamps: true }
 );

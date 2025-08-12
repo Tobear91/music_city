@@ -2,7 +2,7 @@ import styles from "../../assets/scss/vinyles_store/Wantlist.module.scss";
 import { faTrash, faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function WantlistList({ index, item, deleteRelease }) {
+function Card({ index, item, deleteRelease }) {
   return (
     <div className={styles.item}>
       <div>
@@ -22,4 +22,4 @@ function WantlistList({ index, item, deleteRelease }) {
   );
 }
 
-export default WantlistList;
+export default Card;

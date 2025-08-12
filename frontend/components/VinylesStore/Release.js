@@ -1,4 +1,4 @@
-import { faHeart, faLink, faArrowLeft, faCoins } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faLink, faArrowLeft, faCoins, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Release.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import discogsHelper from "../../modules/discogs";
@@ -23,12 +23,17 @@ function Release() {
     })();
   }, [router.isReady]);
 
-  // Toggle de la release en BDD
   const handleToggleWantlist = (e, action) => {
     e.preventDefault();
     discogsHelper.toggleWantlist(action, release.id);
   };
 
+  const handleToggleCollection = (e, action) => {
+    e.preventDefault();
+    discogsHelper.toggleCollection(action, release.id);
+  };
+
+  const isInCollection = () => discogs.collection_items.includes(release.id);
   const isInWantList = () => discogs.wantlist_items.includes(release.id);
 
   return (
@@ -59,6 +64,16 @@ function Release() {
               )}
 
               <div className={styles.links}>
+                {isInCollection(router.query.id) && (
+                  <span className="button-square small green" onClick={(e) => handleToggleCollection(e, "remove")}>
+                    <FontAwesomeIcon icon={faCompactDisc} />
+                  </span>
+                )}
+                {!isInCollection(router.query.id) && (
+                  <button className="button-square small blue" onClick={(e) => handleToggleCollection(e, "add")}>
+                    <FontAwesomeIcon icon={faCompactDisc} />
+                  </button>
+                )}
                 {isInWantList(router.query.id) && (
                   <span className="button-square small green" onClick={(e) => handleToggleWantlist(e, "remove")}>
                     <FontAwesomeIcon icon={faHeart} />

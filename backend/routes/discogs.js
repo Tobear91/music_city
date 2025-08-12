@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Discogs = require("disconnect").Client;
-const helpers = require("../modules/helpers");
-const User = require("../models/users");
 
 const DISCOGS_KEY = process.env.DISCOGS_KEY;
 const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
@@ -77,6 +75,40 @@ router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
     const dis = new Discogs(req.session.accessData);
     const wantlist = dis.user().wantlist();
     await wantlist.removeRelease(req.params.username, req.params.release_id);
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/users/:username/collection", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const collection = dis.user().collection();
+    const releases = await collection.getReleases(req.params.username, 0);
+    res.json({ result: true, collection: releases });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/users/:username/collection/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const collection = dis.user().collection();
+    await collection.addRelease(req.params.username, 0, req.params.release_id);
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/users/:username/collection/:release_id", async (req, res, next) => {
+  try {
+    const dis = new Discogs(req.session.accessData);
+    const collection = dis.user().collection();
+    const instances = await collection.getReleaseInstances(req.params.username, req.params.release_id);
+    await collection.removeRelease(req.params.username, 0, req.params.release_id, instances.releases[0].instance_id);
     res.json({ result: true });
   } catch (error) {
     next(error);

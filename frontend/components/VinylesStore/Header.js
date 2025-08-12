@@ -1,4 +1,4 @@
-import { faXmark, faBars, faMagnifyingGlass, faBarcode, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faBars, faMagnifyingGlass, faBarcode, faHeart, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Header.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { leaveApplication } from "../../modules/appinteraction";
@@ -59,6 +59,10 @@ function Header({ q }) {
           <FontAwesomeIcon icon={faBars} />
         </button> */}
         <span>Vinyles Store</span>
+        <button className="button-square blue" onClick={() => router.push("/vinyles-store/collection")}>
+          <span>{discogs.collection_items.length}</span>
+          <FontAwesomeIcon icon={faCompactDisc} />
+        </button>
         <button className="button-square pink" onClick={() => router.push("/vinyles-store/wantlist")}>
           <span>{discogs.wantlist_items.length}</span>
           <FontAwesomeIcon icon={faHeart} />

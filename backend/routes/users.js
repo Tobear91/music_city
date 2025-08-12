@@ -284,4 +284,45 @@ router.put("/toggle-wantlist", async (req, res, next) => {
   }
 });
 
+router.post("/collection", async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email }, { collection: 1, _id: 0 });
+    res.json({ result: true, collection: user?.collection || [] });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/set-collection", async (req, res, next) => {
+  try {
+    const { email, releases } = req.body;
+    await User.updateOne({ email }, { $set: { collection: [] } });
+
+    releases.forEach(async (release) => {
+      await User.findOneAndUpdate({ email }, { $push: { collection: release } }, { new: true });
+    });
+
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/toggle-collection", async (req, res, next) => {
+  try {
+    const { action, email, release } = req.body;
+
+    if (action === "add") {
+      await User.findOneAndUpdate({ email }, { $push: { collection: release } }, { new: true });
+    } else {
+      await User.findOneAndUpdate({ email }, { $pull: { collection: { release_id: release.release_id } } }, { new: true });
+    }
+
+    res.json({ result: true });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;
