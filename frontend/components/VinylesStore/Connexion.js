@@ -1,6 +1,7 @@
+import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/VinylesStore/Connexion.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { leaveApplication } from "../../modules/appinteraction";
 import { setUsername } from "../../reducers/discogs.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setDiscogs } from "../../reducers/user.js";
@@ -61,6 +62,9 @@ function Connexion() {
 
   return (
     <section className={styles.connexion}>
+      <button className="button-bulle pink " onClick={() => leaveApplication(router)}>
+        <FontAwesomeIcon icon={faXmark} />
+      </button>
       <aside>
         <Image src="/img/cloudy_moon.jpg" alt="Cloudy Moon" width={707} height={194} priority />
         <h1>Vinyles Store</h1>
