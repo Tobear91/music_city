@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import styles from "../../assets/scss/blindtest/CorrectionElement.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -10,27 +10,37 @@ export default function CorrectionElement({
   serieName,
   userAnswer,
   isCorrect,
+  playingIndex,
+  setPlayingIndex,
+  index,
 }) {
-  const audioRef = useRef(null);
-  let timeoutId = null;
-  const [isPlaying, setIsPlaying] = useState(false); // me permet d'empêcher l'utilisateur de relciquer sue le bouton pendant l'coyte
+  const audioRef = useRef(null); // Référence vers l'élément audio
+  let timeoutId = null; // ID du timer pour arrêter le son
 
+  const isPlaying = playingIndex === index; // true si c'est cet extrait qui est en train de jouer
+
+  // Si pas de réponse, texte par défaut
   if (!userAnswer) {
     userAnswer = "Vous n'avez pas répondu à la question";
   }
+
   const handlePlay = () => {
+    // Bloque le lancement si un autre extrait joue déjà
+    if (playingIndex !== null && playingIndex !== index) return;
+
     const audio = audioRef.current;
     if (audio) {
-      setIsPlaying(true);
-      audio.currentTime = 0;
+      setPlayingIndex(index); // Déclare cet extrait comme en cours
+      audio.currentTime = 0; // Redémarre depuis le début
       audio.volume = 0.3;
       audio.play();
-      clearTimeout(timeoutId);
+
+      clearTimeout(timeoutId); // Annule un ancien timer s'il existe
       timeoutId = setTimeout(() => {
         audio.pause();
         audio.currentTime = 0;
-        setIsPlaying(false);
-      }, 5000); //arret de al musique au bout de 5s ec
+        setPlayingIndex(null); // Libère le "verrou"
+      }, 5000); // Stoppe après 5 secondes
     }
   };
 
@@ -54,13 +64,13 @@ export default function CorrectionElement({
         <button
           onClick={handlePlay}
           className="form-button primary"
-          disabled={isPlaying}
+          disabled={playingIndex !== null && playingIndex !== index} // ✅ désactive tous les autres
         >
           {isPlaying ? (
             "Lecture en cours..."
           ) : (
             <>
-              Reécouter l'extrait <FontAwesomeIcon icon={faPlay} />
+              Réécouter l'extrait <FontAwesomeIcon icon={faPlay} />
             </>
           )}
         </button>

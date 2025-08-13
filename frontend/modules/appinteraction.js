@@ -3,10 +3,7 @@ import { leaveBuilding } from "../reducers/character";
 
 const leaveApplication = (router) => {
   store.dispatch(leaveBuilding());
-  router.push({
-    pathname: "/map",
-    query: { fromLeaveScreen: "true" },
-  });
+  router.push("/map");
 };
 
 export { leaveApplication };

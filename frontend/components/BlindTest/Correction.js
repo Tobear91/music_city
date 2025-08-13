@@ -7,19 +7,23 @@ import { leaveApplication } from "../../modules/appinteraction";
 import Image from "next/image";
 import CorrectionElement from "./CorrectionElement";
 import Header from "./Header";
+import { useState } from "react";
 
 export default function Correction() {
+  // État global pour savoir quel extrait est en train de jouer (null = aucun)
+  const [playingIndex, setPlayingIndex] = useState(null);
   const router = useRouter();
-
   const blindtestInfo = useSelector((state) => state.blindtest);
 
   const handleBack = () => {
+    // Retour à la page des résultats
     router.push("./results");
   };
   const handleLeaveBuilding = () => {
+    // Quitter l'application et retourne sur la carte
     leaveApplication(router);
   };
-
+  // On parcourt toutes les questions du blindtest
   const correction = blindtestInfo.questionList.map((data, i) => {
     let isAnswerCorrect = blindtestInfo.correction[i].isCorrect;
     return (
@@ -30,7 +34,10 @@ export default function Correction() {
         serieName={data.serieName}
         userAnswer={blindtestInfo.answerList[i].answer}
         totalQuestion={blindtestInfo.answerList.length}
-        isCorrect={isAnswerCorrect}
+        isCorrect={isAnswerCorrect} // Index de l'extrait en cours
+        playingIndex={playingIndex} // Fonction pour changer l'extrait en cours
+        setPlayingIndex={setPlayingIndex}
+        index={i}
       ></CorrectionElement>
     );
   });
