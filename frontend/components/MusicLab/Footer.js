@@ -36,7 +36,9 @@ function Footer(props) {
     );
     const data = await recommandations.json();
     dispatch(setRecommandationsList(data.tracks));
-    router.push("/MusicLab/recommandations");
+   
+    router.push("/music-lab/recommandations");
+
   }
 
   function handleRemove(word) {
@@ -50,7 +52,7 @@ function Footer(props) {
   return (
     <div className={styles.footer}>
       <div className={styles.button}>
-        <button className={"form-button primary"} style={{width:500}} onClick={() => handleClickRecommandations(criteres)}>
+        <button className={"form-button primary"} style={{width:500, height:40}} onClick={() => handleClickRecommandations(criteres)}>
           Decouvrir nos Recommandations pour :
           <FontAwesomeIcon icon={faArrowRight} />
         </button>

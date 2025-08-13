@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function Lyrics(props) {
-  const audioRef = useRef(null); //pour lecture preview *pourquoi useRef?
+  const audioRef = useRef(null); //modif useRef ne declenche pas de rerender
   const storeData = useSelector((state) => state.analyses.value);
 
   const [isFav, setIsFav] = useState(false);
@@ -23,7 +23,6 @@ function Lyrics(props) {
       setIsPlaying(false);
     }
     async function fetchFavorites() {
-      //creation de fonction async dans le scope du useEffect car useEffect ne peux pas l'etre (j'ai été tznté de faire un const data = await fetchfavorite)
       const data = await getFavorites(props.email);
       if (data && data.favorites) {
         const bool = data.favorites.some(
