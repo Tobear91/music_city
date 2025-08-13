@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { leaveApplication } from "../../modules/appinteraction";
 import Image from "next/image";
 import Header from "./Header";
+import { descriptionLevel } from "../../modules/blindtest/checkResults";
 
 export default function Results() {
   const router = useRouter();
@@ -23,6 +24,8 @@ export default function Results() {
   const handleLeaveBuilding = () => {
     leaveApplication(router);
   };
+
+  const description = descriptionLevel(blindtestInfo.score);
 
   return (
     <div className={styles.modalOverlay}>
@@ -44,7 +47,7 @@ export default function Results() {
               Votre score est : {blindtestInfo.score}/
               {blindtestInfo.questionList.length * 3}{" "}
             </p>
-            <p className={styles.subtitle}> Votre niveau est ... </p>
+            <p className={styles.subtitle}> {description}</p>
           </div>
           <div className={styles.buttonTriple}>
             <button className={styles.button} onClick={handleWatchCorrection}>

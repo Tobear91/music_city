@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { leaveApplication } from "../../modules/appinteraction";
+import { useState } from "react";
 import Image from "next/image";
 import CorrectionElement from "./CorrectionElement";
 import Header from "./Header";
@@ -20,6 +21,16 @@ export default function Correction() {
     leaveApplication(router);
   };
 
+  const [playingIndex, setPlayingIndex] = useState(null); // null = aucun audio en cours
+
+  const handlePlay = (index) => {
+    setPlayingIndex(index); // indique quel audio joue
+  };
+
+  const handleStop = () => {
+    setPlayingIndex(null); // stop audio
+  };
+
   const correction = blindtestInfo.questionList.map((data, i) => {
     let isAnswerCorrect = blindtestInfo.correction[i].isCorrect;
     return (
@@ -31,6 +42,9 @@ export default function Correction() {
         userAnswer={blindtestInfo.answerList[i].answer}
         totalQuestion={blindtestInfo.answerList.length}
         isCorrect={isAnswerCorrect}
+        playingIndex={playingIndex} // audio en cours
+        onPlay={handlePlay}
+        onStop={handleStop}
       ></CorrectionElement>
     );
   });

@@ -9,10 +9,12 @@ export default function QuestionElement({
   questioNumber,
   isCertain,
 }) {
+  //audioRef va permettre d'écouter la préveiw url et de ne peux faire de rerender lors de l'interaciton avec
   const audioRef = useRef(null);
   let timeoutId = null;
   const [isPlaying, setIsPlaying] = useState(false); // me permet d'empêcher l'utilisateur de relciquer sue le bouton pendant l'coyte
 
+  // Lorsque l'on appuie sur play le son est joué pendnat 5 secondes
   const handlePlay = () => {
     const audio = audioRef.current;
     if (audio) {

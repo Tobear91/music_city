@@ -4,35 +4,42 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 export default function CorrectionElement({
+  index,
   previewUrl,
   totalQuestion,
   questionNbr,
   serieName,
   userAnswer,
   isCorrect,
+  playingIndex,
+  onPlay,
+  onStop,
 }) {
   const audioRef = useRef(null);
-  let timeoutId = null;
-  const [isPlaying, setIsPlaying] = useState(false); // me permet d'empêcher l'utilisateur de relciquer sue le bouton pendant l'coyte
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  if (!userAnswer) {
-    userAnswer = "Vous n'avez pas répondu à la question";
-  }
+  if (!userAnswer) userAnswer = "Vous n'avez pas répondu à la question";
+
   const handlePlay = () => {
-    const audio = audioRef.current;
-    if (audio) {
+    if (audioRef.current) {
       setIsPlaying(true);
-      audio.currentTime = 0;
-      audio.volume = 0.3;
-      audio.play();
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        audio.pause();
-        audio.currentTime = 0;
+      onPlay(index); // informe le parent que cet audio joue
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = 0.3;
+      audioRef.current.play();
+
+      setTimeout(() => {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
         setIsPlaying(false);
-      }, 5000); //arret de al musique au bout de 5s ec
+        onStop(); // informe le parent que l'audio est arrêté
+      }, 5000);
     }
   };
+
+  // Si un autre audio joue, on bloque le bouton
+  const disabled =
+    isPlaying || (playingIndex !== null && playingIndex !== index);
 
   return (
     <div className={styles.question}>
@@ -54,13 +61,13 @@ export default function CorrectionElement({
         <button
           onClick={handlePlay}
           className="form-button primary"
-          disabled={isPlaying}
+          disabled={disabled}
         >
           {isPlaying ? (
             "Lecture en cours..."
           ) : (
             <>
-              Reécouter l'extrait <FontAwesomeIcon icon={faPlay} />
+              Réécouter l'extrait <FontAwesomeIcon icon={faPlay} />
             </>
           )}
         </button>
