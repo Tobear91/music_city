@@ -80,7 +80,7 @@ router.post("/signup", async (req, res, next) => {
     const { email, password, pseudo } = req.body;
 
     // Check user in database
-    let user = await User.findOne({ email, type: "app" });
+    let user = await User.findOne({ email });
     if (user) throw Object.assign(new Error("User already exist"), { status: 409 });
 
     // Add user in database
@@ -158,7 +158,7 @@ router.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
 
     // Check user in database
-    let user = await User.findOne({ email, type: "app" });
+    let user = await User.findOne({ email });
     if (!user || (user && !bcrypt.compareSync(password, user.password))) throw Object.assign(new Error("Unauthorized"), { status: 401 });
 
     // Generate tokens
@@ -330,10 +330,7 @@ router.post("/removefromfavorites", async (req, res) => {
 
   const track = await Track.findOne({ track_spotify_id: track_id });
 
-  await User.findOneAndUpdate(
-    { email: email },
-    { $pull: { favorites: track._id } }
-  );
+  await User.findOneAndUpdate({ email: email }, { $pull: { favorites: track._id } });
 
   res.json({ result: true });
 });
