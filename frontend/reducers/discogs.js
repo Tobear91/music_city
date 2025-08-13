@@ -14,21 +14,15 @@ export const discogsSlice = createSlice({
       state.username = action.payload;
     },
     toggleWantlistItem: (state, action) => {
-      if (state.wantlist_items.includes(action.payload)) {
-        state.wantlist_items = state.wantlist_items.filter((item) => item !== action.payload);
-      } else {
-        state.wantlist_items.push(action.payload);
-      }
+      const isInclude = state.wantlist_items.includes(action.payload);
+      state.wantlist_items = isInclude ? state.wantlist_items.filter((item) => item !== action.payload) : state.wantlist_items.push(action.payload);
     },
     setWantlist: (state, action) => {
       state.wantlist_items = action.payload;
     },
     toggleCollectionItem: (state, action) => {
-      if (state.collection_items.includes(action.payload)) {
-        state.collection_items = state.collection_items.filter((item) => item !== action.payload);
-      } else {
-        state.collection_items.push(action.payload);
-      }
+      const isInclude = state.collection_items.includes(action.payload);
+      state.collection_items = isInclude ? state.collection_items.filter((item) => item !== action.payload) : state.collection_items.push(action.payload);
     },
     setCollection: (state, action) => {
       state.collection_items = action.payload;
