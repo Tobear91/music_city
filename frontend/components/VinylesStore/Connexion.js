@@ -1,9 +1,11 @@
-import styles from "../../assets/scss/vinyles_store/Connexion.module.scss";
+import { faArrowRight, faXmark } from "@fortawesome/free-solid-svg-icons";
+import styles from "../../assets/scss/VinylesStore/Connexion.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { leaveApplication } from "../../modules/appinteraction";
 import { setUsername } from "../../reducers/discogs.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setDiscogs } from "../../reducers/user.js";
+import discogsHelper from "../../modules/discogs";
 import { useRouter } from "next/router.js";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -16,39 +18,43 @@ function Connexion() {
   const router = useRouter();
   const [error, setError] = useState(null);
 
+  // Hook permettant d'attendre que le router soit pret
   useEffect(() => {
     if (!router.isReady) return;
 
+    // Récupération dans l'URL d'un param discogs puis mise à jour du store sinon redirection vers la page de connexion
     if (router.query.discogs) {
       const jsonString = atob(router.query.discogs);
       const datas = JSON.parse(jsonString);
       if (datas.connected) dispatch(setDiscogs(true));
+      else setError("Erreur lors de la connexion avec Discogs");
     }
   }, [router.isReady]);
 
+  /**
+   * Hook qui attend que le user Discogs soit connecté pour pouvoir appeler la method identity
+   * Pour save le username discogs dans un store
+   */
   useEffect(() => {
     (async () => {
-      if (user?.discogs) {
-        let response = await fetch("http://127.0.0.1:3000/discogs/identity", {
-          credentials: "include",
-        });
-        let datas = await response.json();
+      if (user.discogs) {
+        const datas = await discogsHelper.getIdentity();
 
         if (datas.result) {
           const { username } = datas.identity;
           dispatch(setUsername(username));
           router.push("/vinyles-store/collection");
-        }
+        } else setError(datas.error);
       }
     })();
-  }, [user?.discogs]);
+  }, [user.discogs]);
 
-  const handleDiscord = async () => {
-    const response = await fetch(`http://127.0.0.1:3000/discogs/authorize?email=${user.email}`, {
-      credentials: "include",
-    });
-    const datas = await response.json();
-
+  /**
+   * Fonction qui au clique permet de récupérer via le back l'URL de connexion à l'app Discogs
+   * credentials: "include" passe un cookie du front au back, doit être passé pour chaque requête vers le back /discogs
+   */
+  const handleDiscogsConnexion = async () => {
+    const datas = await discogsHelper.getAuthorizeUrl();
     if (datas.result) {
       router.push(datas.authorize_url);
     } else setError(datas.error);
@@ -56,6 +62,9 @@ function Connexion() {
 
   return (
     <section className={styles.connexion}>
+      <button className="button-bulle pink " onClick={() => leaveApplication(router)}>
+        <FontAwesomeIcon icon={faXmark} />
+      </button>
       <aside>
         <Image src="/img/cloudy_moon.jpg" alt="Cloudy Moon" width={707} height={194} priority />
         <h1>Vinyles Store</h1>
@@ -64,7 +73,7 @@ function Connexion() {
         <div>
           <h2>Connectez-vous avec votre compte</h2>
           {error && <p>{error}</p>}
-          <button className="form-button primary" onClick={() => handleDiscord()}>
+          <button className="form-button primary" onClick={() => handleDiscogsConnexion()}>
             Discogs
             <FontAwesomeIcon icon={faArrowRight} />
           </button>

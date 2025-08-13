@@ -6,12 +6,14 @@ import "../assets/scss/core/core.scss";
 import { useEffect } from "react";
 import Head from "next/head";
 
+// Fonction qui englobe les pages pour intercepter si le user peut accéder ou non à des pages.
 function AuthGuard({ children }) {
   const user = useSelector((state) => state.user.user);
   const router = useRouter();
-  const publicRoutes = ["/", "/connexion", "inscription"];
+  const publicRoutes = ["/", "/connexion", "/inscription"];
 
   useEffect(() => {
+    // Vérification sur la page actuelle est une page publique
     if (!user && !publicRoutes.includes(router.pathname)) {
       router.push("/connexion");
     }

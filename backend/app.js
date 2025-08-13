@@ -9,9 +9,6 @@ const logger = require("morgan");
 const path = require("path");
 const cors = require("cors");
 
-const swaggerJsdoc = require("swagger-jsdoc");
-const swaggerUi = require("swagger-ui-express");
-
 const errorHandler = require("./middlewares/error");
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -19,7 +16,7 @@ const spotifyRouter = require("./routes/spotify");
 const discogsRouter = require("./routes/discogs");
 const blindtestRouter = require("./routes/blindtest");
 const tracksRouter = require("./routes/tracks");
-const quizRouter = require("./routes/quiz")
+const quizRouter = require("./routes/quiz");
 
 const app = express();
 
@@ -47,35 +44,19 @@ app.use(
   })
 );
 
-
-// Options Swagger
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "API Music City",
-      version: "1.0.0",
-    },
-  },
-  apis: ["./routes/*.js"],
-};
-// Génère le document OpenAPI
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/spotify", spotifyRouter);
 app.use("/discogs", discogsRouter);
 app.use("/blindtest", blindtestRouter);
 app.use("/tracks", tracksRouter);
-app.use("/quiz", quizRouter)
+app.use("/quiz", quizRouter);
 
 app.use(errorHandler);
 

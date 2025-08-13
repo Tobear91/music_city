@@ -131,5 +131,48 @@
         }
       }
     }
+
+    // Résultats
+    form + div {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 30px;
+
+      & > div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        svg {
+          width: 50px;
+          height: 50px;
+        }
+
+        .infos {
+          text-align: left;
+
+          & > p:first-child {
+            font-weight: 600;
+          }
+
+          & > p:last-child {
+            font-size: 1.4rem;
+            color: #7c7c7c;
+            margin-top: 5px;
+          }
+        }
+
+        .actions {
+          display: flex;
+          margin-left: auto;
+          gap: 5px;
+
+          span {
+            cursor: inherit;
+          }
+        }
+      }
+    }
   }
 }

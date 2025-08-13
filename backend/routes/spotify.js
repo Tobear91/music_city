@@ -11,20 +11,7 @@ const router = express.Router();
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
 
-/**
- * @swagger
- * /spotify/login:
- *   get:
- *     summary: Redirige vers la page d'autorisation Spotify (OAuth2)
- *     tags: [Spotify]
- *     description: |
- *       Démarre le flux d'authentification OAuth2 avec Spotify. Redirige l'utilisateur vers Spotify pour qu'il autorise l'application.
- *     responses:
- *       302:
- *         description: Redirection vers Spotify pour authentification
- *       500:
- *         description: Erreur serveur lors de la génération de l'URL d'autorisation
- */
+// Récupération de l'URL de connexion à l'App Spotify
 router.get("/login", async (req, res, next) => {
   try {
     const generateRandomString = (length) => {
@@ -49,6 +36,7 @@ router.get("/login", async (req, res, next) => {
   }
 });
 
+// Callback une fois que l'app Spotify renvoit vers Music City
 router.get("/callback", async (req, res, next) => {
   try {
     if (req.query.error) throw Object.assign(new Error("Access Denied"), { status: 403 });
@@ -66,7 +54,6 @@ router.get("/callback", async (req, res, next) => {
       user = await User.create({
         email,
         password: bcrypt.hashSync(email, 10),
-        type: "spotify",
       });
     }
 
@@ -98,6 +85,7 @@ router.get("/callback", async (req, res, next) => {
   }
 });
 
+// Endpoint appelé dès que l'API renvoit une 401 et qu'il faut refresh le token
 router.post("/refresh-token", async (req, res, next) => {
   try {
     const refresh_token = req.cookies.spotify_refresh_token;

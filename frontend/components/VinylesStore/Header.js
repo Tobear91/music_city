@@ -1,9 +1,10 @@
-import { faXmark, faBars, faMagnifyingGlass, faBarcode, faHeart, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
-import styles from "../../assets/scss/vinyles_store/Header.module.scss";
+import { faXmark, faMagnifyingGlass, faBarcode, faHeart, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
+import styles from "../../assets/scss/VinylesStore/Header.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { leaveApplication } from "../../modules/appinteraction";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import ModalBarcode from "./ModalBarcode";
 import { useRouter } from "next/router";
 
 function Header({ q }) {
@@ -12,52 +13,20 @@ function Header({ q }) {
   const [searchValue, setSearchValue] = useState(q || "");
   const [openModal, setOpenModal] = useState(false);
 
+  // Hook qui permet de récupérer la recherche depuis l'URL pour l'injecter dans l'input du formulaire
   useEffect(() => {
     setSearchValue(q || "");
   }, [q]);
 
+  // Redirection vers la page de recherche
   const handleRecherche = (e) => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const search = formData.get("search");
-
-    if (search.trim() !== "") {
-      router.push(`/vinyles-store/recherche?q=${encodeURIComponent(search)}`);
-    }
-  };
-
-  const handleCodeBarre = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const barcode = formData.get("barcode");
-
-    const body = {
-      search: "",
-      params: {
-        barcode,
-      },
-    };
-
-    const response = await fetch(`http://127.0.0.1:3000/discogs/database/search`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      credentials: "include",
-    });
-    const datas = await response.json();
-
-    if (datas.result && datas.results.pagination.items > 0) {
-      console.log(datas.results.results[0]);
-      router.push(`/vinyles-store/release/${datas.results.results[0].id}`);
-    }
+    if (searchValue.trim() !== "") router.push(`/vinyles-store/recherche?q=${encodeURIComponent(searchValue)}`);
   };
 
   return (
     <>
       <header className={styles.header}>
-        {/* <button className="button-bulle purple">
-          <FontAwesomeIcon icon={faBars} />
-        </button> */}
         <span>Vinyles Store</span>
         <button className="button-square blue" onClick={() => router.push("/vinyles-store/collection")}>
           <span>{discogs.collection_items.length}</span>
@@ -81,19 +50,8 @@ function Header({ q }) {
         </button>
       </header>
 
-      {openModal && (
-        <section className={styles.modal} onClick={() => setOpenModal(false)}>
-          <div onClick={(e) => e.stopPropagation()}>
-            <FontAwesomeIcon icon={faBarcode} />
-            <form onSubmit={(e) => handleCodeBarre(e)}>
-              <input type="text" className="form-input" placeholder="Ton code barre" name="barcode" autoComplete="off" />
-              <button type="submit">
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </button>
-            </form>
-          </div>
-        </section>
-      )}
+      {/* Composant Modal */}
+      {openModal && <ModalBarcode setOpenModal={(value) => setOpenModal(value)} />}
     </>
   );
 }

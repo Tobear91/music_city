@@ -1,5 +1,5 @@
 import { faHeart, faLink, faArrowLeft, faCoins, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
-import styles from "../../assets/scss/vinyles_store/Release.module.scss";
+import styles from "../../assets/scss/VinylesStore/Release.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import discogsHelper from "../../modules/discogs";
 import { useEffect, useState } from "react";
@@ -12,7 +12,7 @@ function Release() {
   const [release, setRelease] = useState(null);
   const discogs = useSelector((state) => state.discogs);
 
-  // Récupération de la wanted list sur Discogs
+  // Hook pour récupérer la release quand le router est bien chargé
   useEffect(() => {
     if (!router.isReady) return;
 
@@ -23,16 +23,19 @@ function Release() {
     })();
   }, [router.isReady]);
 
+  // Ajout ou suppresion de la wantlist (impacte le store, la bdd et l'api discogs si user connecté)
   const handleToggleWantlist = (e, action) => {
     e.preventDefault();
     discogsHelper.toggleWantlist(action, release.id);
   };
 
+  // Ajout ou suppresion de la collection (impacte le store, la bdd et l'api discogs si user connecté)
   const handleToggleCollection = (e, action) => {
     e.preventDefault();
     discogsHelper.toggleCollection(action, release.id);
   };
 
+  // Discute avec le store pour savoir si la release est déjà en wantlist ou collection
   const isInCollection = () => discogs.collection_items.includes(release.id);
   const isInWantList = () => discogs.wantlist_items.includes(release.id);
 

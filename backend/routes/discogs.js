@@ -1,18 +1,18 @@
+const Discogs = require("disconnect").Client;
 const express = require("express");
 const router = express.Router();
-const Discogs = require("disconnect").Client;
 
 const DISCOGS_KEY = process.env.DISCOGS_KEY;
 const DISCOGS_SECRET = process.env.DISCOGS_SECRET;
 const DISCOGS_REDIRECT_URI = process.env.DISCOGS_REDIRECT_URI;
 
+// Récupération de l'URL de connexion à l'App Discogs
 router.get("/authorize", function (req, res, next) {
   try {
     const oAuth = new Discogs().oauth();
 
     oAuth.getRequestToken(DISCOGS_KEY, DISCOGS_SECRET, DISCOGS_REDIRECT_URI, function (err, requestData) {
       req.session.requestData = requestData;
-      // req.session.email = req.query.email;
       const authorize_url = requestData.authorizeUrl;
       res.json({ result: true, authorize_url });
     });
@@ -21,6 +21,7 @@ router.get("/authorize", function (req, res, next) {
   }
 });
 
+// Callback une fois que l'app Discogs renvoit vers Music City
 router.get("/callback", async (req, res, next) => {
   try {
     console.log("requestData", req.session.requestData);
@@ -37,6 +38,7 @@ router.get("/callback", async (req, res, next) => {
   }
 });
 
+// Récupère les informations de base du user
 router.get("/identity", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -48,6 +50,7 @@ router.get("/identity", async (req, res, next) => {
   }
 });
 
+// Récupère la Wantlist
 router.get("/users/:username/wantlist", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -59,6 +62,7 @@ router.get("/users/:username/wantlist", async (req, res, next) => {
   }
 });
 
+// Ajoute une release à la wantlist
 router.put("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -70,6 +74,7 @@ router.put("/users/:username/wants/:release_id", async (req, res, next) => {
   }
 });
 
+// Supprime une release de la wantlist
 router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -81,6 +86,7 @@ router.delete("/users/:username/wants/:release_id", async (req, res, next) => {
   }
 });
 
+// Récupère la collection de vinyles
 router.get("/users/:username/collection", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -92,6 +98,7 @@ router.get("/users/:username/collection", async (req, res, next) => {
   }
 });
 
+// Ajoute une release à la collection
 router.put("/users/:username/collection/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -103,6 +110,7 @@ router.put("/users/:username/collection/:release_id", async (req, res, next) => 
   }
 });
 
+// Supprime une release de la collection
 router.delete("/users/:username/collection/:release_id", async (req, res, next) => {
   try {
     const dis = new Discogs(req.session.accessData);
@@ -115,6 +123,7 @@ router.delete("/users/:username/collection/:release_id", async (req, res, next) 
   }
 });
 
+// Récupère une release (pas besoin du token user sur ce endpoint)
 router.get("/releases/:release_id", async (req, res, next) => {
   try {
     const url = `https://api.discogs.com/releases/${req.params.release_id}`;
@@ -127,12 +136,19 @@ router.get("/releases/:release_id", async (req, res, next) => {
       },
     });
     const release = await response.json();
+
+    if (release.message)
+      throw Object.assign(new Error(release.message), {
+        status: 404,
+      });
+
     res.json({ result: true, release });
   } catch (error) {
     next(error);
   }
 });
 
+// Recherche sur l'API (pas besoin du token user sur ce endpoint)
 router.post("/database/search", async (req, res, next) => {
   try {
     const { search, params } = req.body;

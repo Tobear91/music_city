@@ -1,5 +1,5 @@
 import { faXmark, faBars } from "@fortawesome/free-solid-svg-icons";
-import styles from "../../assets/scss/vinyles_store/Header.module.scss";
+import styles from "../../assets/scss/VinylesStore/Header.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
 import { leaveApplication } from "../../modules/appinteraction";

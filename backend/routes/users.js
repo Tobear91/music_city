@@ -9,67 +9,7 @@ const router = express.Router();
 const User = require("../models/users");
 const Track = require("../models/tracks");
 
-/**
- * @swagger
- * /users/signup:
- *   post:
- *     summary: Crée un nouvel utilisateur
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: xxx.xxx@xxx.com
- *               password:
- *                 type: string
- *                 format: password
- *                 example: secret123
- *     responses:
- *       200:
- *         description: Utilisateur créé avec succès
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 result:
- *                   type: boolean
- *                   example: true
- *                 user:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       example: 68812c3310dc82f9709ac23b
- *                     email:
- *                       type: string
- *                       format: email
- *                       example: xxx.xxx@xxx.com
- *                     password:
- *                       type: string
- *                       example: ...
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: 2025-07-23T18:38:43.603Z
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       example: 2025-07-23T18:38:43.603Z
- *       400:
- *         description: Champs requis manquants
- *       409:
- *         description: Utilisateur déjà existant
- */
+// Inscription d'un user
 router.post("/signup", async (req, res, next) => {
   try {
     // Check fields are missing
@@ -80,7 +20,7 @@ router.post("/signup", async (req, res, next) => {
     const { email, password, pseudo } = req.body;
 
     // Check user in database
-    let user = await User.findOne({ email, type: "app" });
+    let user = await User.findOne({ email });
     if (user) throw Object.assign(new Error("User already exist"), { status: 409 });
 
     // Add user in database
@@ -88,7 +28,6 @@ router.post("/signup", async (req, res, next) => {
       pseudo,
       email,
       password: bcrypt.hashSync(password, 10),
-      type: "app",
     });
 
     res.json({ result: true });
@@ -97,57 +36,7 @@ router.post("/signup", async (req, res, next) => {
   }
 });
 
-/**
- * @swagger
- * /users/login:
- *   post:
- *     summary: Authentifie un utilisateur et retourne un token JWT
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: xxx.xxx@xxx.com
- *               password:
- *                 type: string
- *                 format: password
- *                 example: secret123
- *     responses:
- *       200:
- *         description: Connexion réussie, retourne l'utilisateur et un access token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 result:
- *                   type: boolean
- *                   example: true
- *                 user:
- *                   type: object
- *                   properties:
- *                     email:
- *                       type: string
- *                       format: email
- *                       example: xxx.xxx@xxx.com
- *                     access_token:
- *                       type: string
- *                       description: Token JWT d'accès
- *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *       400:
- *         description: Champs requis manquants
- *       401:
- *         description: Identifiants invalides
- */
+// Connexion d'un user
 router.post("/login", async (req, res, next) => {
   try {
     // Check fields are missing
@@ -158,7 +47,7 @@ router.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
 
     // Check user in database
-    let user = await User.findOne({ email, type: "app" });
+    let user = await User.findOne({ email });
     if (!user || (user && !bcrypt.compareSync(password, user.password))) throw Object.assign(new Error("Unauthorized"), { status: 401 });
 
     // Generate tokens
@@ -243,6 +132,7 @@ router.post("/favorites", async (req, res) => {
   res.json({ result: true, favorites: user.favorites });
 });
 
+// Récupération de la wantlist d'un user depuis la BDD Mongo
 router.post("/wantlist", async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -253,6 +143,7 @@ router.post("/wantlist", async (req, res, next) => {
   }
 });
 
+// Ajout des releases depuis discogs vers la wantlist BDD Mongo (pour être toujours à jour entre l'API Discogs et la BDD Mongo)
 router.post("/set-wantlist", async (req, res, next) => {
   try {
     const { email, releases } = req.body;
@@ -268,6 +159,7 @@ router.post("/set-wantlist", async (req, res, next) => {
   }
 });
 
+// Ajout ou suppression d'une release dans le sous document wantlist
 router.put("/toggle-wantlist", async (req, res, next) => {
   try {
     const { action, email, release } = req.body;
@@ -284,6 +176,7 @@ router.put("/toggle-wantlist", async (req, res, next) => {
   }
 });
 
+// Récupération de la collection d'un user depuis la BDD Mongo
 router.post("/collection", async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -294,6 +187,7 @@ router.post("/collection", async (req, res, next) => {
   }
 });
 
+// Ajout des releases depuis discogs vers la collection BDD Mongo (pour être toujours à jour entre l'API Discogs et la BDD Mongo)
 router.post("/set-collection", async (req, res, next) => {
   try {
     const { email, releases } = req.body;
@@ -309,6 +203,7 @@ router.post("/set-collection", async (req, res, next) => {
   }
 });
 
+// Ajout ou suppression d'une release dans le sous document collection
 router.put("/toggle-collection", async (req, res, next) => {
   try {
     const { action, email, release } = req.body;
@@ -330,10 +225,7 @@ router.post("/removefromfavorites", async (req, res) => {
 
   const track = await Track.findOne({ track_spotify_id: track_id });
 
-  await User.findOneAndUpdate(
-    { email: email },
-    { $pull: { favorites: track._id } }
-  );
+  await User.findOneAndUpdate({ email: email }, { $pull: { favorites: track._id } });
 
   res.json({ result: true });
 });

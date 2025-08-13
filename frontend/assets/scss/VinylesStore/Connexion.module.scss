@@ -4,6 +4,12 @@
   height: 100vh;
   display: flex;
 
+  & > button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+  }
+
   & > * {
     flex: 1;
     padding: 20px;
