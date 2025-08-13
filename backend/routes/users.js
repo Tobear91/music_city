@@ -9,6 +9,7 @@ const router = express.Router();
 const User = require("../models/users");
 const Track = require("../models/tracks");
 
+// Inscription d'un user
 router.post("/signup", async (req, res, next) => {
   try {
     // Check fields are missing
@@ -35,6 +36,7 @@ router.post("/signup", async (req, res, next) => {
   }
 });
 
+// Connexion d'un user
 router.post("/login", async (req, res, next) => {
   try {
     // Check fields are missing
@@ -130,6 +132,7 @@ router.post("/favorites", async (req, res) => {
   res.json({ result: true, favorites: user.favorites });
 });
 
+// Récupération de la wantlist d'un user depuis la BDD Mongo
 router.post("/wantlist", async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -140,6 +143,7 @@ router.post("/wantlist", async (req, res, next) => {
   }
 });
 
+// Ajout des releases depuis discogs vers la wantlist BDD Mongo (pour être toujours à jour entre l'API Discogs et la BDD Mongo)
 router.post("/set-wantlist", async (req, res, next) => {
   try {
     const { email, releases } = req.body;
@@ -155,6 +159,7 @@ router.post("/set-wantlist", async (req, res, next) => {
   }
 });
 
+// Ajout ou suppression d'une release dans le sous document wantlist
 router.put("/toggle-wantlist", async (req, res, next) => {
   try {
     const { action, email, release } = req.body;
@@ -171,6 +176,7 @@ router.put("/toggle-wantlist", async (req, res, next) => {
   }
 });
 
+// Récupération de la collection d'un user depuis la BDD Mongo
 router.post("/collection", async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -181,6 +187,7 @@ router.post("/collection", async (req, res, next) => {
   }
 });
 
+// Ajout des releases depuis discogs vers la collection BDD Mongo (pour être toujours à jour entre l'API Discogs et la BDD Mongo)
 router.post("/set-collection", async (req, res, next) => {
   try {
     const { email, releases } = req.body;
@@ -196,6 +203,7 @@ router.post("/set-collection", async (req, res, next) => {
   }
 });
 
+// Ajout ou suppression d'une release dans le sous document collection
 router.put("/toggle-collection", async (req, res, next) => {
   try {
     const { action, email, release } = req.body;
