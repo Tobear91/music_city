@@ -84,7 +84,7 @@ function Launch() {
     dispatch(getAlbumTracks(albumData.items));
 
     // 5. Redirection vers la page résultats
-    router.push("/MusicLab/results");
+    router.push("/music-lab/results");
   }
 
   return (

@@ -62,6 +62,7 @@ function Recommandations() {
     fetchData();
   }, [useremail, storeRecommandations]);
 
+  
   const recommandationsList = storeRecommandations.map((track, index) => {
     return (
       <div key={index} style={{ marginBottom: "12px" }}>
@@ -135,7 +136,6 @@ function Recommandations() {
       .catch((err) => console.error("Erreur lors de la lecture :", err));
   };
 
-  console.log(criteres)
   return (
     <div className={styles.resultsContainer}>
       <header className={styles.headerContainer}>

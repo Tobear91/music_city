@@ -227,7 +227,7 @@ function Results() {
 
         {/* FOOTER */}
         <footer className={styles.footerContainer}>
-          <Footer />
+          <Footer setIsPlaying={setIsPlaying}/>
         </footer>
       </div>
     </>

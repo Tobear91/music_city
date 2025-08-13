@@ -8,7 +8,7 @@ import styles from "../../styles/MusicLab/Header.module.scss";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-
+import {leaveApplication} from '../../modules/appinteraction'
 import {
   getAlbumTracks,
   newTrackFromSPO,
@@ -140,7 +140,7 @@ function Header() {
     const albumData = await getAlbumDataFromTrackData(spotifyData);
     dispatch(getAlbumTracks(albumData.items));
 
-    router.push("/MusicLab/loadingpage");
+    router.push("/music-lab/results");
   }
 
   //gestion de la selection d'une suggestion
@@ -149,7 +149,9 @@ function Header() {
     setSuggestions([]); 
     searchTrack(track.name, track.artists[0].name) ; // lance la recherche au clic
   };
-
+  const handleLeaveBuilding = () => {
+      leaveApplication(router)
+  };
   return (
     <header className={styles.header}>
       <button className="button-bulle purple">
@@ -193,7 +195,7 @@ function Header() {
           ))}
         </ul>
       )}
-      <button className="button-bulle pink">
+      <button className="button-bulle pink" onClick={handleLeaveBuilding}>
         <FontAwesomeIcon icon={faXmark} />
       </button>
     </header>
