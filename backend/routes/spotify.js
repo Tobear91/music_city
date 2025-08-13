@@ -66,7 +66,6 @@ router.get("/callback", async (req, res, next) => {
       user = await User.create({
         email,
         password: bcrypt.hashSync(email, 10),
-        type: "spotify",
       });
     }
 

@@ -88,7 +88,6 @@ router.post("/signup", async (req, res, next) => {
       pseudo,
       email,
       password: bcrypt.hashSync(password, 10),
-      type: "app",
     });
 
     res.json({ result: true });
