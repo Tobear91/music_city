@@ -1,4 +1,4 @@
-import { faXmark, faBars, faMagnifyingGlass, faBarcode, faHeart, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faMagnifyingGlass, faBarcode, faHeart, faCompactDisc, faEye } from "@fortawesome/free-solid-svg-icons";
 import styles from "../../assets/scss/vinyles_store/Header.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { leaveApplication } from "../../modules/appinteraction";
@@ -11,6 +11,7 @@ function Header({ q }) {
   const discogs = useSelector((state) => state.discogs);
   const [searchValue, setSearchValue] = useState(q || "");
   const [openModal, setOpenModal] = useState(false);
+  const [codebarResults, setCodebarResults] = useState([]);
 
   useEffect(() => {
     setSearchValue(q || "");
@@ -45,19 +46,15 @@ function Header({ q }) {
       credentials: "include",
     });
     const datas = await response.json();
-
-    if (datas.result && datas.results.pagination.items > 0) {
-      console.log(datas.results.results[0]);
-      router.push(`/vinyles-store/release/${datas.results.results[0].id}`);
-    }
+    if (datas.result) setCodebarResults(datas.results);
   };
+
+  const isInCollection = (id) => discogs.collection_items.includes(id);
+  const isInWantList = (id) => discogs.wantlist_items.includes(id);
 
   return (
     <>
       <header className={styles.header}>
-        {/* <button className="button-bulle purple">
-          <FontAwesomeIcon icon={faBars} />
-        </button> */}
         <span>Vinyles Store</span>
         <button className="button-square blue" onClick={() => router.push("/vinyles-store/collection")}>
           <span>{discogs.collection_items.length}</span>
@@ -91,6 +88,37 @@ function Header({ q }) {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </button>
             </form>
+            <div>
+              {codebarResults.length === 0 && <p>Aucuns résultats</p>}
+              {codebarResults.length > 0 &&
+                codebarResults.map((result, i) => {
+                  return (
+                    <div key={i}>
+                      {result.thumb && <img src={result.thumb} alt={result.title} width={50} />}
+                      {!result.thumb && <FontAwesomeIcon icon={faCompactDisc} />}
+                      <div className={styles.infos}>
+                        <p>{result.title}</p>
+                        <p>{result.format.length > 0 && result.format.join(", ")}</p>
+                      </div>
+                      <div className={styles.actions}>
+                        {isInCollection(result.id) && (
+                          <span className="button-square small green">
+                            <FontAwesomeIcon icon={faCompactDisc} />
+                          </span>
+                        )}
+                        {isInWantList(result.id) && (
+                          <span className="button-square small green">
+                            <FontAwesomeIcon icon={faHeart} />
+                          </span>
+                        )}
+                        <a className="button-square small purple" href={`/vinyles-store/release/${result.id}`}>
+                          <FontAwesomeIcon icon={faEye} />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         </section>
       )}

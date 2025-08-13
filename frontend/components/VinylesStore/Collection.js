@@ -7,16 +7,17 @@ import Card from "./Card";
 function Collection() {
   const [collectionlist, setCollectionlist] = useState([]);
 
-  // Récupération de la wanted list sur Discogs
   useEffect(() => {
     (async () => {
+      // Récupération des collections
       const releases = await discogsHelper.getCollection();
+      // Récupération de la wantlist en tache de fond
       discogsHelper.getWantlist();
       setCollectionlist(releases);
     })();
   }, []);
 
-  // Suppression de la release partout : state, store, bdd, discogs
+  // Suppression de la release partout : state, store, bdd, discogs (si user connecté à discogs)
   const handleDeleteRelease = async (id, indexToRemove) => {
     setCollectionlist((prev) => prev.filter((_, i) => i !== indexToRemove));
     discogsHelper.toggleCollection("remove", id);
