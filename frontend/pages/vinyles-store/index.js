@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 function VSConnexionPage() {
   const user = useSelector((state) => state.user.user);
   const router = useRouter();
-  if (!user) router.push("/connexion");
+  if (!user) return;
   else user.discogs ? router.push("/vinyles-store/collection") : router.push("/vinyles-store/connexion");
 }
 
