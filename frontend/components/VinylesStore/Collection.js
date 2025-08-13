@@ -1,4 +1,4 @@
-import styles from "../../assets/scss/vinyles_store/Wantlist.module.scss";
+import styles from "../../assets/scss/VinylesStore/Wantlist.module.scss";
 import discogsHelper from "../../modules/discogs";
 import { useEffect, useState } from "react";
 import Header from "./Header";

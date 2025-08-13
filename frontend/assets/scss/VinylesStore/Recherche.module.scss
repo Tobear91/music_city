@@ -59,7 +59,15 @@
         & > div:last-child {
           // Titre
           p {
-            font-size: 1.4rem;
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+
+            & + p {
+              font-size: 1.3rem;
+              font-weight: 400;
+              color: #7c7c7c;
+            }
           }
 
           // Actions

@@ -127,6 +127,12 @@ router.get("/releases/:release_id", async (req, res, next) => {
       },
     });
     const release = await response.json();
+
+    if (release.message)
+      throw Object.assign(new Error(release.message), {
+        status: 404,
+      });
+
     res.json({ result: true, release });
   } catch (error) {
     next(error);

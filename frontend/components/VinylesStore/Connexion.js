@@ -1,4 +1,4 @@
-import styles from "../../assets/scss/vinyles_store/Connexion.module.scss";
+import styles from "../../assets/scss/VinylesStore/Connexion.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { setUsername } from "../../reducers/discogs.js";

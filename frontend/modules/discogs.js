@@ -236,4 +236,15 @@ const getRelease = async (release_id) => {
   return await response.json();
 };
 
-module.exports = { getAuthorizeUrl, getIdentity, getCollection, getWantlist, toggleWantlist, getRelease, setWantedlist, toggleCollection, setCollectionList };
+// Recherche sur l'API Discogs
+const search = async (body) => {
+  const response = await fetch(`http://127.0.0.1:3000/discogs/database/search`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    credentials: "include",
+  });
+  return await response.json();
+};
+
+module.exports = { getAuthorizeUrl, getIdentity, getCollection, getWantlist, toggleWantlist, getRelease, setWantedlist, toggleCollection, setCollectionList, search };
