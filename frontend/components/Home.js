@@ -1,5 +1,4 @@
 import { useSelector } from "react-redux";
-import spotify from "../modules/spotify";
 import dynamic from "next/dynamic";
 
 function Home() {
