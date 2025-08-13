@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Phaser from "phaser";
-import styles from "../styles/PhaserGame.module.css";
+import styles from "../assets/scss/phaser/phaser.module.scss";
 import { preload, update, create } from "../modules/phaser";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -12,7 +12,6 @@ const PhaserGame = () => {
   const characterPosition = useSelector((state) => state.character.position);
   const router = useRouter();
   const [showEnterScreen, setShowEnterScreen] = useState(false);
-
   useEffect(() => {
     if (
       characterPosition.name &&
