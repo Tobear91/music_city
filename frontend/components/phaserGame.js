@@ -12,7 +12,6 @@ const PhaserGame = () => {
   const characterPosition = useSelector((state) => state.character.position);
   const router = useRouter();
   const [showEnterScreen, setShowEnterScreen] = useState(false);
-
   useEffect(() => {
     if (
       characterPosition.name &&

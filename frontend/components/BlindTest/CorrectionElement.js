@@ -1,10 +1,9 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import styles from "../../assets/scss/blindtest/CorrectionElement.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 export default function CorrectionElement({
-  index,
   previewUrl,
   totalQuestion,
   questionNbr,
@@ -12,34 +11,38 @@ export default function CorrectionElement({
   userAnswer,
   isCorrect,
   playingIndex,
-  onPlay,
-  onStop,
+  setPlayingIndex,
+  index,
 }) {
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null); // Référence vers l'élément audio
+  let timeoutId = null; // ID du timer pour arrêter le son
 
-  if (!userAnswer) userAnswer = "Vous n'avez pas répondu à la question";
+  const isPlaying = playingIndex === index; // true si c'est cet extrait qui est en train de jouer
+
+  // Si pas de réponse, texte par défaut
+  if (!userAnswer) {
+    userAnswer = "Vous n'avez pas répondu à la question";
+  }
 
   const handlePlay = () => {
-    if (audioRef.current) {
-      setIsPlaying(true);
-      onPlay(index); // informe le parent que cet audio joue
-      audioRef.current.currentTime = 0;
-      audioRef.current.volume = 0.3;
-      audioRef.current.play();
+    // Bloque le lancement si un autre extrait joue déjà
+    if (playingIndex !== null && playingIndex !== index) return;
 
-      setTimeout(() => {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        setIsPlaying(false);
-        onStop(); // informe le parent que l'audio est arrêté
-      }, 5000);
+    const audio = audioRef.current;
+    if (audio) {
+      setPlayingIndex(index); // Déclare cet extrait comme en cours
+      audio.currentTime = 0; // Redémarre depuis le début
+      audio.volume = 0.3;
+      audio.play();
+
+      clearTimeout(timeoutId); // Annule un ancien timer s'il existe
+      timeoutId = setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        setPlayingIndex(null); // Libère le "verrou"
+      }, 5000); // Stoppe après 5 secondes
     }
   };
-
-  // Si un autre audio joue, on bloque le bouton
-  const disabled =
-    isPlaying || (playingIndex !== null && playingIndex !== index);
 
   return (
     <div className={styles.question}>
@@ -61,7 +64,7 @@ export default function CorrectionElement({
         <button
           onClick={handlePlay}
           className="form-button primary"
-          disabled={disabled}
+          disabled={playingIndex !== null && playingIndex !== index} // ✅ désactive tous les autres
         >
           {isPlaying ? (
             "Lecture en cours..."
