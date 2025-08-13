@@ -36,10 +36,8 @@ const getWantlist = async () => {
     releases = datas.wantlist;
   }
 
-  if (releases.length > 0) {
-    const ids = releases.map((item) => item.release_id);
-    store.dispatch(setWantlist(ids));
-  }
+  const ids = releases.map((item) => item.release_id);
+  store.dispatch(setWantlist(ids));
 
   return releases;
 };
@@ -135,10 +133,8 @@ const getCollection = async () => {
     releases = datas.collection;
   }
 
-  if (releases.length > 0) {
-    const ids = releases.map((item) => item.release_id);
-    store.dispatch(setCollection(ids));
-  }
+  const ids = releases.map((item) => item.release_id);
+  store.dispatch(setCollection(ids));
 
   return releases;
 };
@@ -204,4 +200,4 @@ const getRelease = async (release_id) => {
   return await response.json();
 };
 
-module.exports = { getCollection, getWantlist, toggleWantlist, getRelease, setWantedlist, toggleCollection };
+module.exports = { getCollection, getWantlist, toggleWantlist, getRelease, setWantedlist, toggleCollection, setCollectionList };
