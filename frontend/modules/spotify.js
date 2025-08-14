@@ -64,68 +64,77 @@ const getFollowedArtists = async () => {
 
 const getTracksUser = async () => {
   const url = "https://api.spotify.com/v1/me/tracks";
-  return await customFetch(url)
-}
-
+  return await customFetch(url);
+};
+// Récuperer la playlist de l'utilisateur
 const getPlaylistsUser = async () => {
-  const url = "https://api.spotify.com/v1/me/playlists"
-  return await customFetch(url)
-}
-
+  const url = "https://api.spotify.com/v1/me/playlists";
+  return await customFetch(url);
+};
+// Récuperer les musiques d'une playlist (par ID)
 const getPlaylistTracks = async (playlistId) => {
-  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
-  return await customFetch(url)
-}
-
-//recup via API la track à partir du titre et de l'artiste
+  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+  return await customFetch(url);
+};
 const getTrackData = async (titre, artiste) => {
   const query = `${titre} artist:${artiste}`;
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
-  return await customFetch(url)}
+  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+    query
+  )}&type=track&limit=1`;
+  return await customFetch(url);
+};
 
-
-const getPlaylistWeek = async () => {
-const url = `https://api.spotify.com/v1/playlists/37i9dQZEVXcBL58LnMCTZU/tracks`
-return await customFetch(url)
-}
-
-//recup via API les tracks de l'album à partir de l'id
 const getAlbumDataFromTrackData = async (trackdata) => {
   const url = `https://api.spotify.com/v1/albums/${trackdata.tracks.items[0].album.id}/tracks`;
   return await customFetch(url);
-}
+};
 
 //recup via API les infos sur l'artiste à partir de l'id
 const getArtistData = async (artistId) => { 
   const url = `https://api.spotify.com/v1/artists/${artistId}`;
   return await customFetch(url);
-}
-//Récupère 5 album sur Spotify pour une recherche donnée 
-const getAlbum = async(albumQuery)=>{
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(albumQuery)}&type=album&limit=10`;
+};
+//Récupère 5 album sur Spotify pour une recherche donnée
+const getAlbum = async (albumQuery) => {
+  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+    albumQuery
+  )}&type=album&limit=10`;
   return await customFetch(url);
-}
+};
 
 // récupère la première track d'un album
-const getFirstTrackAlbum =async(albumId)=>{
+const getFirstTrackAlbum = async (albumId) => {
   const tracksResponse = await customFetch(
-      `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=1`
-  )
-
+    `https://api.spotify.com/v1/albums/${albumId}/tracks?limit=1`
+  );
 
   const firstTrack = tracksResponse.items[0];
-      
-      return {
-          trackName: firstTrack.name,
-          artistName: firstTrack.artists[0]?.name || 'Artiste inconnu',
-          trackId: firstTrack.id,
-      }
-}
+
+  return {
+    trackName: firstTrack.name,
+    artistName: firstTrack.artists[0]?.name || "Artiste inconnu",
+    trackId: firstTrack.id,
+  };
+};
 
 //Récupère 5 tracks pour une recherche donnée
-const getTracks = async(Query)=>{
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(Query)}&type=track&limit=5`;
+const getTracks = async (Query) => {
+  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+    Query
+  )}&type=track&limit=5`;
   return await customFetch(url);
-}
+};
 
-module.exports = { getMe, getFollowedArtists, getTrackData, getTracksUser, getAlbumDataFromTrackData, getArtistData, getPlaylistsUser, getAlbum, getFirstTrackAlbum, getPlaylistTracks, getTracks };
+module.exports = {
+  getMe,
+  getFollowedArtists,
+  getTrackData,
+  getTracksUser,
+  getAlbumDataFromTrackData,
+  getArtistData,
+  getPlaylistsUser,
+  getAlbum,
+  getFirstTrackAlbum,
+  getPlaylistTracks,
+  getTracks,
+};

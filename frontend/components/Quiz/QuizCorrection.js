@@ -5,31 +5,10 @@ import Header from "./Header";
 import Image from "next/image";
 
 export default function QuizCorrection() {
-  const userId = useSelector((state) => state.user.user._id);
-  const email = useSelector((state) => state.user.user.email);
+  // Récuperation des données du quiz depuis Redux
   const { questions, score, total } = useSelector((state) => state.quiz);
   const router = useRouter();
   const { q } = router.query;
-
-  const saveQuiz = () => {
-    fetch("http://localhost:3000/quiz", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId,
-        email,
-        questions,
-        score,
-        total,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.result) {
-          alert("Quiz sauvegardé avec succès !");
-        }
-      });
-  };
 
   return (
     <div>
@@ -90,9 +69,6 @@ export default function QuizCorrection() {
             onClick={() => router.push("/quiz")}
           >
             Rejouer un quiz
-          </button>
-          <button className={styles.endButton} onClick={saveQuiz}>
-            Enregistrer ce quiz
           </button>
         </div>
       </div>
