@@ -98,7 +98,6 @@
   grid-row: 9 / 12;
   background: white;
   color: #2e1b5c;
-  border: 0.5px solid black;
   overflow-y: auto; /* active le scroll vertical */
   border-radius: 5px;
     padding: 10px;
@@ -111,8 +110,6 @@
   grid-row: 12 / 13;
   background: white;
   color: #2e1b5c;
-  border: 0.5px solid black;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }

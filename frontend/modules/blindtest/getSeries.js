@@ -2,12 +2,14 @@ import { getSoundtrackScore } from "./getSoundtrackScore.js";
 import { getAlbum, getFirstTrackAlbum } from "../spotify.js";
 
 export async function fetchRandomShow() {
+  // appelle route our récupérer séries aléatoires
   const res = await fetch("http://127.0.0.1:3000/blindtest/randomshow");
   if (!res.ok) throw new Error("Erreur lors de la récupération des séries");
   return res.json();
 }
 
 export async function findBestAlbumForSeries(title, platform) {
+  //récupèr el'album avec le meilleur score
   const query = `${title} soundtrack`;
   const albums = await getAlbum(query);
 
@@ -25,10 +27,12 @@ export async function findBestAlbumForSeries(title, platform) {
 }
 
 export async function getFirstTrack(albumId) {
+  //récupère la première track de l'album
   return getFirstTrackAlbum(albumId);
 }
 
 export async function getSpotifyPreviewUrl(artistName, trackName) {
+  // récupère la preview de la premièr etrack
   const res = await fetch("http://127.0.0.1:3000/blindtest/previewUrl", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -46,6 +50,7 @@ export function buildEnrichedSerie(
   bestScore,
   previewUrl
 ) {
+  // mise en forme des données pour les enregristrer dans la DB
   return {
     ...originalSerie,
     artistName: firstTrack.artistName,

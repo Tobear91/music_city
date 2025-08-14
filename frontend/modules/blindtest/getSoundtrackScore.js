@@ -1,5 +1,6 @@
 export function getSoundtrackScore(album, serieName, platformName) {
-  // const name = album.name.toLowerCase().trim();
+  // donne un score au nom de la soundtrack récupérée pour savori si elle peut correspondre à la réelle playlist de la série
+
   const name = album.toLowerCase().trim();
   const serie = serieName.toLowerCase().trim().split(":")[0];
 

@@ -1,21 +1,16 @@
 import styles from "../../styles/MusicLab/Composants.module.css";
-import { useState, useEffect, use } from "react";
-import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-
+import { useSelector } from "react-redux";
 function Interpretation(props) {
   const interpretationState = useSelector(
     (state) => state.analyses.value.interpretation_by_ai.interpretation
   );
-  
+
   const donnerSonAvis = (dejafait) => {
     if (dejafait) {
-      return (
-        <div>
-        </div>
-      );
+      return <div></div>;
     } else {
-      return (<div style={{ textAlign: "center", fontFamily: "sans-serif" }}>
+      return (
+        <div style={{ textAlign: "center", fontFamily: "sans-serif" }}>
           <p>Êtes-vous d'accord avec cette interpretation?</p>
           <button
             onClick={props.handleLike}
@@ -42,10 +37,10 @@ function Interpretation(props) {
           >
             Pas d'accord
           </button>
-        </div>)
+        </div>
+      );
     }
   };
-
 
   async function handleClick() {
     const result = await props.launchInterpretation();

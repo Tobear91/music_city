@@ -1,14 +1,12 @@
 import styles from "../../styles/MusicLab/Track.module.css";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { replaceMsWithMinutesAndSeconds } from "../../modules/formatages";
 import { addToFavorites, getFavorites } from "../../modules/listedefavoris";
 import { getPreviewWithArtistAndTitle } from "../../modules/getpreviewspotify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHeart,
-  faPlus,
   faPlay,
   faPause,
 } from "@fortawesome/free-solid-svg-icons";
@@ -33,7 +31,7 @@ function Track(props) {
           (e) => e.track_spotify_id === storeData.album.tracks[props.index].id
         );
         setIsFav(bool);
-      }
+      } 
     }
     fetchFavorites();
     async function fetchPreview() {

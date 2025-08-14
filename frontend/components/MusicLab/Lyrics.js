@@ -43,7 +43,7 @@ function Lyrics(props) {
       }
     }
     fetchPreview();
-  }, [props.globalIsPlaying]);
+  }, [props.globalIsPlaying, storeData]);
 
   return (
     <div>

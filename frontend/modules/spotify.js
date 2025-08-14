@@ -89,7 +89,8 @@ const getAlbumDataFromTrackData = async (trackdata) => {
   return await customFetch(url);
 };
 
-const getArtistData = async (artistId) => {
+//recup via API les infos sur l'artiste à partir de l'id
+const getArtistData = async (artistId) => { 
   const url = `https://api.spotify.com/v1/artists/${artistId}`;
   return await customFetch(url);
 };

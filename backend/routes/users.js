@@ -53,12 +53,15 @@ router.post("/login", async (req, res, next) => {
     // Generate tokens
     const access_token = auth.generateAccessToken(email);
 
+    const datas = await spotify.generateSimpleToken();
+    const { access_token: spotify_access_token } = datas;
+
     user = {
       email,
       access_token,
       spotify: {
         type: "simple",
-        access_token: await spotify.generateSimpleToken(),
+        access_token: spotify_access_token,
       },
       discogs: !!req.session.accessData,
     };
@@ -126,11 +129,24 @@ router.post("/addtofavorites", async (req, res) => {
   }
 });
 
+//recupere les favoris de l'utilisateur
 router.post("/favorites", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email }).populate("favorites");
   res.json({ result: true, favorites: user.favorites });
 });
+
+//suppression d'un favoris
+router.post("/removefromfavorites", async (req, res) => {
+  const { track_id, email } = req.body;
+
+  const track = await Track.findOne({ track_spotify_id: track_id });
+
+  await User.findOneAndUpdate({ email: email }, { $pull: { favorites: track._id } });
+
+  res.json({ result: true });
+});
+module.exports = router;
 
 // Récupération de la wantlist d'un user depuis la BDD Mongo
 router.post("/wantlist", async (req, res, next) => {
@@ -219,14 +235,3 @@ router.put("/toggle-collection", async (req, res, next) => {
     next(error);
   }
 });
-
-router.post("/removefromfavorites", async (req, res) => {
-  const { track_id, email } = req.body;
-
-  const track = await Track.findOne({ track_spotify_id: track_id });
-
-  await User.findOneAndUpdate({ email: email }, { $pull: { favorites: track._id } });
-
-  res.json({ result: true });
-});
-module.exports = router;

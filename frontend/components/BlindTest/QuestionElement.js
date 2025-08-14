@@ -45,7 +45,7 @@ export default function QuestionElement({
             </span>
           )}
         </h2>
-        <p> De quel série provient cet extrait musicale ?</p>
+        <p> De quel série provient cet extrait musical ?</p>
       </div>
 
       <div className={styles.listenButton}>

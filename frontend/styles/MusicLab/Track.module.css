@@ -1,11 +1,11 @@
 .titleRow{
-
+  font-weight: bold;
   align-items: center;
     display: flex;
   justify-content: space-between; /* espace entre les éléments */
 }
 
-.titles{
+.title{
   display: flex;
 }
 .buttons{

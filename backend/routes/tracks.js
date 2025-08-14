@@ -7,7 +7,7 @@ const Track = require("../models/tracks");
 const interpreterParoles = require("../modules/MusicLab/lyricsinterpretation");
 const spotifyPreviewFinder = require("spotify-preview-finder");
 
-//ajout d'un nouveau track
+//ajout d'un nouveau track à la database
 router.post("/", async (req, res) => {
   try {
     const track = await Track.findOne({ track_spotify_id: req.body.track_id });
@@ -30,7 +30,6 @@ router.post("/", async (req, res) => {
       dislikes_interpretation: 0,
       duration_ms: req.body.duration_ms
     });
-
     await newTrack.save();
     res.json({ result: true });
   } catch (err) {
@@ -75,7 +74,7 @@ router.put("/updateanalyse", (req, res) => {
     });
 });
 
-//pour avoir la liste des likes et dislikes de l'interpretation (optionnel car provoquait un rerender chelou)
+//pour avoir la liste des likes et dislikes de l'interpretation (optionnel car fonctionnalité de reset interpretation pas encore implementé)
 router.get("/like", async (req, res) => {
   const { track_id } = req.query;
   Track.findOne({ track_spotify_id: track_id })
@@ -169,6 +168,7 @@ router.get("/lyrics/interpretation", async (req, res) => {
   }
 });
 
+//recupere le preview url avec spotifyPreviewFinder
 router.post("/previewUrl", async (req, res) => {
   const artistName = req.body.artistName;
   const trackName = req.body.trackName;
@@ -180,6 +180,7 @@ router.post("/previewUrl", async (req, res) => {
   }
 });
 
+//recuper les tracks en fonction des critères
 router.post("/recommandations", async (req, res) => {
   try {
     const criteres = req.body; // tableau de strings

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getFavorites } from "../modules/listedefavoris";
+
 
 const initialState = {
   value: {
@@ -12,16 +12,22 @@ export const favorisSlice = createSlice({
 
   initialState,
   reducers: {
-    getFavoritesList: (state, action) => {
-      state.value.tracks = action.payload
+    getFavoritesListInStore: (state, action) => {
+      state.value.tracks = action.payload.map((track, index) => { return {
+        track_id: track.track_spotify_id,
+        title: track.title,
+        artist: track.artist,
+        duration_ms: track.duration_ms
+      }  
+    })
     },
-    removeAFavorite: (state, action) => {
-        state.value.tracks
+    removeAFavoriteFromStore: (state, action) => {
+        state.value.tracks = state.value.tracks.filter(e => e.track_id !== action.payload)
     }
   }
 })
 export const {
-    getFavoritesList,
-    removeAFavorite
+    getFavoritesListInStore,
+    removeAFavoriteFromStore
 } = favorisSlice.actions;
 export default favorisSlice.reducer;
