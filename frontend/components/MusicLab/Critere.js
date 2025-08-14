@@ -1,4 +1,4 @@
-import styles from "../../styles/MusicLab/Recommandations.module.css";
+import styles from "../../styles/MusicLab/RecommandationsFavoris.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus } from "@fortawesome/free-solid-svg-icons";

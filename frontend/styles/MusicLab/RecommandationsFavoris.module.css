@@ -40,7 +40,7 @@
      width: 100%; /* s’étend */
 }
 
-.recommandationsContainer {
+.tracksContainer {
   grid-column: 2 / 12;
   grid-row: 3 / 12;
   background: white;
@@ -57,21 +57,6 @@
      width: 100%; /* s’étend */
 }
 
-.titleRow {
-  display: flex;
-  justify-content: space-between; /* titre à gauche, boutons à droite */
-  align-items: center;
-  width: 100%; /* prend toute la largeur */
-}
-
-.title {
-  flex: 1; /* prend tout l’espace dispo */
-}
-
-.buttons {
-  display: flex;
-  gap: 5px;
-}
 
 .footerContainer{
   grid-column: 2 / 12;

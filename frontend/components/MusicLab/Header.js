@@ -192,9 +192,10 @@ function Header() {
           ))}
         </ul>
       )}
+      <div className={styles.Exit}>
       <button className="button-bulle pink" onClick={handleLeaveBuilding}>
         <FontAwesomeIcon icon={faXmark} />
-      </button>
+      </button></div>
     </header>
   );
 }

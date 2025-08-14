@@ -1,4 +1,4 @@
-import styles from "../../assets/scss/vinyles_store/Connexion.module.scss";
+import styles from "../../assets/scss/VinylesStore/Connexion.module.scss";
 import styles2 from "../../styles/MusicLab/Header.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";

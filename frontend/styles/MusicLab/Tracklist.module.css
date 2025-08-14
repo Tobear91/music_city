@@ -14,3 +14,8 @@
 .title{
     display: flex;
 }
+
+.buttons{
+  display: flex;
+    gap: 5px; /* espace horizontal entre éléments */
+}
