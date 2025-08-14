@@ -1,4 +1,4 @@
-import styles from "../../styles/MusicLab/Album.module.css";
+import styles from "../../styles/MusicLab/Tracklist.module.css";
 import { useDispatch, useSelector } from "react-redux";
 
 import Track from "./Track";

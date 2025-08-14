@@ -1,4 +1,4 @@
-import styles from "../../styles/MusicLab/Recommandations.module.css";
+import styles from "../../styles/MusicLab/RecommandationsFavoris.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
@@ -101,14 +101,14 @@ function Favoris() {
       <div className={styles.titleContainer}>
         <h1 style={{ color: "#2e1b5c" }}>Liste de favoris</h1>
       </div>
-      <div className={styles.recommandationsContainer}>
+      <div className={styles.tracksContainer}>
         <section>{favorisList}</section>
       </div>
       <footer className={styles.footerContainer}>
         <div className={styles.button}>
           <button
             className={"form-button primary"}
-            style={{ width: 800, height: 35 }}
+            style={{ width: 600, height: 35 }}
             onClick={() => handleClickAnalyse()}
           >
             ANALYSE
@@ -117,7 +117,7 @@ function Favoris() {
         <div className={styles.button}>
           <button
             className={"form-button primary"}
-            style={{ width: 800, height: 35 }}
+            style={{ width: 600, height: 35 }}
             onClick={() => handleClickRecommandations()}
           >
             RECOMMANDATIONS

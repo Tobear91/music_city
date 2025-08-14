@@ -76,22 +76,26 @@ const getPlaylistTracks = async (playlistId) => {
   const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
   return await customFetch(url)
 }
+
+//recup via API la track à partir du titre et de l'artiste
 const getTrackData = async (titre, artiste) => {
   const query = `${titre} artist:${artiste}`;
   const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=1`;
   return await customFetch(url)}
-  
+
+
 const getPlaylistWeek = async () => {
 const url = `https://api.spotify.com/v1/playlists/37i9dQZEVXcBL58LnMCTZU/tracks`
 return await customFetch(url)
 }
 
-
+//recup via API les tracks de l'album à partir de l'id
 const getAlbumDataFromTrackData = async (trackdata) => {
   const url = `https://api.spotify.com/v1/albums/${trackdata.tracks.items[0].album.id}/tracks`;
   return await customFetch(url);
 }
 
+//recup via API les infos sur l'artiste à partir de l'id
 const getArtistData = async (artistId) => { 
   const url = `https://api.spotify.com/v1/artists/${artistId}`;
   return await customFetch(url);

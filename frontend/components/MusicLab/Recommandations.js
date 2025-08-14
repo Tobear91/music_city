@@ -1,4 +1,4 @@
-import styles from "../../styles/MusicLab/Recommandations.module.css";
+import styles from "../../styles/MusicLab/RecommandationsFavoris.module.css";
 import { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
@@ -13,6 +13,8 @@ function Recommandations() {
   const storeRecommandations = useSelector(
     (state) => state.recommandations.value.tracks
   );
+
+  const storeFavoris = useSelector((state) => state.favoris.value.tracks);
 
   const useremail = useSelector((state) => state.user.user.email);
   const criteres = useSelector((state) => state.criteres.value.criteres);
@@ -76,6 +78,7 @@ function Recommandations() {
         useremail={useremail}
         isplaying={isPlaying}
         setisplaying={setIsPlaying}
+        storefavoris={storeFavoris}
       />
     );
   });
@@ -88,7 +91,7 @@ function Recommandations() {
       <div className={styles.titleContainer}>
         <h1 style={{ color: "#2e1b5c" }}>{criteres.join(" / ")}</h1>
       </div>
-      <div className={styles.recommandationsContainer}>
+      <div className={styles.tracksContainer}>
         <section>{recommandationsList}</section>
       </div>
       <footer className={styles.footerContainer}>
