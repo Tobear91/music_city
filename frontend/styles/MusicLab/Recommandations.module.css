@@ -72,3 +72,10 @@
   display: flex;
   gap: 5px;
 }
+
+.footerContainer{
+  grid-column: 2 / 12;
+  grid-row: 12 / 13;
+  display: flex;
+  justify-content: space-between;
+}

@@ -1,26 +1,44 @@
 import styles from "../../styles/MusicLab/Recommandations.module.css";
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "./Header";
-import TrackReco from "./TrackReco";
+import TrackFav from "./TrackFav";
 import { store } from "../../modules/store";
 
-function Recommandations() {
+import { getFavorites } from "../../modules/listedefavoris";
+import { getFavoritesListInStore } from "../../reducers/favoris";
+
+function Favoris() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const audioRef = useRef(null); //pour lecture preview *pourquoi useRef?
 
-  const storeRecommandations = useSelector(
-    (state) => state.recommandations.value.tracks
-  );
+  const storeFavoris = useSelector((state) => state.favoris.value.tracks);
 
   const useremail = useSelector((state) => state.user.user.email);
-  const criteres = useSelector((state) => state.criteres.value.criteres);
-
   const [isFav, setIsFav] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  //fonction de lecture d'audio à partir d'une url
+  useEffect(() => {
+    if (isPlaying === false) {
+      setIsPlaying(false);
+    }
+    //va chercher les favoris dans la DB et met à jour le store
+    async function fetchFavorites() {
+      const data = await getFavorites(useremail);
+      dispatch(getFavoritesListInStore(data.favorites));
+      if (data && data.favorites) {
+        const bool = data.favorites.some(
+          (e) => e.track_spotify_id === storeFavoris.track_id
+        );
+        setIsFav(bool);
+      }
+    }
+    fetchFavorites();
+  }, [isPlaying]);
+
+  console.log(favorisList);
   const playPreview = (url) => {
     if (isPlaying) {
       // Mettre en pause si déjà en train de jouer
@@ -43,7 +61,6 @@ function Recommandations() {
       .then(() => setIsPlaying(true))
       .catch((err) => console.error("Erreur lors de la lecture :", err));
   };
-
   //arrete la lecture et navigue vers la page results
   function handleClickAnalyse() {
     if (audioRef.current) {
@@ -53,49 +70,45 @@ function Recommandations() {
     router.push("/music-lab/results");
   }
 
-  //arrete la lecture et navigue vers la page favoris
-  function handleClickFavoris() {
+  //arrete la lecture et navigue vers la page recommandations
+  function handleClickRecommandations() {
     if (audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
     }
-    router.push("/music-lab/favoris");
+    router.push("/music-lab/recommandations");
   }
 
-  const recommandationsList = storeRecommandations.map((track, index) => {
-    return (
-      <TrackReco
-        key={index}
-        track_id={track.track_id}
-        title={track.title}
-        artist={track.artist}
-        duration_ms={track.duration_ms}
-        isfav={isFav}
-        setisfav={setIsFav}
-        playpreview={playPreview}
-        useremail={useremail}
-        isplaying={isPlaying}
-        setisplaying={setIsPlaying}
-      />
-    );
-  });
-
+  //genere la liste de tracks à partir du store redux Favoris
+  const favorisList = storeFavoris.map((track, index) => (
+    <TrackFav
+      key={index}
+      title={track.title}
+      artist={track.artist}
+      duration_ms={track.duration_ms}
+      track_id={track.track_id}
+      setisplaying={setIsPlaying}
+      isplaying={isPlaying}
+      playpreview={playPreview}
+      useremail={useremail}
+    />
+  ));
   return (
     <div className={styles.resultsContainer}>
       <header className={styles.headerContainer}>
         <Header />
       </header>
       <div className={styles.titleContainer}>
-        <h1 style={{ color: "#2e1b5c" }}>{criteres.join(" / ")}</h1>
+        <h1 style={{ color: "#2e1b5c" }}>Liste de favoris</h1>
       </div>
       <div className={styles.recommandationsContainer}>
-        <section>{recommandationsList}</section>
+        <section>{favorisList}</section>
       </div>
       <footer className={styles.footerContainer}>
         <div className={styles.button}>
           <button
             className={"form-button primary"}
-            style={{ width: 600, height: 35 }}
+            style={{ width: 800, height: 35 }}
             onClick={() => handleClickAnalyse()}
           >
             ANALYSE
@@ -104,10 +117,10 @@ function Recommandations() {
         <div className={styles.button}>
           <button
             className={"form-button primary"}
-            style={{ width: 600, height: 35 }}
-            onClick={() => handleClickFavoris()}
+            style={{ width: 800, height: 35 }}
+            onClick={() => handleClickRecommandations()}
           >
-            FAVORIS
+            RECOMMANDATIONS
           </button>
         </div>
       </footer>
@@ -115,4 +128,4 @@ function Recommandations() {
   );
 }
 
-export default Recommandations;
+export default Favoris;

@@ -1,18 +1,9 @@
 import styles from "../../styles/MusicLab/Recommandations.module.css";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCriteres,
-  removeFromCriteres,
-  resetCriteres,
-} from "../../reducers/criteres";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus } from "@fortawesome/free-solid-svg-icons";
 function Critere(props) {
-  const dispatch = useDispatch();
-  const criteres = useSelector((state) => state.criteres.value.criteres) || [];
+
 
   return (
     <div>

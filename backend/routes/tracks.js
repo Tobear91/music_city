@@ -9,11 +9,14 @@ const spotifyPreviewFinder = require("spotify-preview-finder");
 
 //ajout d'un nouveau track
 router.post("/", async (req, res) => {
+  // console.log("**************************************", req.body.genres) //affiche tableau remplis
   try {
     const track = await Track.findOne({ track_spotify_id: req.body.track_id });
     if (track) {
       return res.json({ result: false, error: "Track already exists" });
     }
+    // console.log("**************************************", req.body.genres) //affiche tableau vide
+    // console.log("**************************************", req.body.genres) //affiche tableau vide
     const newTrack = new Track({
       title: req.body.title,
       artist: req.body.artist,

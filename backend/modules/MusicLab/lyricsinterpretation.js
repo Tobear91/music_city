@@ -4,49 +4,52 @@ async function interpreterParoles(paroles, artiste) {
   const client = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });  const prompt = 
-`
-Tu es un expert en analyse de paroles de chansons.
+// `Un expert en sémantique et un expert en culture musicale discutent pour analyser les paroles ci-dessous et comprendre leur sens global.
 
-Analyse les paroles suivantes : """${paroles}""" de l'artiste """${artiste}""".
+// Artiste : """${artiste}"""
+// Paroles : """${paroles}"""
 
-Ta mission :
-1. Fournir une interprétation synthétique du sens global du texte (utilise des extraits des paroles si nécessaire, mais reste concis).
-2. Identifier **exactement un thème principal** dans la liste ci-dessous (en français, minuscules, singulier) :
-["amour", "rupture", "espoir", "désir", "tristesse", "rébellion", "confiance en soi", "liberté", "nostalgie", "joie", "injustice", "amitié", "famille", "spiritualité", "voyage", "societe", "temps", "rêve", "mort"].
-3. Ajouter de 0 à 4 **sous-thèmes** issus uniquement de la liste correspondant au thème principal :
-{
-  "amour": ["amour naissant", "amour passionnel", "amour impossible", "amour à distance", "amour interdit"],
-  "rupture": ["séparation douloureuse", "trahison", "regrets", "réconciliation avortée"],
-  "désir": ["séduction", "fantasme", "attirance physique", "amour charnel"],
-  "tristesse": ["solitude", "perte", "mélancolie", "dépression"],
-  "nostalgie": ["souvenirs d’enfance", "amours passés", "lieux du passé", "regret du bon vieux temps"],
-  "joie": ["bonheur simple", "célébration", "optimisme", "légèreté", "fête"],
-  "espoir": ["renaissance", "persévérance", "rêve de réussite", "rédemption"],
-  "rébellion": ["contestation politique", "provocation", "révolution sociale"],
-  "injustice": ["oppression", "inégalités", "guerre", "corruption"],
-  "societe": ["critique sociale", "culture populaire", "vie urbaine", "technologie", "féminisme"],
-  "confiance en soi": ["affirmation personnelle", "dépassement de soi", "liberté d’être soi-même", "résilience"],
-  "liberté": ["indépendance", "voyage libre", "évasion", "fuite"],
-  "amitié": ["soutien", "complicité", "amitié trahie", "souvenirs partagés"],
-  "famille": ["parentalité", "relations fraternelles", "famille absente", "héritage et racines"],
-  "spiritualité": ["foi religieuse", "quête de sens", "mysticisme", "destin"],
-  "voyage": ["exploration", "découverte culturelle", "route et aventure", "mer et horizon"],
-  "temps": ["passage du temps", "attente", "instant présent", "éternité"],
-  "rêve": ["rêve d’avenir", "illusion", "rêve amoureux", "monde imaginaire"],
-  "mort": ["perte d’un proche", "mort symbolique", "acceptation de la fin", "vie après la mort"]
-}
+// Méthode d'analyse :
+// 1. Identifier 2 à 4 grandes idées majeures dans les paroles (concepts ou messages clés).
+// 2. Pour chaque grande idée, choisir 1 à 2 thèmes pertinents dans la liste fournie.
+// 3. Les thèmes doivent venir du sens global de l'idée, pas d'un mot isolé.
+// 4. À la fin, fusionner toutes les idées en une interprétation synthétique (max. 3 phrases).
+// 5. Regrouper tous les thèmes trouvés, sans doublon, dans l'ordre d'importance.
 
-Règles strictes :
-- "themes[0]" = thème principal obligatoire (issu de la liste principale).
-- "themes[1..4]" = sous-thèmes optionnels (issus uniquement de la liste liée au thème principal).
-- Tous les éléments de "themes" doivent être en français, minuscules, au singulier.
-- Ne pas inventer de nouveaux thèmes ou sous-thèmes.
-- Sortie **strictement** en JSON valide, sans texte avant ou après.
+// Liste des thèmes autorisés :
+// ["amour", "rupture", "espoir", "désir", "tristesse", "rébellion", "confiance en soi", "liberté", "nostalgie", "joie", "injustice", "amitié", "famille", "spiritualité", "voyage", "societe", "temps", "rêve", "mort", "humour", "philosophie", "identité", "succès", "fête"]
 
-Réponds uniquement au format suivant :
+// Format de sortie :
+// Répondre uniquement avec du JSON valide, sans texte avant ou après :
+// {
+//   "interpretation": "texte synthétique",
+//   "themes": ["thème1", "thème2", "thème3", ...]
+// }`
+// `
+
+`Tu es un expert en analyse de paroles de chansons.
+
+Artiste: """${artiste}"""
+Paroles: """${paroles}"""
+
+Objectif :
+1. Donner une interprétation synthétique du sens global (extraits permis, mais concis).
+2. Identifier 2 à 5 thèmes pertinents dans la liste.
+
+
+Règles de sélection :
+- Éviter de choisir un thème sur un mot isolé : analyser le sens global.
+- Tous les noms en français, minuscules, singulier.
+- Ne pas inventer de thèmes 
+
+Liste des thèmes :
+["amour", "rupture", "espoir", "désir", "tristesse", "rébellion", "confiance en soi", "liberté", "nostalgie", "joie", "injustice", "amitié", "famille", "spiritualité", "voyage", "societe", "temps", "rêve", "mort", "humour", "philosophie", "fête", "succès"]
+
+
+Format de sortie (uniquement JSON valide, sans texte autour) :
 {
   "interpretation": "texte synthétique",
-  "themes": ["thème principal", "sous-thème 1", "sous-thème 2", "sous-thème 3", "sous-thème 4"]
+  "themes": ["thème 1", "thème 2", "..."]
 }`;
   try {
     const response = await client.chat.completions.create({

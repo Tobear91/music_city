@@ -14,7 +14,6 @@ import {
   newTrackFromSPO,
   getLyrics,
   getGenres,
-  getAudioFeatures,
   getTrackFromDatabase,
   resetAnalyses,
 } from "../../reducers/analyses";
@@ -34,7 +33,6 @@ function Header() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
-
   useEffect(() => {
     //si input vide, on reset liste de suggestion
     if (!query) {
@@ -48,7 +46,7 @@ function Header() {
       if (spotifyData?.tracks?.items) {
         setSuggestions(spotifyData.tracks.items);
       }
-    }, 1000); // délai 
+    }, 300); // délai 
 
     //clear timeout si query change avant la fin du délai
     return () => clearTimeout(timeoutId); 
@@ -80,8 +78,7 @@ function Header() {
       dispatch(getTrackFromDatabase(dbData));
     } catch (err) {
       console.log(
-        "Track not found in the database, adding new track:",
-        err.message
+        "Track not found in the database, adding new track:"
       );
 
       // 2.2 Sinon, ajout de la nouvelle track dans le store
