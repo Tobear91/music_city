@@ -43,7 +43,7 @@ export default function Launch() {
           <h1 className={styles.titlePage}>Music City</h1>
         </div>
         <div className={styles.modalTxt}>
-          <audio ref={audioRef} src="/music/lauch_music.mp3" loop autoPlay />
+          <audio ref={audioRef} src="/music/lauch_music.mp3" loop />
 
           <FontAwesomeIcon
             icon={faMusic}

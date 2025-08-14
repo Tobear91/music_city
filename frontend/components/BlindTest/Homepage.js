@@ -10,96 +10,66 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch } from "react-redux";
 import { addQuestionListToStore } from "../../reducers/blindtest";
-import { getSoundtrackScore } from "../../modules/checkKeyWords";
-import { getAlbum, getFirstTrackAlbum } from "../../modules/spotify";
 import { useRouter } from "next/router";
 import { leaveApplication } from "../../modules/appinteraction";
+import {
+  fetchRandomShow,
+  findBestAlbumForSeries,
+  getFirstTrack,
+  getSpotifyPreviewUrl,
+  buildEnrichedSerie,
+} from "../../modules/blindtest/getSeries";
 
 export default function Home() {
   const [dispLoadingScreen, setDispLoadingScreen] = useState(false);
   const dispatch = useDispatch();
-  const validSeries = [];
   const router = useRouter();
 
-  const initializeQuiz = () => {
-    dispatch(addQuestionListToStore(validSeries));
+  // lancement du quizz
+  const initializeQuiz = (series) => {
+    dispatch(addQuestionListToStore(series));
     router.push("./blindtest-serie/questions");
   };
 
+  // retourne sur la map
   const handleLeaveBuilding = () => {
     leaveApplication(router);
   };
-
-  // test de page de chargement pendant 1 secondes
   const handleStartQuiz = async () => {
+    //affiche écran de chargement
     setDispLoadingScreen(true);
-    let data = await fetch("http://127.0.0.1:3000/blindtest/randomshow");
-    data = await data.json();
 
-    const requiredCount = 5; // Nombre de séries valides minimum
+    //récupération de 5 séries parmis les 10 récupérés de base
+    const requiredCount = 5;
+    const data = await fetchRandomShow();
+    const validSeries = [];
     const maxSeries = data.series.length;
 
-    for (
-      let i = 0;
-      i < data.series.length &&
-      validSeries.length < requiredCount &&
-      i < maxSeries;
-      i++
-    ) {
-      const title = data.series[i].title;
-      const platform = data.series[i].platform;
-      const query = `${title} soundtrack`;
-      let albums = await getAlbum(query);
+    // on prend chaque série parmi les 01 récupérés et on check si on arrive à récupérer une previewurl, si on y arrive pas on ne garde pas la série.
+    for (let i = 0; i < maxSeries && validSeries.length < requiredCount; i++) {
+      const serie = data.series[i];
 
-      let bestAlbum = null;
-      let bestScore = -1;
-
-      for (let album of albums.albums.items) {
-        const score = await getSoundtrackScore(album.name, title, platform);
-        if (score > bestScore) {
-          bestScore = score;
-          bestAlbum = album;
-        }
-      }
+      const { bestAlbum, bestScore } = await findBestAlbumForSeries(
+        serie.title,
+        serie.platform
+      );
       if (!bestAlbum) continue;
 
-      const firstTrack = await getFirstTrackAlbum(bestAlbum.id);
-      if (!firstTrack || !firstTrack.trackId) continue;
+      const firstTrack = await getFirstTrack(bestAlbum.id);
+      if (!firstTrack?.trackId) continue;
 
-      const response = await fetch(
-        "http://127.0.0.1:3000/blindtest/previewUrl",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            artistName: firstTrack.artistName,
-            trackName: firstTrack.trackName,
-          }),
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        }
+      const previewUrl = await getSpotifyPreviewUrl(
+        firstTrack.artistName,
+        firstTrack.trackName
       );
-
-      if (!response.ok) continue;
-
-      const dataSpotifyPreview = await response.json();
-      if (!dataSpotifyPreview.previewUrl) continue;
-
-      // Construire la série enrichie
-      const enrichedSerie = {
-        ...data.series[i],
-        artistName: firstTrack.artistName,
-        soundtrack: firstTrack.trackName,
-        trackId: firstTrack.trackId,
-        isTrackMatchCertain: bestScore > 25,
-        previewURL: dataSpotifyPreview.previewUrl,
-      };
-
-      validSeries.push(enrichedSerie);
+      if (!previewUrl) continue;
+      // on prend les infos qui nous intéressent sur la série
+      validSeries.push(
+        buildEnrichedSerie(serie, firstTrack, bestScore, previewUrl)
+      );
     }
-
-    setDispLoadingScreen(false);
-    initializeQuiz();
+    // on lance le quizz
+    initializeQuiz(validSeries);
   };
 
   // Affiche LoadingScreen si on charge un quiz

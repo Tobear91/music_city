@@ -1,22 +1,25 @@
 import { faMusic, faLink, faHeart, faEye, faCompactDisc } from "@fortawesome/free-solid-svg-icons";
-import styles from "../../assets/scss/vinyles_store/Recherche.module.scss";
+import styles from "../../assets/scss/VinylesStore/Recherche.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useSelector } from "react-redux";
 import discogsHelper from "../../modules/discogs";
+import { useSelector } from "react-redux";
 
 function RechercheItem({ item }) {
   const discogs = useSelector((state) => state.discogs);
 
+  // Ajout ou suppresion de la wantlist (impacte le store, la bdd et l'api discogs si user connecté)
   const handleToggleWantlist = (e, action) => {
     e.preventDefault();
     discogsHelper.toggleWantlist(action, item.id);
   };
 
+  // Ajout ou suppresion de la collection (impacte le store, la bdd et l'api discogs si user connecté)
   const handleToggleCollection = (e, action) => {
     e.preventDefault();
     discogsHelper.toggleCollection(action, item.id);
   };
 
+  // Discute avec le store pour savoir si la release est déjà en wantlist ou collection
   const isInCollection = () => discogs.collection_items.includes(item.id);
   const isInWantList = () => discogs.wantlist_items.includes(item.id);
 
@@ -28,6 +31,7 @@ function RechercheItem({ item }) {
       </div>
       <div>
         <p>{item.title}</p>
+        <p>{item.format.join(", ")}</p>
         <div>
           <a className="button-square small purple" href={`/vinyles-store/release/${item.id}`}>
             <FontAwesomeIcon icon={faEye} />

@@ -1,4 +1,5 @@
-import styles from "../../assets/scss/vinyles_store/Recherche.module.scss";
+import styles from "../../assets/scss/VinylesStore/Recherche.module.scss";
+import discogsHelper from "../../modules/discogs";
 import { useEffect, useState } from "react";
 import RechercheItem from "./RechercheItem";
 import { useRouter } from "next/router";
@@ -9,6 +10,7 @@ function Recherche() {
   const { q } = router.query;
   const [results, setResults] = useState([]);
 
+  // Hook qui récupère la valeur de l'input recherche
   useEffect(() => {
     (async () => {
       if (q) {
@@ -18,14 +20,7 @@ function Recherche() {
             type: "release",
           },
         };
-
-        const response = await fetch(`http://127.0.0.1:3000/discogs/database/search`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-          credentials: "include",
-        });
-        const datas = await response.json();
+        const datas = await discogsHelper.search(body);
         if (datas.result) setResults(datas.results);
       }
     })();
