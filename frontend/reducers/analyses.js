@@ -63,7 +63,7 @@ export const analysesSlice = createSlice({
       state.value.lyrics.artist = track.artist;
       state.value.lyrics.lyrics = track.lyrics;
 
-      state.value.album.name = track.album;
+      state.value.album.name = track.album_name;
       state.value.album.album_id = track.album_tracks_id;
       state.value.album.date = track.release_date;
       state.value.album.image = track.album_image;

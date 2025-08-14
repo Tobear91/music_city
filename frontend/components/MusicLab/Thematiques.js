@@ -1,6 +1,4 @@
 import styles from "../../styles/MusicLab/Composants.module.css";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";

@@ -8,14 +8,8 @@ import Album from "./Album";
 import Genres from "./Genres";
 import Interpretation from "./Interpretation";
 import Thematiques from "./Thematiques";
-import Audiofeatures from "./Audiofeatures";
 import Footer from "./Footer";
-import {
-  getInterpretationAndThemes,
-  resetAnalyses,
-  addALike,
-  addADislike,
-} from "../../reducers/analyses";
+import { getInterpretationAndThemes } from "../../reducers/analyses";
 import { replaceLinesBreacksWithBr } from "../../modules/formatages";
 import { store } from "../../modules/store";
 
@@ -25,7 +19,6 @@ function Results() {
   const audioRef = useRef(null);
   const storeData = useSelector((state) => state.analyses.value);
   const useremail = useSelector((state) => state.user.user.email);
-
 
   const [dejaFait, setDejafait] = useState(false);
   const [criteres, setCriteres] = useState([]);
@@ -59,6 +52,7 @@ function Results() {
   let formatedlyrics = replaceLinesBreacksWithBr(storeData.lyrics.lyrics);
 
   async function interpretationFunction(lyrics, artiste) {
+    console.log(lyrics, artiste);
     if (lyrics === "") {
       alert("No lyrics found for this track");
       return;
@@ -66,7 +60,7 @@ function Results() {
     const data = await fetch(
       `http://127.0.0.1:3000/tracks/lyrics/interpretation?paroles=${encodeURIComponent(
         lyrics
-      )}&artiste=${artiste}`
+      )}&artiste=${encodeURIComponent(artiste)}`
     );
     const res = await data.json();
     //ATTENTION : le backend renvoie un objet avec une clé "interpretation" contenant l'interprétation et les thématiques
@@ -86,58 +80,106 @@ function Results() {
     dispatch(getInterpretationAndThemes(res));
   }
 
+  // useEffect(() => {
+
+  //   fetch("http://127.0.0.1:3000/tracks", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       title: storeData.lyrics.title,
+  //       track_id: storeData.track_id,
+  //       uri: storeData.uri,
+  //       artist: storeData.lyrics.artist,
+  //       genres: storeData.genres,
+  //       lyrics: storeData.lyrics.lyrics,
+  //       album: storeData.album.name,
+  //       duration_ms: storeData.duration_ms,
+  //       album_image: storeData.album.image,
+  //       release_date: storeData.release_date,
+  //       preview_url: storeData.preview_url,
+  //     }),
+  //   }).then((response) => response.json());
+
+  //   fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
+  //     method: "PUT",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       track_id: storeData.track_id,
+  //       interpretation: interpretation,
+  //       thematiques: themes,
+  //     }),
+  //   }).then((response) => response.json());
+
+  //   fetch(`http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`)
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (
+  //         data.some((database_id) => {
+  //           return database_id === storeData.track_id;
+  //         })
+  //       ) {
+  //         setDejafait(true);
+  //       } else {
+  //         setDejafait(false);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching user data:", error);
+  //     });
+  // }, [storeData]);
+
   useEffect(() => {
-    const tracksIdFromAlbum = storeData.album.tracks.map((track) => track.id);
-    console.log(typeof storeData.duration_ms);
-    fetch("http://127.0.0.1:3000/tracks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: storeData.lyrics.title,
-        track_id: storeData.track_id,
-        uri: storeData.uri,
-        artist: storeData.lyrics.artist,
-        genres: storeData.genres,
-        lyrics: storeData.lyrics.lyrics,
-        album: storeData.album.name,
-        duration_ms: storeData.duration_ms,
-        album_image: storeData.album.image,
-        release_date: storeData.release_date,
-        preview_url: storeData.preview_url,
-      }),
-    }).then((response) => response.json());
+    if (!storeData?.track_id || !storeData?.genres?.length) return;
 
-    fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        track_id: storeData.track_id,
-        interpretation: interpretation,
-        thematiques: themes,
-      }),
-    }).then((response) => response.json());
+    const sendData = async () => {
+      try {
+        // 1. Sauvegarder la track
+        await fetch("http://127.0.0.1:3000/tracks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: storeData.lyrics.title,
+            track_id: storeData.track_id,
+            uri: storeData.uri,
+            artist: storeData.lyrics.artist,
+            genres: storeData.genres,
+            lyrics: storeData.lyrics.lyrics,
+            album: storeData.album.name,
+            duration_ms: storeData.duration_ms,
+            album_image: storeData.album.image,
+            release_date: storeData.release_date,
+            preview_url: storeData.preview_url,
+          }),
+        });
 
-    fetch(`http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (
-          data.some((database_id) => {
-            return database_id === storeData.track_id;
-          })
-        ) {
-          setDejafait(true);
-        } else {
-          setDejafait(false);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-      });
-  }, []);
+        // 2. Mettre à jour analyse
+        await fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            track_id: storeData.track_id,
+            interpretation,
+            thematiques: themes,
+          }),
+        });
+
+        // 3. Vérifier si déjà fait
+        const res = await fetch(
+          `http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`
+        );
+        const data = await res.json();
+        setDejafait(data.includes(storeData.track_id));
+      } catch (err) {
+        console.error("Erreur dans useEffect:", err);
+      }
+    };
+
+    sendData();
+  }, [storeData, interpretation, themes, useremail]);
 
   function saveCritere(newcritere) {
     setCriteres((prev) => [...prev, newcritere]);
@@ -227,7 +269,7 @@ function Results() {
 
         {/* FOOTER */}
         <footer className={styles.footerContainer}>
-          <Footer setIsPlaying={setIsPlaying}/>
+          <Footer setIsPlaying={setIsPlaying} audioRef={audioRef} />
         </footer>
       </div>
     </>

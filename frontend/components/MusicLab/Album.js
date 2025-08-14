@@ -1,13 +1,12 @@
 import styles from "../../styles/MusicLab/Album.module.css";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { replaceMsWithMinutesAndSeconds } from "../../modules/formatages";
+
 import Track from "./Track";
 
 function Album(props) {
   const storeData = useSelector((state) => state.analyses.value);
 
+  //genere la liste de tracks de l'album
   let trackslist = storeData.album.tracks.map((track, index) => (
     <Track index={index} playpreview={props.playpreview} globalIsPlaying={props.isPlaying}/>
   ));

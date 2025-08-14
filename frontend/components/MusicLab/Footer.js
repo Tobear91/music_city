@@ -1,18 +1,10 @@
 import styles from "../../styles/MusicLab/Footer.module.css";
 import Critere from "./Critere";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addToCriteres,
   removeFromCriteres,
-  resetCriteres,
 } from "../../reducers/criteres";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-faArrowRight
-} from "@fortawesome/free-solid-svg-icons";
 
 import { setRecommandationsList } from "../../reducers/recommandations";
 
@@ -20,7 +12,6 @@ function Footer(props) {
   const dispatch = useDispatch();
   const router = useRouter();
   const criteres = useSelector((state) => state.criteres.value.criteres) || [];
-
 
   async function handleClickRecommandations(array) {
     const body = array;
@@ -36,28 +27,53 @@ function Footer(props) {
     );
     const data = await recommandations.json();
     dispatch(setRecommandationsList(data.tracks));
-   
-    router.push("/music-lab/recommandations");
 
+    if (props.audioRef.current) {
+      //permet d'eviter undefined error sur audioRef.current si rien ne joue
+      props.audioRef.current.pause();
+      props.setIsPlaying(false);
+    }
+
+    router.push("/music-lab/recommandations");
   }
 
   function handleRemove(word) {
     dispatch(removeFromCriteres(word));
   }
 
+  function handleClickFavoris() {
+    if (props.audioRef.current) {
+      //permet d'eviter undefined error sur audioRef.current si rien ne joue
+      props.audioRef.current.pause();
+      props.setIsPlaying(false);
+    }
+    router.push("/music-lab/favoris");
+  }
   const list = criteres.map((critere, index) => (
     <Critere critere={critere} remove={() => handleRemove(critere)} />
   ));
 
   return (
     <div className={styles.footer}>
-      <div className={styles.button}>
-        <button className={"form-button primary"} style={{width:500, height:40}} onClick={() => handleClickRecommandations(criteres)}>
-          Decouvrir nos Recommandations pour :
-          <FontAwesomeIcon icon={faArrowRight} />
+      <div>
+        <button
+          className={"form-button primary"}
+          style={{ width: 600, height: 35 }}
+          onClick={() => handleClickFavoris(criteres)}
+        >
+          FAVORIS
         </button>
       </div>
-      <div className={styles.criteresList}>{list}</div>
+      <div>
+        <button
+          className={"form-button primary"}
+          style={{ width: 600, height: 35 }}
+          onClick={() => handleClickRecommandations(criteres)}
+        >
+          RECOMMANDATIONS PAR CRITERES
+        </button>
+        <div className={styles.criteresList}>{list}</div>
+      </div>
     </div>
   );
 }
