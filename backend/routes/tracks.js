@@ -10,10 +10,13 @@ const spotifyPreviewFinder = require("spotify-preview-finder");
 //ajout d'un nouveau track à la database
 router.post("/", async (req, res) => {
   try {
+    console.log("******************************************************************",req.body)
     const track = await Track.findOne({ track_spotify_id: req.body.track_id });
     if (track) {
       return res.json({ result: false, error: "Track already exists" });
     }
+console.log("******************************************************************",req.body)
+console.log("******************************************************************",req.body)
     const newTrack = new Track({
       title: req.body.title,
       artist: req.body.artist,
@@ -28,7 +31,7 @@ router.post("/", async (req, res) => {
       release_date: req.body.release_date,
       likes_interpretation: 0,
       dislikes_interpretation: 0,
-      duration_ms: req.body.duration_ms
+      duration_ms: req.body.duration_ms,
     });
     await newTrack.save();
     res.json({ result: true });
@@ -140,10 +143,16 @@ router.get("/lyrics", async (req, res) => {
   if (!artiste || !titre) {
     return res.status(400).json({ error: "Paramètres manquants" });
   }
-
   try {
-    const lyrics = await scraperLyrics(artiste, titre);
-    res.json({ lyrics });
+    let lyrics;
+    try {
+      lyrics = await scraperLyrics(artiste, titre);
+      res.json({ lyrics });
+    } catch (err) {
+      lyrics = await scraperLyrics(titre, artiste);
+
+      res.json({ lyrics });
+    }
   } catch (err) {
     res.status(500).json({ error: "Paramètres du GETLyrics invalides" });
   }
@@ -185,13 +194,15 @@ router.post("/recommandations", async (req, res) => {
   try {
     const criteres = req.body; // tableau de strings
 
-    const tracks = await Track.find({     
-      $and: criteres.map(critere => ({    //$and: cherche toutes les combinaisons key:value qui suivent
-        $or: [                            //$or: au moins l'une des options doit matcher
+    const tracks = await Track.find({
+      $and: criteres.map((critere) => ({
+        //$and: cherche toutes les combinaisons key:value qui suivent
+        $or: [
+          //$or: au moins l'une des options doit matcher
           { genres: critere },
-          { thematiques: critere }
-        ]
-      }))
+          { thematiques: critere },
+        ],
+      })),
     });
 
     res.json({ result: true, tracks });

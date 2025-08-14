@@ -133,7 +133,7 @@ function Results() {
   // }, [storeData]);
 
   useEffect(() => {
-    if (!storeData?.track_id || !storeData?.genres?.length) return;
+    if (!storeData?.track_id) return;
 
     const sendData = async () => {
       try {
@@ -179,7 +179,7 @@ function Results() {
     };
 
     sendData();
-  }, [storeData, interpretation, themes, useremail]);
+  }, [storeData]);
 
   function saveCritere(newcritere) {
     setCriteres((prev) => [...prev, newcritere]);
@@ -254,6 +254,8 @@ function Results() {
             handleDislike={() => handleDislike()}
             email={useremail}
             dejafait={dejaFait}
+            likes={storeData.interpretation_by_ai.likes}
+            dislikes={storeData.interpretation_by_ai.dislikes}
           />
         </section>
 
