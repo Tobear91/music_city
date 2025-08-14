@@ -109,16 +109,16 @@ export default function Home() {
           <p className={styles.instruction}>
             Dans ce bâtiment, vous allez pouvoir tester vos connaissances
             musicales sur les séries. Il vous sera possible d'écouter des
-            extraits musicaux de série choisis aléatoirement. Vous enchaînerez 5
-            question. Vous aurez la possibilité de demander un indice sur le nom
-            de l'acteur principal ou bien l'affiche de la série.
+            extraits musicaux de séries choisis aléatoirement. Vous enchaînerez
+            5 questions. Vous aurez la possibilité de demander un indice sur le
+            nom de l'acteur principal ou bien sur l'affiche de la série.
           </p>
           <p className={styles.instruction}>
             <FontAwesomeIcon
               icon={faExclamationTriangle}
               style={{ width: "20px", height: "20px" }}
             />{" "}
-            ATTENTION : en demandant un indice vous gagnerez moins de points.
+            ATTENTION : en demandant un indice, vous gagnerez moins de points.
           </p>
           <hr className={styles.separator} />
           <ul className={styles.bodyTxt}>
@@ -142,7 +142,7 @@ export default function Home() {
           </ul>
 
           <button onClick={handleStartQuiz} className={"form-button primary"}>
-            Démarrer le quiz
+            Lancer le quiz
             <FontAwesomeIcon icon={faArrowRight} />
           </button>
         </div>

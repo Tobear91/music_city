@@ -9,6 +9,7 @@ export default function ResponseElement({
   currentAnswer,
   setCurrentAnswer,
 }) {
+  // permet communication avec composant parent pour renvoyer la réponse et les indices révélés
   const handleActorClick = () => {
     setCurrentAnswer((prev) => ({ ...prev, showActor: true }));
   };
