@@ -8,25 +8,42 @@ import { getTracksUser } from "../../modules/spotify";
 import { useRouter } from "next/router";
 import Header from "./Header";
 
-export default function Quiz({ Questions }) {
-  const spotifyAccessToken = useSelector((state) => state.user.user.spotify.access_token);
+export default function Quiz({ initialQuestions }) {
   const dispatch = useDispatch();
-
   const router = useRouter();
-  const { q } = router.query;
+  const { q, id } = router.query;
 
+  useEffect(() => {
+    if (!initialQuestions) {
+      if (id === "qui") {
+        // charger morceaux aléatoires depuis Spotify
+      } else if (id === "playlist") {
+        // aller chercher les morceaux d'une playlist
+      }
+    }
+  }, [id, initialQuestions]);
+
+  const spotifyAccessToken = useSelector(
+    (state) => state.user.user.spotify.access_token
+  );
+  const userId = useSelector((state) => state.user.user._id);
+  const email = useSelector((state) => state.user.user.email);
+  const questionsAnswers = useSelector((state) => state.quiz.questions);
 
   const [questionsList, setQuestionsList] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
 
+  // Charger les questions
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        if (Questions && Questions.length > 0) {
-          setQuestionsList(Questions);
-          dispatch(setQuestions(Questions));
+        //  questions en props reçu
+        if (initialQuestions && initialQuestions.length > 0) {
+          setQuestionsList(initialQuestions);
+          dispatch(setQuestions(initialQuestions));
         } else {
+          // Sinon, on va chercher les titres Spotify de l'utilisateur
           const data = await getTracksUser(spotifyAccessToken);
           const tracks = data.items.map((item) => item.track);
           const generatedQuestions = getQuestions(tracks);
@@ -34,13 +51,43 @@ export default function Quiz({ Questions }) {
           dispatch(setQuestions(generatedQuestions));
         }
       } catch (err) {
-        console.log("Erreur lors du chargement des questions :", err);
+        console.error("Erreur lors du chargement des questions :", err);
       }
     };
 
     fetchQuestions();
-  }, [spotifyAccessToken, Questions]);
+  }, [spotifyAccessToken, initialQuestions]);
 
+  // Sauvegarde en BDD a la fin du quiz
+  useEffect(() => {
+    const isFinished = currentQuestion === questionsAnswers.length;
+
+    if (isFinished) {
+      dispatch(setResult({ score, total: questionsAnswers.length }));
+
+      fetch("http://localhost:3000/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          email,
+          questions: questionsAnswers,
+          score,
+          total: questionsList.length,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.result) {
+            console.log("Quiz enregistré avec succès !");
+          } else {
+            console.error("Erreur enregistrement quiz :", data.error);
+          }
+        });
+    }
+  }, [currentQuestion, questionsList, score, userId, email, dispatch]);
+
+  // Réponse utilisateur, ajout d'un point par bonne réponse
   const handleAnswer = (selected) => {
     dispatch(
       setUserAnswer({ questionIndex: currentQuestion, answer: selected })
@@ -50,11 +97,9 @@ export default function Quiz({ Questions }) {
     }
     setCurrentQuestion(currentQuestion + 1);
   };
-  
-  const myQuestion = questionsList[currentQuestion];
 
+  // Affichage fin de Quiz
   if (currentQuestion >= questionsList.length) {
-    dispatch(setResult({ score, total: questionsList.length }));
     return (
       <>
         <Header q={q} />
@@ -87,7 +132,7 @@ export default function Quiz({ Questions }) {
             </button>
             <button
               className={styles.endButton}
-              onClick={() => window.location.reload()}
+              onClick={() =>router.push("/quiz")}
             >
               Rejouer un quiz
             </button>
@@ -97,6 +142,8 @@ export default function Quiz({ Questions }) {
     );
   }
 
+  // Ecran des Questions
+  const myQuestion = questionsList[currentQuestion];
   return (
     <>
       <Header q={q} />
@@ -112,17 +159,15 @@ export default function Quiz({ Questions }) {
             />
           </div>
         </div>
-        {console.log(myQuestion)};
-        
-        {/* Afficher image si la question concernant une cover pop*/}
+        {/* Afficher image si la question concerne une pochette*/}
         {myQuestion.image && (
-            <Image
-              className={styles.cover}
-              src={myQuestion.image}
-              alt="Cover track"
-              width={200}
-              height={200}
-            />
+          <Image
+            className={styles.cover}
+            src={myQuestion.image}
+            alt="image track"
+            width={200}
+            height={200}
+          />
         )}
         <div className={styles.questionCard}>
           <span className={styles.counter}>

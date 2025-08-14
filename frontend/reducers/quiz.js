@@ -20,8 +20,9 @@ const quizSlice = createSlice({
       state.total = state.total = action.payload.total;
     },
     setUserAnswer(state, action) {
-  state.questions[action.payload.questionIndex].userAnswer = action.payload.answer;
-    }
+      state.questions[action.payload.questionIndex].userAnswer =
+        action.payload.answer;
+    },
   },
 });
 

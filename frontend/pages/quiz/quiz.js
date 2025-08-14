@@ -1,10 +1,10 @@
-import QuizHome from "../../components/quiz/QuizHome";
+import Quiz from "../../components/quiz/Quiz"
 import { useSelector } from "react-redux";
 
-function Index() {
+function QuizPage() {
   const user = useSelector((state) => state.user.user);
   if (!user) return;
-  return <QuizHome />;
+  return <Quiz/>;
 }
 
-export default Index;
+export default QuizPage;

@@ -53,12 +53,15 @@ router.post("/login", async (req, res, next) => {
     // Generate tokens
     const access_token = auth.generateAccessToken(email);
 
+    const datas = await spotify.generateSimpleToken();
+    const { access_token: spotify_access_token } = datas;
+
     user = {
       email,
       access_token,
       spotify: {
         type: "simple",
-        access_token: await spotify.generateSimpleToken(),
+        access_token: spotify_access_token,
       },
       discogs: !!req.session.accessData,
     };
@@ -232,5 +235,3 @@ router.put("/toggle-collection", async (req, res, next) => {
     next(error);
   }
 });
-
-

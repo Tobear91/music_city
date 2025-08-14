@@ -1,19 +1,15 @@
-import styles from "../../assets/scss/quiz/QuizPlaylists.module.scss";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { faArrowRight} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { getPlaylistsUser } from "../../modules/spotify";
-import Image from "next/image";
-import { getPlaylistTracks } from "../../modules/spotify";
-import { getQuestions } from "./Questions";
-import Quiz from "./Quiz";
 import { useRouter } from "next/router";
+import Image from "next/image";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+
 import Header from "./Header";
+import styles from "../../assets/scss/quiz/QuizPlaylists.module.scss";
+import { getPlaylistsUser} from "../../modules/spotify";
 
 function QuizPlaylists() {
   const [playlists, setPlaylists] = useState([]);
-  const [questions, setQuestions] = useState([]);
 
   const router = useRouter();
   const { q } = router.query;
@@ -31,34 +27,13 @@ function QuizPlaylists() {
     fetchPlaylists();
   }, []);
 
-  const handlePlaylistTrack = async (playlistId) => {
-    try {
-      const data = await getPlaylistTracks(playlistId);
-
-      const tracks = data.items
-        .map((item) => item.track)
-        .filter(
-          (track) =>
-            track && track.name && track.artists?.[0]?.name && track.album?.name
-        );
-
-      if (tracks.length === 0) {
-        alert("Cette playlist est vide");
-        return;
-      }
-
-      const generatedQuestions = getQuestions(tracks);
-      setQuestions(generatedQuestions);
-    } catch (err) {
-      console.error("Erreur lors du chargement des morceaux :", err);
-    }
-  };
-
-  // Des questions sont prêtes afficher le quiz
-  if (questions.length > 0) {
-    return <Quiz questions={questions} />;
+  // Charger morceaux playlist et générer les questions
+  const handlePlaylistQuestions = (playlistId) => {
+    if (!playlistId) return;
+    router.push(`/quiz/playlist/${playlistId}`);
   }
 
+  // Afficher le quiz si les questions sont prêtes
   return (
     <>
       <Header q={q} />
@@ -80,13 +55,13 @@ function QuizPlaylists() {
               <button
                 key={playlist.id}
                 className={"form-button primary"}
-                onClick={() => handlePlaylistTrack(playlist.id)}
+                onClick={() => handlePlaylistQuestions(playlist.id)}
               >
                 {playlist.name}
                 <FontAwesomeIcon
-                                  icon={faArrowRight}
-                                  style={{ color: "#fb6ca2" }}
-                                />
+                  icon={faArrowRight}
+                  style={{ color: "#fb6ca2" }}
+                />
               </button>
             ))
           )}
