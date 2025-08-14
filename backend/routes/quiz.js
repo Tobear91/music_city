@@ -2,15 +2,16 @@ const express = require("express");
 const router = express.Router();
 const quizresult = require("../models/quiz/quizResult"); 
 
-// Sauver un quiz
+// Sauver un quiz en BDD
 router.post("/", (req, res) => {
+  const { userId, email, questions, score, total } = req.body;
 
   const newQuiz = new quizresult({
-    userId: req.body.userId,
-    email: req.body.email,
-    questions: req.body.questions,
-    score: req.body.score,
-    total: req.body.total
+    userId,
+    email,
+    questions,
+    score,
+    total
   });
 
   newQuiz.save().then(savedDoc => {

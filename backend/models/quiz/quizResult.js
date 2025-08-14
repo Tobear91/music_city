@@ -11,7 +11,7 @@ const quizResultSchema = new mongoose.Schema({
     }
   ],
   score: Number,
-  total: Number,
-});
+  total: Number
+},{ timestamps: true });
 
 module.exports = mongoose.model("quizresult", quizResultSchema);
