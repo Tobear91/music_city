@@ -31,7 +31,7 @@ export default function Correction() {
         previewUrl={data.previewURL}
         questionNbr={i + 1}
         key={i}
-        serieName={data.serieName}
+        serieName={data.title}
         userAnswer={blindtestInfo.answerList[i].answer}
         totalQuestion={blindtestInfo.answerList.length}
         isCorrect={isAnswerCorrect} // Index de l'extrait en cours

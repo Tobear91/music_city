@@ -1,6 +1,7 @@
 import stringSimilarity from "string-similarity";
 
 function checkCorrection(correctAnswer, userAnswer) {
+  // utilise stringsimialtiry pour savori si la réponse données est identifque au nom de la série
   const threshold = 0.7;
   const safeCorrect = (correctAnswer || "").trim().toLowerCase();
   const safeUser = (userAnswer || "").trim().toLowerCase();
@@ -9,6 +10,7 @@ function checkCorrection(correctAnswer, userAnswer) {
 }
 
 export function descriptionLevel(score) {
+  // retourne une description en fonction du score
   if (score <= 5) {
     return "Débutant — vous explorez encore le monde des séries";
   } else if (score <= 10) {
@@ -19,16 +21,18 @@ export function descriptionLevel(score) {
 }
 
 export const saveAnswer = (dispatch, currentAnswer, addAnswerToStore) => {
+  //enregistre les réponses dans le strore
   dispatch(addAnswerToStore(currentAnswer));
 };
 
 export const getUpdatedAnswerList = (blindtestInfo, currentAnswer) => {
+  // mets à jours la liste de réponses locale
   return [...blindtestInfo.answerList, currentAnswer];
 };
 
 export const calculateCorrectionAndScore = (
   blindtestInfo,
-  updatedAnswerList
+  updatedAnswerList //calcul le score de l'utilsateur par question en fonction d'une nombre indice révélés et de la réponse.
 ) => {
   const correctionList = blindtestInfo.questionList.map((q) => q.title);
 
