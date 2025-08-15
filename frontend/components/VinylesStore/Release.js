@@ -18,6 +18,8 @@ function Release() {
 
     (async () => {
       const datas = await discogsHelper.getRelease(router.query.id);
+      console.log(datas.release);
+
       if (datas.result) setRelease(datas.release);
       else setRelease(false);
     })();
