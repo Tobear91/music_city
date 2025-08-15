@@ -14,19 +14,29 @@ function TrackFav(props) {
   const [previewUrl, setPreviewUrl] = useState("");
 
   useEffect(() => {
-    //va chercher l'url de la preview
+    // va chercher l'url de la preview
     async function fetchPreview() {
       const preview = await getPreviewWithArtistAndTitle(
         props.title,
         props.artist
       );
-      console.log(preview);
       if (preview) {
         setPreviewUrl(preview);
       }
     }
     fetchPreview();
   }, [props.isplaying]);
+
+  async function fetchPreview() {
+    const preview = await getPreviewWithArtistAndTitle(
+      props.title,
+      props.artist
+    );
+    console.log(preview);
+    if (preview) {
+      setPreviewUrl(preview);
+    }
+  }
 
   return (
     <div key={props.key} style={{ marginBottom: "12px" }}>
@@ -59,8 +69,10 @@ function TrackFav(props) {
               cursor: "pointer",
               transition: "background-color 0.3s ease",
             }}
-            onClick={() => {
-              props.playpreview(previewUrl);
+            onClick={async () => {
+
+                props.playpreview(previewUrl);
+              
             }}
           >
             <FontAwesomeIcon icon={props.isplaying ? faPause : faPlay} />

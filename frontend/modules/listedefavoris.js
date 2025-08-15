@@ -1,10 +1,11 @@
-function addToFavorites(track_id, email, title, artist, uri) {
+function addToFavorites(track_id, email, title, artist, uri, duration_ms) {
   const body = {
     track_id: track_id,
     email: email,
     title: title,
     artist: artist,
     spotify_uri: uri,
+    duration_ms: duration_ms
   };
   
   fetch(`http://127.0.0.1:3000/users/addtofavorites`, {

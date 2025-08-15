@@ -69,7 +69,7 @@ function Favoris() {
     }
     router.push("/music-lab/results");
   }
-
+ 
   //arrete la lecture et navigue vers la page recommandations
   function handleClickRecommandations() {
     if (audioRef.current) {

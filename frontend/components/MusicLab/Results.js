@@ -186,7 +186,7 @@ function Results() {
   }
 
   function handleLike() {
-    fetch("http://127.0.1:3000/tracks/like", {
+    fetch("http://127.0.0.1:3000/tracks/like", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -200,7 +200,7 @@ function Results() {
   }
 
   function handleDislike() {
-    fetch("http://127.0.1:3000/tracks/dislike", {
+    fetch("http://127.0.0.1:3000/tracks/dislike", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
