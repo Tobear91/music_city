@@ -10,7 +10,7 @@ import {
   faPlay,
   faPause,
 } from "@fortawesome/free-solid-svg-icons";
-
+ 
 function Track(props) {
   const [isFav, setIsFav] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -62,12 +62,14 @@ function Track(props) {
               className="button-square small"
               style={{ backgroundColor: isFav ? "pink" : "purple" }}
               onClick={() => {
+                
                 addToFavorites(
                   storeData.album.tracks[props.index].id,
                   useremail,
                   storeData.album.tracks[props.index].name,
                   storeData.lyrics.artist,
-                  storeData.album.tracks[props.index].uri
+                  storeData.album.tracks[props.index].uri,
+                  storeData.album.tracks[props.index].duration_ms
                 );
                 setIsFav(!isFav);
               }}
