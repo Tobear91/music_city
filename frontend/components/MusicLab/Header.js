@@ -8,7 +8,7 @@ import styles from "../../styles/MusicLab/Header.module.scss";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import {leaveApplication} from '../../modules/appinteraction'
+import { leaveApplication } from "../../modules/appinteraction";
 import {
   getAlbumTracks,
   newTrackFromSPO,
@@ -22,9 +22,8 @@ import {
   getTrackData,
   getArtistData,
   getAlbumDataFromTrackData,
-  getTracks
+  getTracks,
 } from "../../modules/spotify";
-
 
 function Header() {
   const dispatch = useDispatch();
@@ -46,21 +45,20 @@ function Header() {
       if (spotifyData?.tracks?.items) {
         setSuggestions(spotifyData.tracks.items);
       }
-    }, 300); // délai 
+    }, 300); // délai
 
     //clear timeout si query change avant la fin du délai
-    return () => clearTimeout(timeoutId); 
+    return () => clearTimeout(timeoutId);
   }, [query]);
-
 
   //fonction principale de recuperation de données
   async function searchTrack(title, artist) {
-    console.log(title, artist)
+    console.log(title, artist);
     dispatch(resetAnalyses());
     // 1. Récupération des données Spotify
     let spotifyData = await getTrackData(title, artist);
     const artiste_id = spotifyData.tracks.items[0].artists[0].id;
-    console.log(spotifyData)
+    console.log(spotifyData);
     const track_id = spotifyData.tracks.items[0].id;
 
     try {
@@ -77,9 +75,7 @@ function Header() {
       //2.1 Si elle existe, l'ajoute au store
       dispatch(getTrackFromDatabase(dbData));
     } catch (err) {
-      console.log(
-        "Track not found in the database, adding new track:"
-      );
+      console.log("Track not found in the database, adding new track:");
 
       // 2.2 Sinon, ajout de la nouvelle track dans le store
       dispatch(newTrackFromSPO(spotifyData));
@@ -90,48 +86,82 @@ function Header() {
     }
 
     // 4. Récupération des paroles
-    const artiste = spotifyData.tracks.items[0].artists[0].name
-      .split("(")[0]
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\$/g, "s")
-      .replace(/[^a-zà-ÿ0-9]/gi, "");
 
-    const titre = spotifyData.tracks.items[0].name
-      .split(/-|\(feat/i)[0]
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\$/g, "s")
-      .replace(/[^a-zà-ÿ0-9]/g, "");
+    let lyricsData;
+    const artisteFormats = [
+      // format 1 : normalisation NFD
+      (str) => {
+        let s = str
+          .split("(")[0]
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-zà-ÿ0-9]/gi, "");
 
-    const lyricsRes = await fetch(
-      `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste}&titre=${titre}`
-    );
-    let lyricsData = await lyricsRes.json();
-    if (lyricsData.lyrics.length === 0) {
-      const artiste2 = spotifyData.tracks.items[0].artists[0].name
-        .split("(")[0]
-        .toLowerCase()
-        .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "") // supprime lettres accentuées
-        .replace(/\$/g, "s")
-        .replace(/[^a-z0-9]/g, "");
+        s = s.replace(/^\s*the\b[\s\-_.]*/i, ""); // supprime "the" au début
+        return s.replace(/[^a-zà-ÿ0-9]/gi, "");
+      },
+      // format 2 : supprime lettres accentuées
+      (str) => {
+        let s = str
+          .split("(")[0]
+          .toLowerCase()
+          .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-z0-9]/g, "");
 
-      const titre2 = spotifyData.tracks.items[0].name
-        .split(/-|\(feat/i)[0]
-        .toLowerCase()
-        .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
-        .replace(/\$/g, "s")
-        .replace(/[^a-z0-9]/g, "");
+        s = s.replace(/^\s*the\b[\s\-_.]*/i, ""); // supprime "the" au début
+        return s.replace(/[^a-zà-ÿ0-9]/gi, "");
+      },
+    ];
+    const titreFormats = [
+      // format 1 : normalisation NFD
+      (str) =>
+        str
+          .split(/-|\(feat/i)[0]
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-zà-ÿ0-9]/gi, ""),
 
-      const lyricsRes2 = await fetch(
-        `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste2}&titre=${titre2}`
-      );
-      lyricsData = await lyricsRes2.json();
-      console.log(lyricsData);
+      // format 2 : suppression directe des accents
+      (str) =>
+        str
+          .split(/-|\(feat/i)[0]
+          .toLowerCase()
+          .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-z0-9]/g, ""),
+
+      // format 3 : ne split[0] pas si tiret
+      (str) =>
+        str
+          .split(/\(feat/i)[0]
+          .toLowerCase()
+          .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-z0-9]/g, ""),
+    ];
+
+    for (const formatArtiste of artisteFormats) {
+      for (const formatTitre of titreFormats) {
+        const artisteFmt = formatArtiste(
+          spotifyData.tracks.items[0].artists[0].name
+        );
+        const titreFmt = formatTitre(spotifyData.tracks.items[0].name);
+
+        const res = await fetch(
+          `http://127.0.0.1:3000/tracks/lyrics?artiste=${artisteFmt}&titre=${titreFmt}`
+        );
+        lyricsData = await res.json();
+        if (lyricsData.lyrics.length > 0) {
+          dispatch(getLyrics(lyricsData.lyrics));
+          break;
+        }
+      }
     }
-    dispatch(getLyrics(lyricsData.lyrics));
 
     // 5. Récupération de l’album et des pistes associées
     const albumData = await getAlbumDataFromTrackData(spotifyData);
@@ -143,11 +173,11 @@ function Header() {
   //gestion de la selection d'une suggestion
   const onSelectSuggestion = (track) => {
     setQuery(track.name, track.artists[0].name);
-    setSuggestions([]); 
-    searchTrack(track.name, track.artists[0].name) ; // lance la recherche au clic
+    setSuggestions([]);
+    searchTrack(track.name, track.artists[0].name); // lance la recherche au clic
   };
   const handleLeaveBuilding = () => {
-      leaveApplication(router)
+    leaveApplication(router);
   };
   return (
     <header className={styles.header}>
@@ -170,7 +200,6 @@ function Header() {
           autoComplete="off"
           onChange={(e) => {
             setQuery(e.target.value);
-
           }}
           value={query}
         ></input>
@@ -193,9 +222,10 @@ function Header() {
         </ul>
       )}
       <div className={styles.Exit}>
-      <button className="button-bulle pink" onClick={handleLeaveBuilding}>
-        <FontAwesomeIcon icon={faXmark} />
-      </button></div>
+        <button className="button-bulle pink" onClick={handleLeaveBuilding}>
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+      </div>
     </header>
   );
 }

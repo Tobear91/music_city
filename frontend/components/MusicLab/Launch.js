@@ -54,12 +54,10 @@ function Launch() {
 
   //fonction principale de recuperation de données
   async function searchTrack(title, artist) {
-    console.log(title, artist);
     dispatch(resetAnalyses());
     // 1. Récupération des données Spotify
     let spotifyData = await getTrackData(title, artist);
     const artiste_id = spotifyData.tracks.items[0].artists[0].id;
-    console.log(spotifyData);
     const track_id = spotifyData.tracks.items[0].id;
 
     try {
@@ -87,48 +85,75 @@ function Launch() {
     }
 
     // 4. Récupération des paroles
-    const artiste = spotifyData.tracks.items[0].artists[0].name
-      .split("(")[0]
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\$/g, "s")
-      .replace(/[^a-zà-ÿ0-9]/gi, "");
+    let lyricsData;
 
-    const titre = spotifyData.tracks.items[0].name
-      .split(/-|\(feat/i)[0]
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\$/g, "s")
-      .replace(/[^a-zà-ÿ0-9]/g, "");
+    const artisteFormats = [
+      // format 1 : normalisation NFD
+      (str) =>
+        str
+          .split("(")[0]
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-zà-ÿ0-9]/gi, ""),
+      // format 2 : supprime lettres accentuées
+      (str) =>
+        str
+          .split("(")[0]
+          .toLowerCase()
+          .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-z0-9]/g, ""),
+    ];
+    const titreFormats = [
+      // format 1 : normalisation NFD
+      (str) =>
+        str
+          .split(/-|\(feat/i)[0]
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-zà-ÿ0-9]/gi, ""),
 
-    const lyricsRes = await fetch(
-      `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste}&titre=${titre}`
-    );
-    let lyricsData = await lyricsRes.json();
-    if (lyricsData.lyrics.length === 0) {
-      const artiste2 = spotifyData.tracks.items[0].artists[0].name
-        .split("(")[0]
-        .toLowerCase()
-        .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "") // supprime lettres accentuées
-        .replace(/\$/g, "s")
-        .replace(/[^a-z0-9]/g, "");
+      // format 2 : suppression directe des accents
+      (str) =>
+        str
+          .split(/-|\(feat/i)[0]
+          .toLowerCase()
+          .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-z0-9]/g, ""),
 
-      const titre2 = spotifyData.tracks.items[0].name
-        .split(/-|\(feat/i)[0]
-        .toLowerCase()
-        .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
-        .replace(/\$/g, "s")
-        .replace(/[^a-z0-9]/g, "");
+      // format 3 : ne split[0] pas si tiret
+      (str) =>
+        str
+          .split(/\(feat/i)[0]
+          .toLowerCase()
+          .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
+          .replace(/\$/g, "s")
+          .replace(/[^a-z0-9]/g, ""),
+    ];
 
-      const lyricsRes2 = await fetch(
-        `http://127.0.0.1:3000/tracks/lyrics?artiste=${artiste2}&titre=${titre2}`
-      );
-      lyricsData = await lyricsRes2.json();
-      console.log(lyricsData);
+    for (const formatArtiste of artisteFormats) {
+      for (const formatTitre of titreFormats) {
+        const artisteFmt = formatArtiste(
+          spotifyData.tracks.items[0].artists[0].name
+        );
+        const titreFmt = formatTitre(spotifyData.tracks.items[0].name);
+
+        const res = await fetch(
+          `http://127.0.0.1:3000/tracks/lyrics?artiste=${artisteFmt}&titre=${titreFmt}`
+        );
+        lyricsData = await res.json();
+        if (lyricsData.lyrics) {
+            dispatch(getLyrics(lyricsData.lyrics));
+          break;
+        }
+      }
     }
-    dispatch(getLyrics(lyricsData.lyrics));
+
 
     // 5. Récupération de l’album et des pistes associées
     const albumData = await getAlbumDataFromTrackData(spotifyData);
@@ -166,17 +191,20 @@ function Launch() {
           <p style={{ color: "#2e1b5c" }}>
             Plongez dans l’univers des chansons d’hier et d’aujourd’hui, et
             redécouvrez-les sous un nouvel angle. Ici, chaque morceau devient
-            une expérience : analysez ses paroles, explorez ses thèmes, laissez-vous porter
-            par vos envies de decouverte et enregistrez vos musiques favorites!
+            une expérience : analysez ses paroles, explorez ses thèmes,
+            laissez-vous porter par vos envies de decouverte et enregistrez vos
+            musiques favorites!
           </p>
 
           <form
+            style={{ flex: 1 }}
             onSubmit={(e) => {
               e.preventDefault();
               searchTrack(query);
             }}
           >
             <input
+              style={{ width: "100%" }}
               type="text"
               className="form-input"
               placeholder="Rechercher un nouveau morceau"
@@ -202,12 +230,13 @@ function Launch() {
               </ul>
             )}
           </form>
-
-          <button className="button-bulle pink" onClick={handleLeaveBuilding}>
-            <FontAwesomeIcon icon={faXmark} />
-          </button>
         </div>
       </main>
+      <div className={styles2.ExitLauncher}>
+        <button className="button-bulle pink" onClick={handleLeaveBuilding}>
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+      </div>
     </section>
   );
 }

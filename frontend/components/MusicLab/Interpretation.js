@@ -22,7 +22,7 @@ function Interpretation(props) {
               cursor: "pointer",
             }}
           >
-            D'accord
+            D'accord({props.likes})
           </button>
 
           <button
@@ -35,7 +35,7 @@ function Interpretation(props) {
               cursor: "pointer",
             }}
           >
-            Pas d'accord
+            Pas d'accord({props.dislikes})
           </button>
         </div>
       );

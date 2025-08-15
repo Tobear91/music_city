@@ -67,7 +67,7 @@ export const analysesSlice = createSlice({
       state.value.album.album_id = track.album_tracks_id;
       state.value.album.date = track.release_date;
       state.value.album.image = track.album_image;
-      state.value.album.tracks = []; 
+      state.value.album.tracks = [];  
 
       state.value.genres = track.genres || [];
       state.value.interpretation_by_ai.interpretation = track.interpretation || "";
