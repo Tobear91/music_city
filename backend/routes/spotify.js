@@ -47,7 +47,7 @@ router.get("/callback", async (req, res, next) => {
     const { email, product } = spotify_user;
 
     // Creation de l'utilisateur ... ou pas
-    let user = await User.findOne({ email, type: "spotify" });
+    let user = await User.findOne({ email });
 
     if (!user) {
       // Add user in database
