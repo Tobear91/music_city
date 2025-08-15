@@ -24,7 +24,7 @@ export default function Launch() {
       setIsPlaying(false);
     } else {
       audioRef.current.play();
-      audioRef.current.volume = 0.05;
+      audioRef.current.volume = 0.5;
       setIsPlaying(true);
     }
   };
