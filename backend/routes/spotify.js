@@ -17,7 +17,7 @@ router.get("/login", async (req, res, next) => {
     const generateRandomString = (length) => {
       return crypto.randomBytes(60).toString("hex").slice(0, length);
     };
-
+ 
     const state = generateRandomString(16);
     const scope = "user-read-private user-read-email user-top-read user-follow-read user-library-read playlist-read-private";
     const redirect_url =
