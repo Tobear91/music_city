@@ -4,24 +4,18 @@ import { useSelector } from "react-redux";
 import { addToFavorites, getFavorites } from "../../modules/listedefavoris";
 import { getPreviewWithArtistAndTitle } from "../../modules/getpreviewspotify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHeart,
-  faPlay,
-  faPause,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
+import { store } from "../../modules/store";
 
 function Lyrics(props) {
   const audioRef = useRef(null); //modif useRef ne declenche pas de rerender
   const storeData = useSelector((state) => state.analyses.value);
 
   const [isFav, setIsFav] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
 
   useEffect(() => {
-    if (props.globalIsPlaying === false) {
-      setIsPlaying(false);
-    }
+    //recupere la liste des favoris dans la bdd
     async function fetchFavorites() {
       const data = await getFavorites(props.email);
       if (data && data.favorites) {
@@ -31,8 +25,11 @@ function Lyrics(props) {
         setIsFav(bool);
       }
     }
-
     fetchFavorites();
+
+  }, [props.storefavoris, storeData]);
+
+  useEffect(() => {
     async function fetchPreview() {
       const preview = await getPreviewWithArtistAndTitle(
         storeData.lyrics.title,
@@ -43,7 +40,7 @@ function Lyrics(props) {
       }
     }
     fetchPreview();
-  }, [props.globalIsPlaying, storeData]);
+  }, [storeData]);
 
   return (
     <div>
@@ -57,7 +54,14 @@ function Lyrics(props) {
               className="button-square small"
               style={{ backgroundColor: isFav ? "pink" : "purple" }}
               onClick={() => {
-                addToFavorites(props.id, props.email);
+                addToFavorites(
+                  storeData.track_id,
+                  props.email,
+                  storeData.lyrics.title,
+                  storeData.lyrics.artist,
+                  storeData.uri,
+                  storeData.duration_ms
+                );
                 setIsFav(!isFav);
               }}
             >
@@ -76,10 +80,10 @@ function Lyrics(props) {
                 }}
                 onClick={() => {
                   props.playpreview(previewUrl);
-                  setIsPlaying(true);
+                  props.setisplaying(!props.isplaying);
                 }}
               >
-                <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} />
+                <FontAwesomeIcon icon={props.isplaying ? faPause : faPlay} />
               </button>
             </div>
           </div>

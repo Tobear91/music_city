@@ -2,6 +2,8 @@ import styles from "../../styles/MusicLab/Results.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import { getFavorites } from "../../modules/listedefavoris";
+import { getFavoritesListInStore } from "../../reducers/favoris";
 import Header from "./Header";
 import Lyrics from "./Lyrics";
 import Album from "./Album";
@@ -9,7 +11,11 @@ import Genres from "./Genres";
 import Interpretation from "./Interpretation";
 import Thematiques from "./Thematiques";
 import Footer from "./Footer";
-import { getInterpretationAndThemes } from "../../reducers/analyses";
+import {
+  addALike,
+  addADislike,
+  getInterpretationAndThemes,
+} from "../../reducers/analyses";
 import { replaceLinesBreacksWithBr } from "../../modules/formatages";
 import { store } from "../../modules/store";
 
@@ -18,6 +24,9 @@ function Results() {
   const router = useRouter();
   const audioRef = useRef(null);
   const storeData = useSelector((state) => state.analyses.value);
+
+  const storeFavoris = useSelector((state) => state.favoris.value.tracks);
+
   const useremail = useSelector((state) => state.user.user.email);
 
   const [dejaFait, setDejafait] = useState(false);
@@ -52,7 +61,6 @@ function Results() {
   let formatedlyrics = replaceLinesBreacksWithBr(storeData.lyrics.lyrics);
 
   async function interpretationFunction(lyrics, artiste) {
-    console.log(lyrics, artiste);
     if (lyrics === "") {
       alert("No lyrics found for this track");
       return;
@@ -65,152 +73,110 @@ function Results() {
     const res = await data.json();
     //ATTENTION : le backend renvoie un objet avec une clé "interpretation" contenant l'interprétation et les thématiques
 
-    fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        track_id: storeData.track_id,
-        interpretation: res.interpretation.interpretation,
-        thematiques: res.interpretation.themes,
-      }),
-    });
-
     dispatch(getInterpretationAndThemes(res));
   }
-
-  // useEffect(() => {
-
-  //   fetch("http://127.0.0.1:3000/tracks", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       title: storeData.lyrics.title,
-  //       track_id: storeData.track_id,
-  //       uri: storeData.uri,
-  //       artist: storeData.lyrics.artist,
-  //       genres: storeData.genres,
-  //       lyrics: storeData.lyrics.lyrics,
-  //       album: storeData.album.name,
-  //       duration_ms: storeData.duration_ms,
-  //       album_image: storeData.album.image,
-  //       release_date: storeData.release_date,
-  //       preview_url: storeData.preview_url,
-  //     }),
-  //   }).then((response) => response.json());
-
-  //   fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
-  //     method: "PUT",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       track_id: storeData.track_id,
-  //       interpretation: interpretation,
-  //       thematiques: themes,
-  //     }),
-  //   }).then((response) => response.json());
-
-  //   fetch(`http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       if (
-  //         data.some((database_id) => {
-  //           return database_id === storeData.track_id;
-  //         })
-  //       ) {
-  //         setDejafait(true);
-  //       } else {
-  //         setDejafait(false);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching user data:", error);
-  //     });
-  // }, [storeData]);
 
   useEffect(() => {
     if (!storeData?.track_id) return;
 
     const sendData = async () => {
-      try {
-        // 1. Sauvegarder la track
-        await fetch("http://127.0.0.1:3000/tracks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: storeData.lyrics.title,
-            track_id: storeData.track_id,
-            uri: storeData.uri,
-            artist: storeData.lyrics.artist,
-            genres: storeData.genres,
-            lyrics: storeData.lyrics.lyrics,
-            album: storeData.album.name,
-            duration_ms: storeData.duration_ms,
-            album_image: storeData.album.image,
-            release_date: storeData.release_date,
-            preview_url: storeData.preview_url,
-          }),
-        });
+      // 1. Sauvegarder la track
+      await fetch("http://127.0.0.1:3000/tracks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: storeData.lyrics.title,
+          track_id: storeData.track_id,
+          uri: storeData.uri,
+          artist: storeData.lyrics.artist,
+          genres: storeData.genres,
+          lyrics: storeData.lyrics.lyrics,
+          album: storeData.album.name,
+          duration_ms: storeData.duration_ms,
+          album_image: storeData.album.image,
+          release_date: storeData.release_date,
+          preview_url: storeData.preview_url,
+        }),
+      });
 
-        // 2. Mettre à jour analyse
-        await fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            track_id: storeData.track_id,
-            interpretation,
-            thematiques: themes,
-          }),
-        });
+      // 2. Mettre à jour la track en bdd
+      await fetch(`http://127.0.0.1:3000/tracks/updateanalyse`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          track_id: storeData.track_id,
+          interpretation: storeData.interpretation_by_ai.interpretation,
+          thematiques: storeData.interpretation_by_ai.themes,
+          genres: storeData.genres,
+          album_image: storeData.album.image,
+          release_date: storeData.release_date,
+          album_name: storeData.album.name,
+          likes_interpretation: storeData.interpretation_by_ai.likes,
+          dislikes_interpretation: storeData.interpretation_by_ai.dislikes,
+        }),
+      });
 
-        // 3. Vérifier si déjà fait
-        const res = await fetch(
-          `http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`
-        );
-        const data = await res.json();
-        setDejafait(data.includes(storeData.track_id));
-      } catch (err) {
-        console.error("Erreur dans useEffect:", err);
-      }
+      // 3. Vérifier si avis déjà fait
+      const res = await fetch(
+        `http://127.0.0.1:3000/users/avisInterpretations?email=${useremail}`
+      );
+      const data = await res.json();
+      setDejafait(data.includes(storeData.track_id));
     };
 
     sendData();
   }, [storeData]);
+
+  useEffect(() => {
+    if (isPlaying === false) {
+      setIsPlaying(false);
+    }
+    //va chercher les favoris dans la DB et met à jour le store
+    async function fetchFavorites() {
+      const data = await getFavorites(useremail);
+      if (data.result === true) {
+        dispatch(getFavoritesListInStore(data.favorites));
+      }
+    }
+    fetchFavorites();
+  }, []);
 
   function saveCritere(newcritere) {
     setCriteres((prev) => [...prev, newcritere]);
   }
 
   function handleLike() {
-    fetch("http://127.0.0.1:3000/tracks/like", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        track_id: storeData.track_id,
-        email: useremail,
-      }),
-    });
-    setDejafait(true);
+    if (dejaFait === false) {
+      fetch("http://127.0.0.1:3000/tracks/like", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          track_id: storeData.track_id,
+          email: useremail,
+        }),
+      });
+      dispatch(addALike());
+      setDejafait(true);
+    }
   }
 
   function handleDislike() {
-    fetch("http://127.0.0.1:3000/tracks/dislike", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        track_id: storeData.track_id,
-        email: useremail,
-      }),
-    });
-    setDejafait(true);
+    if (dejaFait === false) {
+      fetch("http://127.0.0.1:3000/tracks/dislike", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          track_id: storeData.track_id,
+          email: useremail,
+        }),
+      });
+      dispatch(addADislike());
+      setDejafait(true);
+    }
   }
 
   return (
@@ -230,13 +196,19 @@ function Results() {
             uri={storeData.uri}
             email={useremail}
             playpreview={playPreview}
-            globalIsPlaying={isPlaying}
+            isplaying={isPlaying}
+            setisplaying={setIsPlaying}
+            storefavoris={storeFavoris}
           />
         </section>
 
         {/* ALBUM */}
         <section className={styles.albumContainer}>
-          <Album playpreview={playPreview} isPlaying={isPlaying} />
+          <Album
+            playpreview={playPreview}
+            isplaying={isPlaying}
+            setisplaying={setIsPlaying}
+          />
         </section>
 
         {/* INTERPRETATION */}

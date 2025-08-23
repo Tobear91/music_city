@@ -6,9 +6,12 @@ import Track from "./Track";
 function Album(props) {
   const storeData = useSelector((state) => state.analyses.value);
 
+
+  
+
   //genere la liste de tracks de l'album
   let trackslist = storeData.album.tracks.map((track, index) => (
-    <Track index={index} playpreview={props.playpreview} globalIsPlaying={props.isPlaying}/>
+    <Track index={index} playpreview={props.playpreview} isplaying={props.isplaying} setisplaying={props.setisplaying}/>
   ));
   return (
     <div>

@@ -2,6 +2,8 @@
 
 
 .modalOverlay {
+
+     overflow-y: auto;
   position: fixed;
   top: 0; /*permet de mettre la modale en dessous le menu si on change la bien penser à changer la talille du menu aussi */
   left: 0;

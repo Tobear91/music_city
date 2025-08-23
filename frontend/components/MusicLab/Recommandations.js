@@ -1,12 +1,14 @@
 import styles from "../../styles/MusicLab/RecommandationsFavoris.module.css";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "./Header";
 import TrackReco from "./TrackReco";
 import { store } from "../../modules/store";
-
+import { getFavorites } from "../../modules/listedefavoris";
+import { getFavoritesListInStore } from "../../reducers/favoris";
 function Recommandations() {
+  const dispatch = useDispatch();
   const router = useRouter();
   const audioRef = useRef(null); //pour lecture preview *pourquoi useRef?
 
@@ -15,12 +17,23 @@ function Recommandations() {
   );
 
   const storeFavoris = useSelector((state) => state.favoris.value.tracks);
-
   const useremail = useSelector((state) => state.user.user.email);
   const criteres = useSelector((state) => state.criteres.value.criteres);
-
-  const [isFav, setIsFav] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (isPlaying === false) {
+      setIsPlaying(false);
+    }
+    //va chercher les favoris dans la DB et met à jour le store
+    async function fetchFavorites() {
+      const data = await getFavorites(useremail);
+      if (data.result === true) {
+        dispatch(getFavoritesListInStore(data.favorites));
+      }
+    }
+    fetchFavorites();
+  }, []);
 
   //fonction de lecture d'audio à partir d'une url
   const playPreview = (url) => {
@@ -72,8 +85,6 @@ function Recommandations() {
         title={track.title}
         artist={track.artist}
         duration_ms={track.duration_ms}
-        isfav={isFav}
-        setisfav={setIsFav}
         playpreview={playPreview}
         useremail={useremail}
         isplaying={isPlaying}

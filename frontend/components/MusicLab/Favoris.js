@@ -27,18 +27,19 @@ function Favoris() {
     //va chercher les favoris dans la DB et met à jour le store
     async function fetchFavorites() {
       const data = await getFavorites(useremail);
-      dispatch(getFavoritesListInStore(data.favorites));
-      if (data && data.favorites) {
-        const bool = data.favorites.some(
-          (e) => e.track_spotify_id === storeFavoris.track_id
-        );
-        setIsFav(bool);
+      if (data.result === true) {
+        dispatch(getFavoritesListInStore(data.favorites));
+        if (data.favorites) {
+          const bool = data.favorites.some(
+            (e) => e.track_spotify_id === storeFavoris.track_id
+          );
+          setIsFav(bool);
+        }
       }
     }
     fetchFavorites();
-  }, [isPlaying]);
+  }, []);
 
-  console.log(favorisList);
   const playPreview = (url) => {
     if (isPlaying) {
       // Mettre en pause si déjà en train de jouer
@@ -69,7 +70,7 @@ function Favoris() {
     }
     router.push("/music-lab/results");
   }
- 
+
   //arrete la lecture et navigue vers la page recommandations
   function handleClickRecommandations() {
     if (audioRef.current) {
@@ -91,6 +92,7 @@ function Favoris() {
       isplaying={isPlaying}
       playpreview={playPreview}
       useremail={useremail}
+      storefavoris={storeFavoris}
     />
   ));
   return (

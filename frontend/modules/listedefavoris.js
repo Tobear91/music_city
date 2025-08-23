@@ -1,3 +1,5 @@
+
+//ajoute ou supprime la track liké dans la bdd et aux favoris de l'utilisateur
 function addToFavorites(track_id, email, title, artist, uri, duration_ms) {
   const body = {
     track_id: track_id,
@@ -24,7 +26,7 @@ function addToFavorites(track_id, email, title, artist, uri, duration_ms) {
     })
 }
 
-
+//recherche dans la bdd les favoris de l'utilisateur
 function getFavorites(email) {
   const body = { email: email };
   return fetch(`http://127.0.0.1:3000/users/favorites`, {
@@ -45,6 +47,7 @@ function getFavorites(email) {
     });
 }
 
+//supprime de la liste de favoris
 function removeFromFavorites(track_id, email) {
   const body = {
     track_id: track_id,
@@ -52,7 +55,7 @@ function removeFromFavorites(track_id, email) {
   };
 
   fetch(`http://127.0.0.1:3000/users/removefromfavorites`, {
-    method: "POST", // ou "PUT" selon ton API
+    method: "POST", 
     headers: {
       "Content-Type": "application/json",
     },
