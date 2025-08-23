@@ -39,7 +39,7 @@ function Header() {
       return;
     }
 
-    //aprés 1000ms sans changement, lance la recherche spotify
+    //aprés 300ms sans changement, lance la recherche spotify
     const timeoutId = setTimeout(async () => {
       const spotifyData = await getTracks(query);
       if (spotifyData?.tracks?.items) {
@@ -53,14 +53,12 @@ function Header() {
 
   //fonction principale de recuperation de données
   async function searchTrack(title, artist) {
-    console.log(title, artist);
     dispatch(resetAnalyses());
     // 1. Récupération des données Spotify
     let spotifyData = await getTrackData(title, artist);
     const artiste_id = spotifyData.tracks.items[0].artists[0].id;
-    console.log(spotifyData);
     const track_id = spotifyData.tracks.items[0].id;
-
+    dispatch(newTrackFromSPO(spotifyData))
     try {
       // 2. Vérification si la track existe déjà dans la base de donnée
       const res = await fetch(
@@ -74,16 +72,14 @@ function Header() {
       const dbData = await res.json();
       //2.1 Si elle existe, l'ajoute au store
       dispatch(getTrackFromDatabase(dbData));
+      const artistData = await getArtistData(artiste_id);
     } catch (err) {
       console.log("Track not found in the database, adding new track:");
-
-      // 2.2 Sinon, ajout de la nouvelle track dans le store
-      dispatch(newTrackFromSPO(spotifyData));
-
-      // 3. Récupération des genres
-      const artistData = await getArtistData(artiste_id);
-      dispatch(getGenres(artistData.genres));
     }
+
+    // 3. Récupération des genres
+    const artistData = await getArtistData(artiste_id);
+    dispatch(getGenres(artistData.genres));
 
     // 4. Récupération des paroles
 
@@ -145,6 +141,7 @@ function Header() {
           .replace(/[^a-z0-9]/g, ""),
     ];
 
+    //essai de scrapper les lyrics avec tout les formats d'url
     for (const formatArtiste of artisteFormats) {
       for (const formatTitre of titreFormats) {
         const artisteFmt = formatArtiste(
@@ -165,6 +162,7 @@ function Header() {
 
     // 5. Récupération de l’album et des pistes associées
     const albumData = await getAlbumDataFromTrackData(spotifyData);
+    console.log(albumData)
     dispatch(getAlbumTracks(albumData.items));
 
     router.push("/music-lab/results");
@@ -189,7 +187,7 @@ function Header() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          searchTrack(query);
+          searchTrack(suggestions[0].name, suggestions[0].artists[0].name);
         }}
       >
         <input

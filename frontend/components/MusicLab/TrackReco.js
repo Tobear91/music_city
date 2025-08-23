@@ -1,5 +1,6 @@
 import styles from "../../styles/MusicLab/Track.module.css";
 import { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { replaceMsWithMinutesAndSeconds } from "../../modules/formatages";
 import { addToFavorites, getFavorites } from "../../modules/listedefavoris";
 import { getPreviewWithArtistAndTitle } from "../../modules/getpreviewspotify";
@@ -9,24 +10,18 @@ import { faHeart, faPlay, faPause } from "@fortawesome/free-solid-svg-icons";
 function TrackReco(props) {
   const [previewUrl, setPreviewUrl] = useState("");
   const [isFav, setIsFav] = useState(false);
+  const storeFavoris = useSelector((state) => state.favoris.value.tracks);
 
   useEffect(() => {
-    //reset le lecteur
-    if (props.isplaying === false) {
-      props.setisplaying(false);
-    }
-    //recupere la liste des favoris dans la bdd
-       async function fetchFavorites() {
-      const data = await getFavorites(props.useremail);
-      if (data && data.favorites) {
-        const bool = data.favorites.some(
-          (e) => e.track_spotify_id === props.track_id
+    //set isfav selon la liste des favoris dans le store
+        const bool = storeFavoris.some(
+          (e) => e.track_id === props.track_id
         );
         setIsFav(bool);
-      } 
-    }
-    fetchFavorites();
+      
+  }, [storeFavoris]);
 
+  useEffect(() => {
     //recupere le preview avec spotifyPreviewFinder
     async function fetchPreview() {
       const preview = await getPreviewWithArtistAndTitle(
@@ -38,8 +33,9 @@ function TrackReco(props) {
       }
     }
     fetchPreview();
-  }, [props.isplaying]);
+  }, [])
 
+  
   return (
     <div key={props.key} style={{ marginBottom: "12px" }}>
       <div className={styles.titleRow}>

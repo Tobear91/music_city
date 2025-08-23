@@ -6,12 +6,14 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 
 import EnterScreen from "./globalapp/EnterScren";
-
+ 
 const PhaserGame = () => {
   const gameRef = useRef();
   const characterPosition = useSelector((state) => state.character.position);
   const router = useRouter();
   const [showEnterScreen, setShowEnterScreen] = useState(false);
+
+  //check la position du joueur enregistrée dans le local storage (store character)
   useEffect(() => {
     if (
       characterPosition.name &&

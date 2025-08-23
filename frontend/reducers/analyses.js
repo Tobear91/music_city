@@ -26,6 +26,7 @@ export const analysesSlice = createSlice({
 
   initialState,
   reducers: {
+    //quand la donnée arrive de l'API
     newTrackFromSPO: (state, action) => {
       const track = action.payload.tracks.items[0];
       state.value.track_id = track.id;
@@ -41,16 +42,16 @@ export const analysesSlice = createSlice({
       state.value.album.album_id = track.album.id;
       state.value.album.date = track.album.release_date;
       state.value.album.image = track.album.images[0].url;
-      state.value.album.tracks = []; // à remplir après appel à `/albums/:id/tracks`
+      state.value.album.tracks = [];
 
-      state.value.genres = []; // à remplir après appel à `/artists/:id` ou ???
+      // state.value.genres = [];
 
-      state.value.interpretation_by_ai.interpretation = "";
-      state.value.interpretation_by_ai.themes = [];
-      state.value.interpretation_by_ai.likes = 0;
-      state.value.interpretation_by_ai.dislikes = 0;
+      // state.value.interpretation_by_ai.interpretation = "";
+      // state.value.interpretation_by_ai.themes = [];
+      // state.value.interpretation_by_ai.likes = 0;
+      // state.value.interpretation_by_ai.dislikes = 0;
     },
-
+    //quand on va chercher la donnée sur le bdd
     getTrackFromDatabase: (state, action) => {
       const track = action.payload.track;
       state.value.track_id = track.track_spotify_id;
@@ -63,24 +64,20 @@ export const analysesSlice = createSlice({
       state.value.lyrics.artist = track.artist;
       state.value.lyrics.lyrics = track.lyrics;
 
-      state.value.album.name = track.album_name;
-      state.value.album.album_id = track.album_tracks_id;
-      state.value.album.date = track.release_date;
-      state.value.album.image = track.album_image;
-      state.value.album.tracks = [];  
 
-      state.value.genres = track.genres || [];
-      state.value.interpretation_by_ai.interpretation = track.interpretation || "";
+      // state.value.genres = track.genres || [];
+      state.value.interpretation_by_ai.interpretation =
+        track.interpretation || "";
       state.value.interpretation_by_ai.themes = track.thematiques || [];
-      state.value.interpretation_by_ai.likes = 0;
-      state.value.interpretation_by_ai.dislikes = 0;
+      state.value.interpretation_by_ai.likes = track.likes_interpretation;
+      state.value.interpretation_by_ai.dislikes = track.dislikes_interpretation;
     },
 
+    //recup les tracks de l'album
     getAlbumTracks: (state, action) => {
       const tracks = action.payload;
 
       for (let i = 0; i < tracks.length; i++) {
-        // console.log("Track:", tracks[i]);
         const track = {
           track_number: tracks[i].track_number,
           name: tracks[i].name,
@@ -107,8 +104,11 @@ export const analysesSlice = createSlice({
         action.payload.interpretation.interpretation;
       state.value.interpretation_by_ai.themes =
         action.payload.interpretation.themes;
-    },
+        state.value.interpretation_by_ai.likes=0;
+        state.value.interpretation_by_ai.dislikes=0
 
+    },
+    //depreciated by spotify
     getAudioFeatures: (state, action) => {
       state.value.metadatas = {
         acousticness: action.payload.acousticness,

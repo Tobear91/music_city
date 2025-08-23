@@ -20,6 +20,6 @@ export const characterSlice = createSlice({
     }
   },
 });
-
+ 
 export const { setPosition,leaveBuilding } = characterSlice.actions;
 export default characterSlice.reducer;

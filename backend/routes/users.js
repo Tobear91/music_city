@@ -109,6 +109,15 @@ router.post("/addtofavorites", async (req, res) => {
         spotify_uri: uri,
         track_spotify_id: track_id,
         duration_ms: duration_ms,
+        interpretation: '',
+        thematiques: [],
+        likes_interpretation: 0,
+        dislikes_interpretation: 0,
+        genres: [],
+        album_name: '',
+        album_image: '',
+        release_date: '',
+        album_tracks_id: []
       });
       track = await newtrack.save();
     }
@@ -145,7 +154,13 @@ router.post("/addtofavorites", async (req, res) => {
 router.post("/favorites", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email }).populate("favorites");
-  res.json({ result: true, favorites: user.favorites });
+  if(!user){
+    return res.json({ result: false });
+  }
+  if(user.favorites && user.favorites.length > 0) {
+  return res.json({ result: true, favorites: user.favorites });
+}
+  return res.json({result: false})
 });
 
 //suppression d'un favoris

@@ -1,6 +1,6 @@
 import styles from "../../styles/MusicLab/Track.module.css";
 import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { replaceMsWithMinutesAndSeconds } from "../../modules/formatages";
 import { removeFromFavorites } from "../../modules/listedefavoris";
 import { getPreviewWithArtistAndTitle } from "../../modules/getpreviewspotify";
@@ -10,7 +10,7 @@ import { faPlay, faPause, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function TrackFav(props) {
   const dispatch = useDispatch();
-
+  const storeFavoris = useSelector((state) => state.favoris.value.tracks);
   const [previewUrl, setPreviewUrl] = useState("");
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function TrackFav(props) {
       }
     }
     fetchPreview();
-  }, [props.isplaying]);
+  }, [storeFavoris]);
 
   async function fetchPreview() {
     const preview = await getPreviewWithArtistAndTitle(

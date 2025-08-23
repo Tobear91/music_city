@@ -9,10 +9,6 @@ const spotifyPreviewFinder = require("spotify-preview-finder");
 
 //ajout d'un nouveau track à la database
 router.post("/", async (req, res) => {
-  console.log(
-    req.body.track_id,
-    "**************************************************************************"
-  );
   try {
     const track = await Track.findOne({
       title: req.body.title,
@@ -27,7 +23,7 @@ router.post("/", async (req, res) => {
       artist: req.body.artist,
       track_spotify_id: req.body.track_id,
       spotify_uri: req.body.uri,
-      previewUrl: req.body.preview_uri,
+      previewUrl: req.body.preview_url,
       genres: req.body.genres,
       lyrics: req.body.lyrics.lyrics,
       album_name: req.body.album,
@@ -66,19 +62,36 @@ router.get("/", async (req, res) => {
 
 //ajout/update des resultats d'une analyse de track
 router.put("/updateanalyse", (req, res) => {
-  const { track_id, interpretation, thematiques } = req.body;
+  const {
+    track_id,
+    interpretation,
+    thematiques,
+    genres,
+    album_image,
+    release_date,
+    album_name,
+    likes_interpretation,
+    dislikes_interpretation,
+  } = req.body;
   Track.findOneAndUpdate(
-    { track_spotify_id: req.body.track_id },
+    { track_spotify_id: track_id },
     {
       interpretation: interpretation,
       thematiques: thematiques,
+      album_name: album_name,
+      album_image: album_image,
+      release_date: release_date,
+      genres: genres,
+      likes_interpretation: likes_interpretation,
+      dislikes_interpretation: dislikes_interpretation,
     }
   )
     .then(() => {
       res.json({ result: true });
     })
     .catch((err) => {
-      res.status(500).json({ error: "Erreur lors de la mise à jour" });
+      console.error("Erreur Mongoose =", err);
+      res.status(500).json({ error: err.message });
     });
 });
 
@@ -136,6 +149,29 @@ router.put("/dislike", async (req, res) => {
     );
 
     res.json({ result: true }); // ✅ Un seul envoi
+  } catch (err) {
+    res.status(500).json({ result: false, error: err.message });
+  }
+});
+
+//delete la clé étrangère du vote pour chaque user
+// Supprimer la clé étrangère du vote pour tous les utilisateurs
+router.put("/removeVoteAll", async (req, res) => {
+  const { id } = req.body;
+  try {
+    // Récupérer l'_id du track
+    const trackDocument = await Track.findOne({ track_spotify_id: id });
+    if (!trackDocument) {
+      return res.status(404).json({ result: false, error: "Track non trouvé" });
+    }
+
+    // Retirer l'_id du track du tableau avisInterpretations de tous les users
+    await User.updateMany(
+      { avisInterpretations: trackDocument._id },
+      { $pull: { avisInterpretations: trackDocument._id } }
+    );
+
+    res.json({ result: true });
   } catch (err) {
     res.status(500).json({ result: false, error: err.message });
   }

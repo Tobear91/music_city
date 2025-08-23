@@ -40,7 +40,7 @@ function Launch() {
       return;
     }
 
-    //aprés 1000ms sans changement, lance la recherche spotify
+    //aprés 300ms sans changement, lance la recherche spotify
     const timeoutId = setTimeout(async () => {
       const spotifyData = await getTracks(query);
       if (spotifyData?.tracks?.items) {
@@ -59,7 +59,7 @@ function Launch() {
     let spotifyData = await getTrackData(title, artist);
     const artiste_id = spotifyData.tracks.items[0].artists[0].id;
     const track_id = spotifyData.tracks.items[0].id;
-
+    dispatch(newTrackFromSPO(spotifyData))
     try {
       // 2. Vérification si la track existe déjà dans la base de donnée
       const res = await fetch(
@@ -73,38 +73,44 @@ function Launch() {
       const dbData = await res.json();
       //2.1 Si elle existe, l'ajoute au store
       dispatch(getTrackFromDatabase(dbData));
+      const artistData = await getArtistData(artiste_id);
     } catch (err) {
       console.log("Track not found in the database, adding new track:");
-
-      // 2.2 Sinon, ajout de la nouvelle track dans le store
-      dispatch(newTrackFromSPO(spotifyData));
-
-      // 3. Récupération des genres
-      const artistData = await getArtistData(artiste_id);
-      dispatch(getGenres(artistData.genres));
     }
 
-    // 4. Récupération des paroles
-    let lyricsData;
+    // 3. Récupération des genres
+    const artistData = await getArtistData(artiste_id);
+    dispatch(getGenres(artistData.genres));
 
+    // 4. Récupération des paroles
+
+    let lyricsData;
     const artisteFormats = [
       // format 1 : normalisation NFD
-      (str) =>
-        str
+      (str) => {
+        let s = str
           .split("(")[0]
           .toLowerCase()
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
           .replace(/\$/g, "s")
-          .replace(/[^a-zà-ÿ0-9]/gi, ""),
+          .replace(/[^a-zà-ÿ0-9]/gi, "");
+
+        s = s.replace(/^\s*the\b[\s\-_.]*/i, ""); // supprime "the" au début
+        return s.replace(/[^a-zà-ÿ0-9]/gi, "");
+      },
       // format 2 : supprime lettres accentuées
-      (str) =>
-        str
+      (str) => {
+        let s = str
           .split("(")[0]
           .toLowerCase()
           .replace(/[àáâãäåçèéêëìíîïñòóôõöùúûüýÿ]/g, "")
           .replace(/\$/g, "s")
-          .replace(/[^a-z0-9]/g, ""),
+          .replace(/[^a-z0-9]/g, "");
+
+        s = s.replace(/^\s*the\b[\s\-_.]*/i, ""); // supprime "the" au début
+        return s.replace(/[^a-zà-ÿ0-9]/gi, "");
+      },
     ];
     const titreFormats = [
       // format 1 : normalisation NFD
@@ -136,6 +142,7 @@ function Launch() {
           .replace(/[^a-z0-9]/g, ""),
     ];
 
+    //essai de scrapper les lyrics avec tout les formats d'url
     for (const formatArtiste of artisteFormats) {
       for (const formatTitre of titreFormats) {
         const artisteFmt = formatArtiste(
@@ -147,16 +154,16 @@ function Launch() {
           `http://127.0.0.1:3000/tracks/lyrics?artiste=${artisteFmt}&titre=${titreFmt}`
         );
         lyricsData = await res.json();
-        if (lyricsData.lyrics) {
-            dispatch(getLyrics(lyricsData.lyrics));
+        if (lyricsData.lyrics.length > 0) {
+          dispatch(getLyrics(lyricsData.lyrics));
           break;
         }
       }
     }
 
-
     // 5. Récupération de l’album et des pistes associées
     const albumData = await getAlbumDataFromTrackData(spotifyData);
+    console.log(albumData)
     dispatch(getAlbumTracks(albumData.items));
 
     router.push("/music-lab/results");
@@ -200,7 +207,7 @@ function Launch() {
             style={{ flex: 1 }}
             onSubmit={(e) => {
               e.preventDefault();
-              searchTrack(query);
+              searchTrack(suggestions[0].name, suggestions[0].artists[0].name);
             }}
           >
             <input

@@ -4,7 +4,24 @@ function Interpretation(props) {
   const interpretationState = useSelector(
     (state) => state.analyses.value.interpretation_by_ai.interpretation
   );
+  const storeData = useSelector((state) => state.analyses.value);
 
+  //propose un nouveau launch si dislikes > likes
+  if (
+    storeData.interpretation_by_ai.likes <
+    storeData.interpretation_by_ai.dislikes
+  ) {
+    return (
+      <div>
+        <h1 className={styles.title}>INTERPRETATION DES PAROLES:</h1>
+        <button onClick={() => handleClickNew(storeData.track_id)}>
+          Launch
+        </button>
+      </div>
+    );
+  }
+
+  //propose de voter si pas déjà fait
   const donnerSonAvis = (dejafait) => {
     if (dejafait) {
       return <div></div>;
@@ -42,7 +59,32 @@ function Interpretation(props) {
     }
   };
 
+  //genere interpretation
   async function handleClick() {
+    const result = await props.launchInterpretation();
+  }
+
+  //genere nouvelle interpretation et supprime les votes pour cette track
+  async function handleClickNew(id) {
+    try {
+      const res = await fetch("http://127.0.0.1:3000/tracks/removeVoteAll", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      const data = await res.json();
+
+      if (data.result) {
+        console.log("Vote supprimé pour tous les utilisateurs");
+      } else {
+        console.error("Erreur :", data.error);
+      }
+    } catch (err) {
+      console.error("Fetch error :", err);
+    }
     const result = await props.launchInterpretation();
   }
 
@@ -53,6 +95,7 @@ function Interpretation(props) {
         <div>
           <p>{interpretationState}</p>
         </div>
+        <br />
         {donnerSonAvis(props.dejafait)}
       </div>
     );
